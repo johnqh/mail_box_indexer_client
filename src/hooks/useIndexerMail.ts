@@ -12,8 +12,8 @@ import {
   type PointsResponse,
   type SignInMessageResponse,
   type SiteStatsResponse,
-  useApiCall,
 } from '@johnqh/types';
+import { useApiCall } from '@johnqh/di';
 import { IndexerMockData } from './mocks';
 
 interface UseIndexerMailReturn {

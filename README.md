@@ -408,23 +408,45 @@ import type {
 
 ## Testing
 
+### Unit Tests
+
 ```bash
-# Run tests
+# Run unit tests
 npm test
 
-# Run tests once
+# Run unit tests once
 npm run test:run
 
 # Run with coverage
 npm run test:coverage
+```
 
+### Integration Tests
+
+Integration tests run against a real indexer endpoint. See [src/__integration__/README.md](src/__integration__/README.md) for details.
+
+```bash
+# Setup
+cp .env.example .env.test
+# Edit .env.test and set INTEGRATION_TEST_INDEXER_URL
+
+# Run integration tests
+npm run test:integration
+
+# Run integration tests in watch mode
+npm run test:integration:watch
+```
+
+### Other Commands
+
+```bash
 # Type checking
 npm run typecheck
 
 # Linting
 npm run lint
 
-# All checks
+# All checks (lint + typecheck + unit tests)
 npm run check-all
 ```
 
@@ -463,6 +485,31 @@ npm run clean
 - [ ] Request deduplication
 
 See [COVERAGE.md](COVERAGE.md) for detailed implementation status.
+
+## CI/CD
+
+This project uses GitHub Actions for automated testing and releases.
+
+### Automated Workflow
+
+On every push to `main`:
+1. ✅ Run tests on Node.js 20.x and 22.x
+2. ✅ Type checking and linting
+3. ✅ Build verification
+4. ✅ Create GitHub release
+5. ✅ Publish to NPM
+
+### Triggering a Release
+
+```bash
+# Bump version
+npm version patch  # 0.0.1 -> 0.0.2
+
+# Push to trigger release
+git push origin main
+```
+
+See [.github/workflows/README.md](.github/workflows/README.md) for detailed CI/CD documentation.
 
 ## Contributing
 

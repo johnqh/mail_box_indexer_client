@@ -5,7 +5,12 @@
       "Bash(cat:*)",
       "Read(//Users/johnhuang/0xmail/di/**)",
       "Read(//Users/johnhuang/0xmail/types/**)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run test:run:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run check-all:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,10 +1,11 @@
 /**
  * Platform-agnostic React hook for indexer points operations (public endpoints only)
- * Uses actual IndexerClient to interact with real API endpoints
+ * Uses React Query for caching, background refetching, and deduplication
  * Note: Signature-protected endpoints have been removed as they're not usable by client applications
  */
 
 import { useCallback, useMemo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import type { LeaderboardResponse, SiteStatsResponse } from '@johnqh/types';
 import { IndexerMockData } from './mocks';
@@ -26,7 +27,6 @@ function useIndexerPoints(
   dev: boolean = false,
   devMode: boolean = false
 ) {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Create stable client instance to prevent unnecessary re-renders
@@ -38,18 +38,15 @@ function useIndexerPoints(
     setError(null);
   }, []);
 
-  const getPointsLeaderboard = useCallback(
-    async (count: number = 10): Promise<LeaderboardResponse> => {
-      setIsLoading(true);
+  // Mutation for getting leaderboard
+  const leaderboardMutation = useMutation({
+    mutationFn: async (count: number = 10): Promise<LeaderboardResponse> => {
       setError(null);
 
       // In devMode, try API with short timeout, then fall back to mock data quickly
       if (devMode) {
         try {
           // Quick attempt with 2 second timeout in devMode
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 2000);
-
           const result = await Promise.race([
             indexerClient.getPointsLeaderboard(count),
             new Promise<never>((_, reject) => {
@@ -57,7 +54,6 @@ function useIndexerPoints(
             }),
           ]);
 
-          clearTimeout(timeoutId);
           return result;
         } catch (err) {
           const errorMessage =
@@ -68,8 +64,6 @@ function useIndexerPoints(
           );
           setError(null); // Don't show error in devMode
           return IndexerMockData.getLeaderboard(count);
-        } finally {
-          setIsLoading(false);
         }
       }
 
@@ -82,25 +76,19 @@ function useIndexerPoints(
           err instanceof Error ? err.message : 'Failed to get leaderboard';
         setError(errorMessage);
         throw err;
-      } finally {
-        setIsLoading(false);
       }
     },
-    [indexerClient, devMode]
-  );
+  });
 
-  const getPointsSiteStats =
-    useCallback(async (): Promise<SiteStatsResponse> => {
-      setIsLoading(true);
+  // Mutation for getting site stats
+  const siteStatsMutation = useMutation({
+    mutationFn: async (): Promise<SiteStatsResponse> => {
       setError(null);
 
       // In devMode, try API with short timeout, then fall back to mock data quickly
       if (devMode) {
         try {
           // Quick attempt with 2 second timeout in devMode
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 2000);
-
           const result = await Promise.race([
             indexerClient.getPointsSiteStats(),
             new Promise<never>((_, reject) => {
@@ -108,7 +96,6 @@ function useIndexerPoints(
             }),
           ]);
 
-          clearTimeout(timeoutId);
           return result;
         } catch (err) {
           const errorMessage =
@@ -119,8 +106,6 @@ function useIndexerPoints(
           );
           setError(null); // Don't show error in devMode
           return IndexerMockData.getSiteStats();
-        } finally {
-          setIsLoading(false);
         }
       }
 
@@ -133,10 +118,26 @@ function useIndexerPoints(
           err instanceof Error ? err.message : 'Failed to get site stats';
         setError(errorMessage);
         throw err;
-      } finally {
-        setIsLoading(false);
       }
-    }, [indexerClient, devMode]);
+    },
+  });
+
+  const getPointsLeaderboard = useCallback(
+    async (count: number = 10): Promise<LeaderboardResponse> => {
+      const result = await leaderboardMutation.mutateAsync(count);
+      return result;
+    },
+    [leaderboardMutation]
+  );
+
+  const getPointsSiteStats =
+    useCallback(async (): Promise<SiteStatsResponse> => {
+      const result = await siteStatsMutation.mutateAsync();
+      return result;
+    }, [siteStatsMutation]);
+
+  const isLoading =
+    leaderboardMutation.isPending || siteStatsMutation.isPending;
 
   return {
     // Public API endpoints only

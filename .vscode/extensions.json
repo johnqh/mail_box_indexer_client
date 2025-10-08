@@ -10,30 +10,15 @@
     "ms-vscode.vscode-typescript-next",
 
     // Better comments
-    "aaron-bond.better-comments",
-
-    // GitLens - Git supercharged
     "eamodio.gitlens",
 
     // Path Intellisense
     "christian-kohler.path-intellisense",
 
     // Auto Close Tag
-    "formulahendry.auto-close-tag",
-
-    // Auto Rename Tag
     "formulahendry.auto-rename-tag",
 
     // Bracket Pair Colorization
-    "coenraads.bracket-pair-colorizer-2",
-
-    // Import Cost - Display import/require package size
-    "wix.vscode-import-cost",
-
-    // npm Intellisense
-    "christian-kohler.npm-intellisense",
-
-    // Error Lens - Highlight errors inline
     "usernamehw.errorlens"
   ]
 }

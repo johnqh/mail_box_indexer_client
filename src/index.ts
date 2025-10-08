@@ -20,7 +20,19 @@ export { IndexerService } from './business/indexer-service';
 
 // Hooks
 export {
+  // Legacy monolithic hook (deprecated)
   useIndexerMail,
+  // Individual endpoint hooks (recommended)
+  useGetWalletAccounts,
+  useValidateUsername,
+  useGetSigningMessage,
+  useGetDelegatedTo,
+  useGetDelegatedFrom,
+  useCreateNonce,
+  useGetNonce,
+  useGetEntitlement,
+  useGetPointsBalance,
+  // Other hooks
   useIndexerPoints,
   useWalletNames,
   useResolveNameToAddress,

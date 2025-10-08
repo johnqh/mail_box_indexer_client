@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { ReactNode } from 'react';
 import { useIndexerPoints } from '../useIndexerPoints';
 
 // Mock IndexerClient
@@ -43,6 +45,19 @@ vi.mock('../mocks', () => ({
 }));
 
 describe('useIndexerPoints', () => {
+  // Create a wrapper with QueryClient for testing
+  const createWrapper = () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetPointsLeaderboard.mockResolvedValue({
@@ -73,8 +88,9 @@ describe('useIndexerPoints', () => {
 
   describe('getPointsLeaderboard', () => {
     it('should fetch leaderboard successfully', async () => {
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       const leaderboard = await result.current.getPointsLeaderboard(10);
@@ -86,8 +102,9 @@ describe('useIndexerPoints', () => {
     });
 
     it('should use default count of 10', async () => {
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       await result.current.getPointsLeaderboard();
@@ -100,8 +117,9 @@ describe('useIndexerPoints', () => {
         new Error('Network error')
       );
 
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       await expect(result.current.getPointsLeaderboard()).rejects.toThrow(
@@ -118,8 +136,9 @@ describe('useIndexerPoints', () => {
         new Error('Network error')
       );
 
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, true)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, true),
+        { wrapper: createWrapper() }
       );
 
       const leaderboard = await result.current.getPointsLeaderboard(10);
@@ -130,8 +149,9 @@ describe('useIndexerPoints', () => {
     });
 
     it('should set loading state', async () => {
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       const promise = result.current.getPointsLeaderboard();
@@ -145,8 +165,9 @@ describe('useIndexerPoints', () => {
 
   describe('getPointsSiteStats', () => {
     it('should fetch site stats successfully', async () => {
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       const stats = await result.current.getPointsSiteStats();
@@ -163,8 +184,9 @@ describe('useIndexerPoints', () => {
         new Error('Service unavailable')
       );
 
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       await expect(result.current.getPointsSiteStats()).rejects.toThrow(
@@ -181,8 +203,9 @@ describe('useIndexerPoints', () => {
         new Error('Service unavailable')
       );
 
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, true)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, true),
+        { wrapper: createWrapper() }
       );
 
       const stats = await result.current.getPointsSiteStats();
@@ -199,8 +222,9 @@ describe('useIndexerPoints', () => {
         new Error('Test error')
       );
 
-      const { result } = renderHook(() =>
-        useIndexerPoints('https://test-indexer.example.com', false, false)
+      const { result } = renderHook(
+        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        { wrapper: createWrapper() }
       );
 
       try {

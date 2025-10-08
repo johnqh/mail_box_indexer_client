@@ -7,7 +7,11 @@
       "Bash(npm run build:*)",
       "Bash(npm run lint)",
       "Bash(npm run lint:*)",
-      "Bash(npm run test:run:*)"
+      "Bash(npm run test:run:*)",
+      "Read(//Users/johnhuang/0xmail/mail_box_indexer/**)",
+      "Bash(npm run check-all:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\ndocs: optimize project for AI-assisted development\n\nAdded comprehensive documentation for AI-assisted development:\n\n- AI_DEVELOPMENT_GUIDE.md: Complete guide for AI assistants working on this codebase\n  - Project architecture and file structure\n  - Authentication patterns and common patterns\n  - Testing patterns and development workflow\n  - Security guidelines and gotchas\n\n- API.md: Complete API documentation with 35 endpoints\n  - All mail & user management endpoints\n  - Points system and referral system\n  - OAuth 2.0 flow (not yet implemented)\n  - KYC verification and Solana integration\n  - Request/response examples for all endpoints\n\n- COVERAGE.md: Detailed implementation status matrix\n  - 43% coverage (15/35 endpoints implemented)\n  - High-priority gaps identified (OAuth 2.0, block status)\n  - Implementation roadmap with effort estimates\n  - Version compatibility tracking\n\n- EXAMPLES.md: Complete code examples\n  - Full authentication flow (EVM and Solana)\n  - All implemented features with working code\n  - React hooks usage examples\n  - Error handling patterns\n  - Complete example React app\n\n- CONTRIBUTING.md: Development guidelines\n  - Setup instructions and workflow\n  - Code standards and testing requirements\n  - Pull request process\n  - How to add new features step-by-step\n\n- README.md: Updated with complete feature list and usage\n  - Quick start guide\n  - API coverage summary\n  - All components documented\n  - Architecture diagram\n  - Development commands\n\nUpdated configuration:\n- Added backend read permissions to Claude settings\n- Version bumped to 0.0.1 (from 1.0.0)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

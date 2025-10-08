@@ -3,17 +3,6 @@
  * React and React Native compatible client library for 0xMail indexer API
  */
 
-// Configuration
-export {
-  IndexerConfigProvider,
-  useIndexerConfig,
-  useIndexerConfigOptional,
-} from './context/IndexerConfigContext';
-export type {
-  IndexerConfig,
-  IndexerConfigProviderProps,
-} from './context/IndexerConfigContext';
-
 // Network client
 export { IndexerClient } from './network/IndexerClient';
 export type {

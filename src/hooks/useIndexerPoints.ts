@@ -8,60 +8,31 @@ import { useCallback, useMemo, useState } from 'react';
 import { IndexerClient } from '../network/IndexerClient';
 import type { LeaderboardResponse, SiteStatsResponse } from '@johnqh/types';
 import { IndexerMockData } from './mocks';
-import { useIndexerConfigOptional } from '../context/IndexerConfigContext';
 
 /**
  * React hook for Indexer Points API operations using actual API endpoints (public only)
  *
- * @param endpointUrl - Optional. Base URL for the indexer API. If not provided, uses IndexerConfigProvider context
- * @param dev - Optional. Development mode flag
- * @param devMode - Optional. When true, falls back to mock data on errors
+ * @param endpointUrl - Base URL for the indexer API
+ * @param dev - Development mode flag
+ * @param devMode - When true, falls back to mock data on errors
  *
  * @example
  * ```tsx
- * // Option 1: Using IndexerConfigProvider (recommended)
- * <IndexerConfigProvider config={{ baseUrl: 'https://indexer.0xmail.box' }}>
- *   <MyComponent />
- * </IndexerConfigProvider>
- *
- * function MyComponent() {
- *   const { getPointsLeaderboard } = useIndexerPoints();
- *   // ...
- * }
- *
- * // Option 2: Direct URL (backward compatible)
  * const { getPointsLeaderboard } = useIndexerPoints('https://indexer.0xmail.box');
  * ```
  */
 function useIndexerPoints(
-  endpointUrl?: string,
+  endpointUrl: string,
   dev: boolean = false,
   devMode: boolean = false
 ) {
-  const contextConfig = useIndexerConfigOptional();
-
-  // Use provided endpointUrl, or fall back to context, or throw error
-  const resolvedEndpointUrl = useMemo(() => {
-    if (endpointUrl) {
-      return endpointUrl;
-    }
-    if (contextConfig?.baseUrl) {
-      return contextConfig.baseUrl;
-    }
-    throw new Error(
-      'IndexerPoints: No endpoint URL provided. Either pass endpointUrl parameter or wrap your app with IndexerConfigProvider.'
-    );
-  }, [endpointUrl, contextConfig]);
-
-  const resolvedDevMode = devMode || contextConfig?.devMode || false;
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Create stable client instance to prevent unnecessary re-renders
   const indexerClient = useMemo(() => {
-    return new IndexerClient(resolvedEndpointUrl, dev);
-  }, [resolvedEndpointUrl, dev]);
+    return new IndexerClient(endpointUrl, dev);
+  }, [endpointUrl, dev]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -73,7 +44,7 @@ function useIndexerPoints(
       setError(null);
 
       // In devMode, try API with short timeout, then fall back to mock data quickly
-      if (resolvedDevMode) {
+      if (devMode) {
         try {
           // Quick attempt with 2 second timeout in devMode
           const controller = new AbortController();
@@ -115,7 +86,7 @@ function useIndexerPoints(
         setIsLoading(false);
       }
     },
-    [indexerClient, resolvedDevMode]
+    [indexerClient, devMode]
   );
 
   const getPointsSiteStats =
@@ -124,7 +95,7 @@ function useIndexerPoints(
       setError(null);
 
       // In devMode, try API with short timeout, then fall back to mock data quickly
-      if (resolvedDevMode) {
+      if (devMode) {
         try {
           // Quick attempt with 2 second timeout in devMode
           const controller = new AbortController();

@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type EntitlementResponse, type Optional } from '@johnqh/types';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerGetEntitlementReturn {
   getEntitlement: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<EntitlementResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -44,7 +44,7 @@ export const useIndexerGetEntitlement = (
       auth,
     }: {
       walletAddress: string;
-      auth: IndexerAuth;
+      auth: IndexerUserAuth;
     }): Promise<Optional<EntitlementResponse>> => {
       setError(null);
       try {
@@ -61,7 +61,7 @@ export const useIndexerGetEntitlement = (
   const getEntitlement = useCallback(
     async (
       walletAddress: string,
-      auth: IndexerAuth
+      auth: IndexerUserAuth
     ): Promise<Optional<EntitlementResponse>> => {
       return await mutation.mutateAsync({ walletAddress, auth });
     },

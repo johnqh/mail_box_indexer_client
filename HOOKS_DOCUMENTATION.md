@@ -53,10 +53,10 @@ The indexer API uses two authentication models:
 No authentication required. These endpoints are accessible to anyone.
 
 ### 2. Signature-Protected Endpoints
-Require wallet signature verification using the `IndexerAuth` type:
+Require wallet signature verification using the `IndexerUserAuth` type:
 
 ```typescript
-interface IndexerAuth {
+interface IndexerUserAuth {
   message: string;    // SIWE/SIWS message that was signed
   signature: string;  // Wallet signature of the message
 }
@@ -86,7 +86,7 @@ const messageData = await getSigningMessage(
 const signature = await walletProvider.signMessage(messageData.data.message);
 
 // Step 3: Create auth object
-const auth: IndexerAuth = {
+const auth: IndexerUserAuth = {
   message: messageData.data.message,
   signature: signature
 };
@@ -252,13 +252,13 @@ interface SignInMessageResponse {
 
 ```typescript
 import { useIndexerGetSigningMessage } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, chainId: number }) {
   const { getSigningMessage, isLoading, error } =
     useIndexerGetSigningMessage('https://indexer.0xmail.box', false);
 
-  const [auth, setAuth] = useState<IndexerAuth | null>(null);
+  const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
 
   const handleSignIn = async () => {
     try {
@@ -284,7 +284,7 @@ function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, c
       });
 
       // Step 3: Create auth object for future API calls
-      const authCredentials: IndexerAuth = {
+      const authCredentials: IndexerUserAuth = {
         message: messageData.data.message,
         signature: signature
       };
@@ -624,7 +624,7 @@ function ReferralStatsDisplay({ referralCode }: { referralCode: string }) {
 
 ## Signature-Protected Endpoints
 
-All endpoints in this section require `IndexerAuth` credentials. See the [Authentication](#authentication) section for details.
+All endpoints in this section require `IndexerUserAuth` credentials. See the [Authentication](#authentication) section for details.
 
 ---
 
@@ -653,7 +653,7 @@ The `getWalletAccounts` function accepts:
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address to query |
-| `auth` | IndexerAuth | Yes | Authentication credentials (signature + message) |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials (signature + message) |
 | `referralCode` | string | No | Referral code to associate with new user registration |
 
 #### Returns
@@ -662,7 +662,7 @@ The `getWalletAccounts` function accepts:
 interface UseIndexerGetWalletAccountsReturn {
   getWalletAccounts: (
     walletAddress: string,
-    auth: IndexerAuth,
+    auth: IndexerUserAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   isLoading: boolean;
@@ -697,14 +697,14 @@ interface EmailAccountsResponse {
 
 ```typescript
 import { useIndexerGetWalletAccounts, useIndexerReferralConsumption } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function WalletAccountsViewer({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getWalletAccounts, isLoading, error } =
     useIndexerGetWalletAccounts('https://indexer.0xmail.box', false);
@@ -797,7 +797,7 @@ Gets the points balance for a specific wallet address.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address to query |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -805,7 +805,7 @@ Gets the points balance for a specific wallet address.
 interface UseIndexerGetPointsBalanceReturn {
   getPointsBalance: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<PointsResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -837,14 +837,14 @@ interface PointsResponse {
 
 ```typescript
 import { useIndexerGetPointsBalance } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function UserPointsDisplay({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getPointsBalance, isLoading, error } =
     useIndexerGetPointsBalance('https://indexer.0xmail.box', false);
@@ -917,7 +917,7 @@ Checks if a wallet has premium entitlements (via RevenueCat subscription).
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address to check |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -925,7 +925,7 @@ Checks if a wallet has premium entitlements (via RevenueCat subscription).
 interface UseIndexerGetEntitlementReturn {
   getEntitlement: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<EntitlementResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -952,7 +952,7 @@ interface EntitlementResponse {
 
 ```typescript
 import { useIndexerGetEntitlement } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function PremiumFeatureGate({
   walletAddress,
@@ -960,7 +960,7 @@ function PremiumFeatureGate({
   children
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
   children: React.ReactNode;
 }) {
   const { getEntitlement, isLoading, error } =
@@ -1024,7 +1024,7 @@ Gets the latest wallet address that this wallet has delegated email access to.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address (delegator) |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -1032,7 +1032,7 @@ Gets the latest wallet address that this wallet has delegated email access to.
 interface UseIndexerGetDelegatedToReturn {
   getDelegatedTo: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<DelegatedToResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -1061,14 +1061,14 @@ interface DelegatedToResponse {
 
 ```typescript
 import { useIndexerGetDelegatedTo } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function DelegationStatus({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getDelegatedTo, isLoading, error } =
     useIndexerGetDelegatedTo('https://indexer.0xmail.box', false);
@@ -1134,7 +1134,7 @@ Gets all wallet addresses that have delegated email access TO this wallet (rever
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address (delegate) |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -1142,7 +1142,7 @@ Gets all wallet addresses that have delegated email access TO this wallet (rever
 interface UseIndexerGetDelegatedFromReturn {
   getDelegatedFrom: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<DelegatedFromResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -1171,14 +1171,14 @@ interface DelegatedFromResponse {
 
 ```typescript
 import { useIndexerGetDelegatedFrom } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function DelegatedAccountsList({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getDelegatedFrom, isLoading, error } =
     useIndexerGetDelegatedFrom('https://indexer.0xmail.box', false);
@@ -1249,7 +1249,7 @@ Creates a new authentication nonce for a username. Nonces are used in the WildDu
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `username` | string | Yes | Email username (without @domain) |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -1257,7 +1257,7 @@ Creates a new authentication nonce for a username. Nonces are used in the WildDu
 interface UseIndexerCreateNonceReturn {
   createNonce: (
     username: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -1283,14 +1283,14 @@ interface NonceResponse {
 
 ```typescript
 import { useIndexerCreateNonce } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function EmailAuthFlow({
   username,
   auth
 }: {
   username: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { createNonce, isLoading, error } =
     useIndexerCreateNonce('https://indexer.0xmail.box', false);
@@ -1345,7 +1345,7 @@ Retrieves an existing authentication nonce for a username.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `username` | string | Yes | Email username (without @domain) |
-| `auth` | IndexerAuth | Yes | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | Authentication credentials |
 
 #### Returns
 
@@ -1353,7 +1353,7 @@ Retrieves an existing authentication nonce for a username.
 interface UseIndexerGetNonceReturn {
   getNonce: (
     username: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -1367,14 +1367,14 @@ interface UseIndexerGetNonceReturn {
 
 ```typescript
 import { useIndexerGetNonce } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function CheckExistingNonce({
   username,
   auth
 }: {
   username: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getNonce, isLoading, error } =
     useIndexerGetNonce('https://indexer.0xmail.box', false);
@@ -1434,7 +1434,7 @@ Gets all ENS/SNS names associated with a wallet address. Uses React Query's `use
 | `endpointUrl` | string | Yes | - | Base URL of the indexer API |
 | `dev` | boolean | Yes | - | Development mode flag |
 | `walletAddress` | string | Yes | - | Wallet address to query |
-| `auth` | IndexerAuth | Yes | - | Authentication credentials |
+| `auth` | IndexerUserAuth | Yes | - | Authentication credentials |
 | `options` | UseQueryOptions | No | - | Additional React Query options |
 
 #### Returns
@@ -1461,14 +1461,14 @@ interface NameServiceResponse {
 
 ```typescript
 import { useWalletNames } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function WalletNamesDisplay({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { data, isLoading, error, refetch } = useWalletNames(
     'https://indexer.0xmail.box',
@@ -1526,7 +1526,7 @@ interface UseIndexerReferralCodeReturn {
   referralCode: Optional<ReferralCodeResponse>;
   isLoading: boolean;
   error: Optional<string>;
-  fetchReferralCode: (walletAddress: string, auth: IndexerAuth) => Promise<ReferralCodeResponse>;
+  fetchReferralCode: (walletAddress: string, auth: IndexerUserAuth) => Promise<ReferralCodeResponse>;
   clearError: () => void;
   reset: () => void;
 }
@@ -1553,14 +1553,14 @@ interface ReferralCodeResponse {
 
 ```typescript
 import { useIndexerReferralCode } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function ReferralCodeManager({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { referralCode, isLoading, error, fetchReferralCode } =
     useIndexerReferralCode('https://indexer.0xmail.box', false);
@@ -1627,7 +1627,7 @@ interface UseIndexerReferralShareReturn {
   getShareUrl: (
     baseUrl: string,
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<string>;  // Returns full URL with referral parameter
 }
 ```
@@ -1636,14 +1636,14 @@ interface UseIndexerReferralShareReturn {
 
 ```typescript
 import { useIndexerReferralShare } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function ShareReferralButton({
   walletAddress,
   auth
 }: {
   walletAddress: string;
-  auth: IndexerAuth;
+  auth: IndexerUserAuth;
 }) {
   const { getShareUrl, isLoading, error } =
     useIndexerReferralShare('https://indexer.0xmail.box', false);
@@ -1722,7 +1722,7 @@ import {
   useIndexerReferralConsumption,
   useIndexerGetWalletAccounts
 } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function App() {
   // This hook automatically checks URL on mount
@@ -1746,7 +1746,7 @@ function App() {
     }
   }, [hasPendingCode, pendingReferralCode]);
 
-  const handleWalletConnect = async (walletAddress: string, auth: IndexerAuth) => {
+  const handleWalletConnect = async (walletAddress: string, auth: IndexerUserAuth) => {
     try {
       // Get the referral code (doesn't delete it yet)
       const referralCode = consumeReferralCode();
@@ -1845,32 +1845,32 @@ interface UseIndexerMailReturn {
   // Signature-protected endpoints
   getWalletAccounts: (
     walletAddress: string,
-    auth: IndexerAuth,
+    auth: IndexerUserAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   getDelegatedTo: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<DelegatedToResponse>>;
   getDelegatedFrom: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<DelegatedFromResponse>>;
   createNonce: (
     username: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<NonceResponse>>;
   getNonce: (
     username: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<NonceResponse>>;
   getEntitlement: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<EntitlementResponse>>;
   getPointsBalance: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<PointsResponse>>;
 
   // State
@@ -1929,10 +1929,10 @@ import {
   useIndexerGetSigningMessage,
   useIndexerGetWalletAccounts
 } from '@johnqh/indexer_client';
-import type { IndexerAuth } from '@johnqh/indexer_client';
+import type { IndexerUserAuth } from '@johnqh/indexer_client';
 
 function AuthenticatedApp({ walletAddress, chainId }: Props) {
-  const [auth, setAuth] = useState<IndexerAuth | null>(null);
+  const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
 
   const { getSigningMessage } = useIndexerGetSigningMessage(
     'https://indexer.0xmail.box',
@@ -1955,7 +1955,7 @@ function AuthenticatedApp({ walletAddress, chainId }: Props) {
 
     const signature = await walletProvider.signMessage(messageData.data.message);
 
-    const credentials: IndexerAuth = {
+    const credentials: IndexerUserAuth = {
       message: messageData.data.message,
       signature
     };
@@ -2155,7 +2155,7 @@ All hooks and types are fully typed. Import types from the package:
 
 ```typescript
 import type {
-  IndexerAuth,
+  IndexerUserAuth,
   AddressValidationResponse,
   SignInMessageResponse,
   EmailAccountsResponse,

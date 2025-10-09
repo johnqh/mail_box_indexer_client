@@ -74,7 +74,7 @@ export type {
 } from './utils/indexer-webhooks';
 
 // Local types
-export type { IndexerAuth } from './types';
+export type { IndexerUserAuth } from './types';
 
 // Re-export types from @johnqh/types for convenience
 export type {

@@ -4,7 +4,7 @@ import {
   IndexerClient,
   type ReferralCodeResponse,
 } from '../network/IndexerClient';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 /**
  * Hook for getting or creating referral code for a wallet
@@ -35,7 +35,7 @@ export const useIndexerReferralCode = (endpointUrl: string, dev: boolean) => {
   const client = new IndexerClient(endpointUrl, dev);
 
   const fetchReferralCode = useCallback(
-    async (walletAddress: string, auth: IndexerAuth) => {
+    async (walletAddress: string, auth: IndexerUserAuth) => {
       setIsLoading(true);
       setError(null);
 

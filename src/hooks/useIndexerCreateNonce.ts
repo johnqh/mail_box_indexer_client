@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type NonceResponse, type Optional } from '@johnqh/types';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerCreateNonceReturn {
   createNonce: (
     username: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -44,7 +44,7 @@ export const useIndexerCreateNonce = (
       auth,
     }: {
       username: string;
-      auth: IndexerAuth;
+      auth: IndexerUserAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
@@ -61,7 +61,7 @@ export const useIndexerCreateNonce = (
   const createNonce = useCallback(
     async (
       username: string,
-      auth: IndexerAuth
+      auth: IndexerUserAuth
     ): Promise<Optional<NonceResponse>> => {
       return await mutation.mutateAsync({ username, auth });
     },

@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type Optional, type PointsResponse } from '@johnqh/types';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerGetPointsBalanceReturn {
   getPointsBalance: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<PointsResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -44,7 +44,7 @@ export const useIndexerGetPointsBalance = (
       auth,
     }: {
       walletAddress: string;
-      auth: IndexerAuth;
+      auth: IndexerUserAuth;
     }): Promise<Optional<PointsResponse>> => {
       setError(null);
       try {
@@ -61,7 +61,7 @@ export const useIndexerGetPointsBalance = (
   const getPointsBalance = useCallback(
     async (
       walletAddress: string,
-      auth: IndexerAuth
+      auth: IndexerUserAuth
     ): Promise<Optional<PointsResponse>> => {
       return await mutation.mutateAsync({ walletAddress, auth });
     },

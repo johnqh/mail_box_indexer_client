@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type DelegatedToResponse, type Optional } from '@johnqh/types';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerGetDelegatedToReturn {
   getDelegatedTo: (
     walletAddress: string,
-    auth: IndexerAuth
+    auth: IndexerUserAuth
   ) => Promise<Optional<DelegatedToResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -44,7 +44,7 @@ export const useIndexerGetDelegatedTo = (
       auth,
     }: {
       walletAddress: string;
-      auth: IndexerAuth;
+      auth: IndexerUserAuth;
     }): Promise<Optional<DelegatedToResponse>> => {
       setError(null);
       try {
@@ -61,7 +61,7 @@ export const useIndexerGetDelegatedTo = (
   const getDelegatedTo = useCallback(
     async (
       walletAddress: string,
-      auth: IndexerAuth
+      auth: IndexerUserAuth
     ): Promise<Optional<DelegatedToResponse>> => {
       return await mutation.mutateAsync({ walletAddress, auth });
     },

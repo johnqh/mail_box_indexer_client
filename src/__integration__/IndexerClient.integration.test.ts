@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { IndexerClient } from '../network/IndexerClient';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 describe('IndexerClient Integration Tests', () => {
   let client: IndexerClient;
@@ -162,7 +162,7 @@ describe('IndexerClient Integration Tests', () => {
 
     it('should get wallet names for address', async () => {
       const testAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'; // vitalik.eth
-      const auth: IndexerAuth = { message: 'test message', signature: 'test signature' };
+      const auth: IndexerUserAuth = { message: 'test message', signature: 'test signature' };
 
       try {
         const response = await client.getWalletNames(testAddress, auth);
@@ -187,7 +187,7 @@ describe('IndexerClient Integration Tests', () => {
   describe('Referral System', () => {
     it('should get referral code for wallet', async () => {
       const testWallet = '0x742d35Cc6285C9D3C0ef5BAdF3a70b1E95c1e6Bb';
-      const auth: IndexerAuth = { message: 'test message', signature: 'test signature' };
+      const auth: IndexerUserAuth = { message: 'test message', signature: 'test signature' };
 
       try {
         const response = await client.getReferralCode(testWallet, auth);

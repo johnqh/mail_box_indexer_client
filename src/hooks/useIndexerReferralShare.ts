@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useIndexerReferralCode } from './useIndexerReferralCode';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 /**
  * Hook for managing referral code sharing
@@ -41,7 +41,7 @@ export const useIndexerReferralShare = (endpointUrl: string, dev: boolean) => {
     async (
       baseUrl: string,
       walletAddress: string,
-      auth: IndexerAuth
+      auth: IndexerUserAuth
     ): Promise<string> => {
       const response = await fetchReferralCode(walletAddress, auth);
       const url = new URL(baseUrl);

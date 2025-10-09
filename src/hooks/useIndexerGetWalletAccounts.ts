@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type EmailAccountsResponse, type Optional } from '@johnqh/types';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerGetWalletAccountsReturn {
   getWalletAccounts: (
     walletAddress: string,
-    auth: IndexerAuth,
+    auth: IndexerUserAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   isLoading: boolean;
@@ -46,7 +46,7 @@ export const useIndexerGetWalletAccounts = (
       referralCode,
     }: {
       walletAddress: string;
-      auth: IndexerAuth;
+      auth: IndexerUserAuth;
       referralCode?: string;
     }): Promise<Optional<EmailAccountsResponse>> => {
       setError(null);
@@ -68,12 +68,12 @@ export const useIndexerGetWalletAccounts = (
   const getWalletAccounts = useCallback(
     async (
       walletAddress: string,
-      auth: IndexerAuth,
+      auth: IndexerUserAuth,
       referralCode?: string
     ): Promise<Optional<EmailAccountsResponse>> => {
       const params: {
         walletAddress: string;
-        auth: IndexerAuth;
+        auth: IndexerUserAuth;
         referralCode?: string;
       } = { walletAddress, auth };
       if (referralCode !== undefined) {

@@ -8,7 +8,7 @@ import type {
   NameServiceResponse,
 } from '@johnqh/types';
 import { IndexerClient } from '../network/IndexerClient';
-import type { IndexerAuth } from '../types';
+import type { IndexerUserAuth } from '../types';
 
 // Query stale times (5 minutes for name service resolution)
 const STALE_TIMES = {
@@ -44,7 +44,7 @@ export const useWalletNames = (
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
-  auth: IndexerAuth,
+  auth: IndexerUserAuth,
   options?: UseQueryOptions<NameServiceResponse>
 ): UseQueryResult<NameServiceResponse> => {
   const client = new IndexerClient(endpointUrl, dev);

@@ -4,19 +4,19 @@
  */
 
 // Network client
-export * from './network/index.js';
+export * from './network';
 
 // Business logic
-export * from './business/index.js';
+export * from './business';
 
 // Hooks
-export * from './hooks/index.js';
+export * from './hooks';
 
 // Utilities
-export * from './utils/index.js';
+export * from './utils';
 
 // Local types
-export type { IndexerUserAuth } from './types.js';
+export type { IndexerUserAuth } from './types';
 
 // Re-export types from @johnqh/types for convenience
 export type {

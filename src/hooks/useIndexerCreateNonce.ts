@@ -1,32 +1,32 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type Optional, type PointsResponse } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import { type NonceResponse, type Optional } from '@johnqh/types';
+import type { IndexerAuth } from '../types';
 
-interface UseGetPointsBalanceReturn {
-  getPointsBalance: (
-    walletAddress: string,
-    auth: SignatureAuth
-  ) => Promise<Optional<PointsResponse>>;
+interface UseIndexerCreateNonceReturn {
+  createNonce: (
+    username: string,
+    auth: IndexerAuth
+  ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
 }
 
 /**
- * React hook for fetching user's points balance
+ * React hook for creating authentication nonce
  * Requires wallet signature for authentication
  * Uses React Query for better state management and error handling
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getPointsBalance function and state
+ * @returns Object with createNonce function and state
  */
-export const useGetPointsBalance = (
+export const useIndexerCreateNonce = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetPointsBalanceReturn => {
+): UseIndexerCreateNonceReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -40,36 +40,36 @@ export const useGetPointsBalance = (
 
   const mutation = useMutation({
     mutationFn: async ({
-      walletAddress,
+      username,
       auth,
     }: {
-      walletAddress: string;
-      auth: SignatureAuth;
-    }): Promise<Optional<PointsResponse>> => {
+      username: string;
+      auth: IndexerAuth;
+    }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsBalance(walletAddress, auth);
+        return await indexerClient.createNonce(username, auth);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get points balance';
+          err instanceof Error ? err.message : 'Failed to create nonce';
         setError(errorMessage);
         throw err;
       }
     },
   });
 
-  const getPointsBalance = useCallback(
+  const createNonce = useCallback(
     async (
-      walletAddress: string,
-      auth: SignatureAuth
-    ): Promise<Optional<PointsResponse>> => {
-      return await mutation.mutateAsync({ walletAddress, auth });
+      username: string,
+      auth: IndexerAuth
+    ): Promise<Optional<NonceResponse>> => {
+      return await mutation.mutateAsync({ username, auth });
     },
     [mutation]
   );
 
   return {
-    getPointsBalance,
+    createNonce,
     isLoading: mutation.isPending,
     error,
     clearError,

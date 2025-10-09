@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import type { SignatureAuth } from '../types';
+import type { IndexerAuth } from '../types';
 import {
   type AddressValidationResponse,
   type DelegatedFromResponse,
@@ -36,32 +36,32 @@ interface UseIndexerMailReturn {
   // Signature-protected endpoints
   getWalletAccounts: (
     walletAddress: string,
-    auth: SignatureAuth,
+    auth: IndexerAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   getDelegatedTo: (
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<DelegatedToResponse>>;
   getDelegatedFrom: (
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<DelegatedFromResponse>>;
   createNonce: (
     username: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<NonceResponse>>;
   getNonce: (
     username: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<NonceResponse>>;
   getEntitlement: (
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<EntitlementResponse>>;
   getPointsBalance: (
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ) => Promise<Optional<PointsResponse>>;
   clearError: () => void;
 }
@@ -175,7 +175,7 @@ const useIndexerMail = (
       referralCode,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
       referralCode?: string;
     }): Promise<Optional<EmailAccountsResponse>> => {
       setError(null);
@@ -201,7 +201,7 @@ const useIndexerMail = (
       auth,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<DelegatedToResponse>> => {
       setError(null);
       try {
@@ -222,7 +222,7 @@ const useIndexerMail = (
       auth,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<DelegatedFromResponse>> => {
       setError(null);
       try {
@@ -243,7 +243,7 @@ const useIndexerMail = (
       auth,
     }: {
       username: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
@@ -264,7 +264,7 @@ const useIndexerMail = (
       auth,
     }: {
       username: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
@@ -285,7 +285,7 @@ const useIndexerMail = (
       auth,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<EntitlementResponse>> => {
       setError(null);
       try {
@@ -306,7 +306,7 @@ const useIndexerMail = (
       auth,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
     }): Promise<Optional<PointsResponse>> => {
       setError(null);
       try {
@@ -361,12 +361,12 @@ const useIndexerMail = (
   const getWalletAccounts = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth,
+      auth: IndexerAuth,
       referralCode?: string
     ): Promise<Optional<EmailAccountsResponse>> => {
       const params: {
         walletAddress: string;
-        auth: SignatureAuth;
+        auth: IndexerAuth;
         referralCode?: string;
       } = { walletAddress, auth };
       if (referralCode !== undefined) {
@@ -380,7 +380,7 @@ const useIndexerMail = (
   const getDelegatedTo = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<DelegatedToResponse>> => {
       return await getDelegatedToMutation.mutateAsync({
         walletAddress,
@@ -393,7 +393,7 @@ const useIndexerMail = (
   const getDelegatedFrom = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<DelegatedFromResponse>> => {
       return await getDelegatedFromMutation.mutateAsync({
         walletAddress,
@@ -406,7 +406,7 @@ const useIndexerMail = (
   const createNonce = useCallback(
     async (
       username: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<NonceResponse>> => {
       return await createNonceMutation.mutateAsync({
         username,
@@ -419,7 +419,7 @@ const useIndexerMail = (
   const getNonce = useCallback(
     async (
       username: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<NonceResponse>> => {
       return await getNonceMutation.mutateAsync({
         username,
@@ -432,7 +432,7 @@ const useIndexerMail = (
   const getEntitlement = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<EntitlementResponse>> => {
       return await getEntitlementMutation.mutateAsync({
         walletAddress,
@@ -445,7 +445,7 @@ const useIndexerMail = (
   const getPointsBalance = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<Optional<PointsResponse>> => {
       return await getPointsBalanceMutation.mutateAsync({
         walletAddress,

@@ -1,32 +1,30 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type NonceResponse, type Optional } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import { type AddressValidationResponse, type Optional } from '@johnqh/types';
 
-interface UseGetNonceReturn {
-  getNonce: (
-    username: string,
-    auth: SignatureAuth
-  ) => Promise<Optional<NonceResponse>>;
+interface UseIndexerValidateUsernameReturn {
+  validateUsername: (
+    username: string
+  ) => Promise<Optional<AddressValidationResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
 }
 
 /**
- * React hook for getting existing authentication nonce
- * Requires wallet signature for authentication
+ * React hook for validating usernames
+ * Public endpoint - no authentication required
  * Uses React Query for better state management and error handling
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getNonce function and state
+ * @returns Object with validateUsername function and state
  */
-export const useGetNonce = (
+export const useIndexerValidateUsername = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetNonceReturn => {
+): UseIndexerValidateUsernameReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -39,37 +37,30 @@ export const useGetNonce = (
   }, []);
 
   const mutation = useMutation({
-    mutationFn: async ({
-      username,
-      auth,
-    }: {
-      username: string;
-      auth: SignatureAuth;
-    }): Promise<Optional<NonceResponse>> => {
+    mutationFn: async (
+      username: string
+    ): Promise<Optional<AddressValidationResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getNonce(username, auth);
+        return await indexerClient.validateUsername(username);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get nonce';
+          err instanceof Error ? err.message : 'Validation failed';
         setError(errorMessage);
         throw err;
       }
     },
   });
 
-  const getNonce = useCallback(
-    async (
-      username: string,
-      auth: SignatureAuth
-    ): Promise<Optional<NonceResponse>> => {
-      return await mutation.mutateAsync({ username, auth });
+  const validateUsername = useCallback(
+    async (username: string): Promise<Optional<AddressValidationResponse>> => {
+      return await mutation.mutateAsync(username);
     },
     [mutation]
   );
 
   return {
-    getNonce,
+    validateUsername,
     isLoading: mutation.isPending,
     error,
     clearError,

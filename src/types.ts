@@ -6,7 +6,7 @@
  * Authentication credentials using message and signature
  * Used for signature-protected endpoints
  */
-export interface SignatureAuth {
+export interface IndexerAuth {
   message: string;
   signature: string;
 }

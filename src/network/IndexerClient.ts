@@ -15,7 +15,7 @@ import type {
   SignInMessageResponse,
   SiteStatsResponse,
 } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import type { IndexerAuth } from '../types';
 
 /**
  * Network request options
@@ -326,7 +326,7 @@ export class IndexerClient {
    * Encodes the message using encodeURIComponent for HTTP header transmission
    * The indexer will decode it using decodeURIComponent
    */
-  private createAuthHeaders(auth: SignatureAuth): Record<string, string> {
+  private createAuthHeaders(auth: IndexerAuth): Record<string, string> {
     return {
       'x-signature': auth.signature.replace(/[\r\n]/g, ''), // Remove any newlines from signature
       'x-message': encodeURIComponent(auth.message), // Encode message for HTTP header
@@ -339,7 +339,7 @@ export class IndexerClient {
    */
   async getWalletAccounts(
     walletAddress: string,
-    auth: SignatureAuth,
+    auth: IndexerAuth,
     referralCode?: string
   ): Promise<EmailAccountsResponse> {
     console.log('[IndexerClient] getWalletAccounts called with:', {
@@ -377,7 +377,7 @@ export class IndexerClient {
    */
   async getDelegatedTo(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<DelegatedToResponse> {
     const response = await this.get<DelegatedToResponse>(
       `/delegations/from/${encodeURIComponent(walletAddress)}`,
@@ -401,7 +401,7 @@ export class IndexerClient {
    */
   async getDelegatedFrom(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<DelegatedFromResponse> {
     const response = await this.get<DelegatedFromResponse>(
       `/delegations/to/${encodeURIComponent(walletAddress)}`,
@@ -425,7 +425,7 @@ export class IndexerClient {
    */
   async createNonce(
     username: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<NonceResponse> {
     const response = await this.post<NonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
@@ -448,10 +448,7 @@ export class IndexerClient {
    * Get nonce for username (requires signature)
    * GET /users/:username/nonce
    */
-  async getNonce(
-    username: string,
-    auth: SignatureAuth
-  ): Promise<NonceResponse> {
+  async getNonce(username: string, auth: IndexerAuth): Promise<NonceResponse> {
     const response = await this.get<NonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
       {
@@ -474,7 +471,7 @@ export class IndexerClient {
    */
   async getEntitlement(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<EntitlementResponse> {
     const response = await this.get<EntitlementResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/entitlements/`,
@@ -498,7 +495,7 @@ export class IndexerClient {
    */
   async getPointsBalance(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<PointsResponse> {
     const response = await this.get<PointsResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/points`,
@@ -522,7 +519,7 @@ export class IndexerClient {
    */
   async getReferralCode(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<ReferralCodeResponse> {
     console.log('[IndexerClient] getReferralCode called with:', {
       walletAddress,
@@ -586,7 +583,7 @@ export class IndexerClient {
    */
   async getWalletNames(
     walletAddress: string,
-    auth: SignatureAuth
+    auth: IndexerAuth
   ): Promise<NameServiceResponse> {
     const response = await this.get<NameServiceResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/names`,

@@ -23,23 +23,23 @@ export {
   // Legacy monolithic hook (deprecated)
   useIndexerMail,
   // Individual endpoint hooks (recommended)
-  useGetWalletAccounts,
-  useValidateUsername,
-  useGetSigningMessage,
-  useGetDelegatedTo,
-  useGetDelegatedFrom,
-  useCreateNonce,
-  useGetNonce,
-  useGetEntitlement,
-  useGetPointsBalance,
+  useIndexerGetWalletAccounts,
+  useIndexerValidateUsername,
+  useIndexerGetSigningMessage,
+  useIndexerGetDelegatedTo,
+  useIndexerGetDelegatedFrom,
+  useIndexerCreateNonce,
+  useIndexerGetNonce,
+  useIndexerGetEntitlement,
+  useIndexerGetPointsBalance,
   // Other hooks
   useIndexerPoints,
   useWalletNames,
   useResolveNameToAddress,
-  useReferralCode,
-  useReferralConsumption,
-  useReferralShare,
-  useReferralStats,
+  useIndexerReferralCode,
+  useIndexerReferralConsumption,
+  useIndexerReferralShare,
+  useIndexerReferralStats,
   IndexerMockData,
 } from './hooks';
 export type { UseIndexerMailReturn } from './hooks/useIndexerMail';
@@ -74,7 +74,7 @@ export type {
 } from './utils/indexer-webhooks';
 
 // Local types
-export type { SignatureAuth } from './types';
+export type { IndexerAuth } from './types';
 
 // Re-export types from @johnqh/types for convenience
 export type {

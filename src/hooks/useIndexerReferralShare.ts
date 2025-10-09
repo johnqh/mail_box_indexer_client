@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useReferralCode } from './useReferralCode';
-import type { SignatureAuth } from '../types';
+import { useIndexerReferralCode } from './useIndexerReferralCode';
+import type { IndexerAuth } from '../types';
 
 /**
  * Hook for managing referral code sharing
@@ -12,7 +12,7 @@ import type { SignatureAuth } from '../types';
  *
  * @example
  * ```typescript
- * const { getShareUrl, isLoading, error } = useReferralShare(
+ * const { getShareUrl, isLoading, error } = useIndexerReferralShare(
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -26,11 +26,9 @@ import type { SignatureAuth } from '../types';
  * // Returns: "https://0xmail.box?referral=ABC123DEF"
  * ```
  */
-export const useReferralShare = (endpointUrl: string, dev: boolean) => {
-  const { referralCode, isLoading, error, fetchReferralCode } = useReferralCode(
-    endpointUrl,
-    dev
-  );
+export const useIndexerReferralShare = (endpointUrl: string, dev: boolean) => {
+  const { referralCode, isLoading, error, fetchReferralCode } =
+    useIndexerReferralCode(endpointUrl, dev);
 
   /**
    * Get referral code and append to share URL
@@ -43,7 +41,7 @@ export const useReferralShare = (endpointUrl: string, dev: boolean) => {
     async (
       baseUrl: string,
       walletAddress: string,
-      auth: SignatureAuth
+      auth: IndexerAuth
     ): Promise<string> => {
       const response = await fetchReferralCode(walletAddress, auth);
       const url = new URL(baseUrl);

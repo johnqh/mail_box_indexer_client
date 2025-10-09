@@ -4,7 +4,7 @@ import {
   IndexerClient,
   type ReferralCodeResponse,
 } from '../network/IndexerClient';
-import type { SignatureAuth } from '../types';
+import type { IndexerAuth } from '../types';
 
 /**
  * Hook for getting or creating referral code for a wallet
@@ -16,7 +16,7 @@ import type { SignatureAuth } from '../types';
  *
  * @example
  * ```typescript
- * const { referralCode, isLoading, error, fetchReferralCode } = useReferralCode(
+ * const { referralCode, isLoading, error, fetchReferralCode } = useIndexerReferralCode(
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -26,7 +26,7 @@ import type { SignatureAuth } from '../types';
  * console.log(referralCode?.referralCode); // "ABC123DEF"
  * ```
  */
-export const useReferralCode = (endpointUrl: string, dev: boolean) => {
+export const useIndexerReferralCode = (endpointUrl: string, dev: boolean) => {
   const [referralCode, setReferralCode] =
     useState<Optional<ReferralCodeResponse>>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +35,7 @@ export const useReferralCode = (endpointUrl: string, dev: boolean) => {
   const client = new IndexerClient(endpointUrl, dev);
 
   const fetchReferralCode = useCallback(
-    async (walletAddress: string, auth: SignatureAuth) => {
+    async (walletAddress: string, auth: IndexerAuth) => {
       setIsLoading(true);
       setError(null);
 

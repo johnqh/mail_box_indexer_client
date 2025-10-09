@@ -1,32 +1,32 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type EntitlementResponse, type Optional } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import { type NonceResponse, type Optional } from '@johnqh/types';
+import type { IndexerAuth } from '../types';
 
-interface UseGetEntitlementReturn {
-  getEntitlement: (
-    walletAddress: string,
-    auth: SignatureAuth
-  ) => Promise<Optional<EntitlementResponse>>;
+interface UseIndexerGetNonceReturn {
+  getNonce: (
+    username: string,
+    auth: IndexerAuth
+  ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
 }
 
 /**
- * React hook for checking wallet entitlement status
+ * React hook for getting existing authentication nonce
  * Requires wallet signature for authentication
  * Uses React Query for better state management and error handling
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getEntitlement function and state
+ * @returns Object with getNonce function and state
  */
-export const useGetEntitlement = (
+export const useIndexerGetNonce = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetEntitlementReturn => {
+): UseIndexerGetNonceReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -40,36 +40,36 @@ export const useGetEntitlement = (
 
   const mutation = useMutation({
     mutationFn: async ({
-      walletAddress,
+      username,
       auth,
     }: {
-      walletAddress: string;
-      auth: SignatureAuth;
-    }): Promise<Optional<EntitlementResponse>> => {
+      username: string;
+      auth: IndexerAuth;
+    }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getEntitlement(walletAddress, auth);
+        return await indexerClient.getNonce(username, auth);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get entitlement';
+          err instanceof Error ? err.message : 'Failed to get nonce';
         setError(errorMessage);
         throw err;
       }
     },
   });
 
-  const getEntitlement = useCallback(
+  const getNonce = useCallback(
     async (
-      walletAddress: string,
-      auth: SignatureAuth
-    ): Promise<Optional<EntitlementResponse>> => {
-      return await mutation.mutateAsync({ walletAddress, auth });
+      username: string,
+      auth: IndexerAuth
+    ): Promise<Optional<NonceResponse>> => {
+      return await mutation.mutateAsync({ username, auth });
     },
     [mutation]
   );
 
   return {
-    getEntitlement,
+    getNonce,
     isLoading: mutation.isPending,
     error,
     clearError,

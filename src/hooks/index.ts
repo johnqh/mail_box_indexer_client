@@ -9,15 +9,15 @@ export * from './useIndexerPoints';
 export * from './useIndexerMail';
 
 // Individual endpoint hooks (recommended)
-export * from './useGetWalletAccounts';
-export * from './useValidateUsername';
-export * from './useGetSigningMessage';
-export * from './useGetDelegatedTo';
-export * from './useGetDelegatedFrom';
-export * from './useCreateNonce';
-export * from './useGetNonce';
-export * from './useGetEntitlement';
-export * from './useGetPointsBalance';
+export * from './useIndexerGetWalletAccounts';
+export * from './useIndexerValidateUsername';
+export * from './useIndexerGetSigningMessage';
+export * from './useIndexerGetDelegatedTo';
+export * from './useIndexerGetDelegatedFrom';
+export * from './useIndexerCreateNonce';
+export * from './useIndexerGetNonce';
+export * from './useIndexerGetEntitlement';
+export * from './useIndexerGetPointsBalance';
 
 // Name service hooks
 export {
@@ -26,10 +26,10 @@ export {
 } from './useIndexerNameService';
 
 // Referral hooks
-export * from './useReferralCode';
-export * from './useReferralShare';
-export * from './useReferralConsumption';
-export * from './useReferralStats';
+export * from './useIndexerReferralCode';
+export * from './useIndexerReferralShare';
+export * from './useIndexerReferralConsumption';
+export * from './useIndexerReferralStats';
 
 // Mock data for testing
 export { IndexerMockData } from './mocks';

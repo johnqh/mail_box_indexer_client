@@ -2,12 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type EmailAccountsResponse, type Optional } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import type { IndexerAuth } from '../types';
 
-interface UseGetWalletAccountsReturn {
+interface UseIndexerGetWalletAccountsReturn {
   getWalletAccounts: (
     walletAddress: string,
-    auth: SignatureAuth,
+    auth: IndexerAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   isLoading: boolean;
@@ -24,10 +24,10 @@ interface UseGetWalletAccountsReturn {
  * @param dev - Whether to use dev mode headers
  * @returns Object with getWalletAccounts function and state
  */
-export const useGetWalletAccounts = (
+export const useIndexerGetWalletAccounts = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetWalletAccountsReturn => {
+): UseIndexerGetWalletAccountsReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -46,7 +46,7 @@ export const useGetWalletAccounts = (
       referralCode,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
+      auth: IndexerAuth;
       referralCode?: string;
     }): Promise<Optional<EmailAccountsResponse>> => {
       setError(null);
@@ -68,12 +68,12 @@ export const useGetWalletAccounts = (
   const getWalletAccounts = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth,
+      auth: IndexerAuth,
       referralCode?: string
     ): Promise<Optional<EmailAccountsResponse>> => {
       const params: {
         walletAddress: string;
-        auth: SignatureAuth;
+        auth: IndexerAuth;
         referralCode?: string;
       } = { walletAddress, auth };
       if (referralCode !== undefined) {

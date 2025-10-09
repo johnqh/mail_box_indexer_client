@@ -1,32 +1,32 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type DelegatedToResponse, type Optional } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import { type DelegatedFromResponse, type Optional } from '@johnqh/types';
+import type { IndexerAuth } from '../types';
 
-interface UseGetDelegatedToReturn {
-  getDelegatedTo: (
+interface UseIndexerGetDelegatedFromReturn {
+  getDelegatedFrom: (
     walletAddress: string,
-    auth: SignatureAuth
-  ) => Promise<Optional<DelegatedToResponse>>;
+    auth: IndexerAuth
+  ) => Promise<Optional<DelegatedFromResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
 }
 
 /**
- * React hook for fetching delegation info (who this wallet delegates to)
+ * React hook for fetching reverse delegation info (who delegates to this wallet)
  * Requires wallet signature for authentication
  * Uses React Query for better state management and error handling
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getDelegatedTo function and state
+ * @returns Object with getDelegatedFrom function and state
  */
-export const useGetDelegatedTo = (
+export const useIndexerGetDelegatedFrom = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetDelegatedToReturn => {
+): UseIndexerGetDelegatedFromReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -44,32 +44,32 @@ export const useGetDelegatedTo = (
       auth,
     }: {
       walletAddress: string;
-      auth: SignatureAuth;
-    }): Promise<Optional<DelegatedToResponse>> => {
+      auth: IndexerAuth;
+    }): Promise<Optional<DelegatedFromResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getDelegatedTo(walletAddress, auth);
+        return await indexerClient.getDelegatedFrom(walletAddress, auth);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get delegated to';
+          err instanceof Error ? err.message : 'Failed to get delegated from';
         setError(errorMessage);
         throw err;
       }
     },
   });
 
-  const getDelegatedTo = useCallback(
+  const getDelegatedFrom = useCallback(
     async (
       walletAddress: string,
-      auth: SignatureAuth
-    ): Promise<Optional<DelegatedToResponse>> => {
+      auth: IndexerAuth
+    ): Promise<Optional<DelegatedFromResponse>> => {
       return await mutation.mutateAsync({ walletAddress, auth });
     },
     [mutation]
   );
 
   return {
-    getDelegatedTo,
+    getDelegatedFrom,
     isLoading: mutation.isPending,
     error,
     clearError,

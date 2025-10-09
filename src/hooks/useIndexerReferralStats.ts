@@ -15,7 +15,7 @@ import {
  *
  * @example
  * ```typescript
- * const { stats, isLoading, error, fetchStats } = useReferralStats(
+ * const { stats, isLoading, error, fetchStats } = useIndexerReferralStats(
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -26,7 +26,7 @@ import {
  * console.log(stats?.data.referredWallets); // Array of referred wallets
  * ```
  */
-export const useReferralStats = (endpointUrl: string, dev: boolean) => {
+export const useIndexerReferralStats = (endpointUrl: string, dev: boolean) => {
   const [stats, setStats] = useState<Optional<ReferralStatsResponse>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);

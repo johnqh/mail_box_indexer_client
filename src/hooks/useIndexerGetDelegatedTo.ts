@@ -1,32 +1,32 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type NonceResponse, type Optional } from '@johnqh/types';
-import type { SignatureAuth } from '../types';
+import { type DelegatedToResponse, type Optional } from '@johnqh/types';
+import type { IndexerAuth } from '../types';
 
-interface UseCreateNonceReturn {
-  createNonce: (
-    username: string,
-    auth: SignatureAuth
-  ) => Promise<Optional<NonceResponse>>;
+interface UseIndexerGetDelegatedToReturn {
+  getDelegatedTo: (
+    walletAddress: string,
+    auth: IndexerAuth
+  ) => Promise<Optional<DelegatedToResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
 }
 
 /**
- * React hook for creating authentication nonce
+ * React hook for fetching delegation info (who this wallet delegates to)
  * Requires wallet signature for authentication
  * Uses React Query for better state management and error handling
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with createNonce function and state
+ * @returns Object with getDelegatedTo function and state
  */
-export const useCreateNonce = (
+export const useIndexerGetDelegatedTo = (
   endpointUrl: string,
   dev: boolean = false
-): UseCreateNonceReturn => {
+): UseIndexerGetDelegatedToReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(
@@ -40,36 +40,36 @@ export const useCreateNonce = (
 
   const mutation = useMutation({
     mutationFn: async ({
-      username,
+      walletAddress,
       auth,
     }: {
-      username: string;
-      auth: SignatureAuth;
-    }): Promise<Optional<NonceResponse>> => {
+      walletAddress: string;
+      auth: IndexerAuth;
+    }): Promise<Optional<DelegatedToResponse>> => {
       setError(null);
       try {
-        return await indexerClient.createNonce(username, auth);
+        return await indexerClient.getDelegatedTo(walletAddress, auth);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to create nonce';
+          err instanceof Error ? err.message : 'Failed to get delegated to';
         setError(errorMessage);
         throw err;
       }
     },
   });
 
-  const createNonce = useCallback(
+  const getDelegatedTo = useCallback(
     async (
-      username: string,
-      auth: SignatureAuth
-    ): Promise<Optional<NonceResponse>> => {
-      return await mutation.mutateAsync({ username, auth });
+      walletAddress: string,
+      auth: IndexerAuth
+    ): Promise<Optional<DelegatedToResponse>> => {
+      return await mutation.mutateAsync({ walletAddress, auth });
     },
     [mutation]
   );
 
   return {
-    createNonce,
+    getDelegatedTo,
     isLoading: mutation.isPending,
     error,
     clearError,

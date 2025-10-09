@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type Optional, type SignInMessageResponse } from '@johnqh/types';
 
-interface UseGetSigningMessageReturn {
+interface UseIndexerGetSigningMessageReturn {
   getSigningMessage: (
     walletAddress: string,
     chainId: number,
@@ -24,10 +24,10 @@ interface UseGetSigningMessageReturn {
  * @param dev - Whether to use dev mode headers
  * @returns Object with getSigningMessage function and state
  */
-export const useGetSigningMessage = (
+export const useIndexerGetSigningMessage = (
   endpointUrl: string,
   dev: boolean = false
-): UseGetSigningMessageReturn => {
+): UseIndexerGetSigningMessageReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
   const indexerClient = useMemo(

@@ -22,7 +22,7 @@ const REFERRAL_CODE_KEY = 'pending_referral_code';
  *   pendingReferralCode,
  *   consumeReferralCode,
  *   clearReferralCode
- * } = useReferralConsumption();
+ * } = useIndexerReferralConsumption();
  *
  * // In getWalletAccounts call:
  * const code = consumeReferralCode(); // Returns code and keeps it pending
@@ -30,7 +30,7 @@ const REFERRAL_CODE_KEY = 'pending_referral_code';
  * clearReferralCode(); // Clear after successful API call
  * ```
  */
-export const useReferralConsumption = () => {
+export const useIndexerReferralConsumption = () => {
   const [pendingReferralCode, setPendingReferralCode] =
     useState<Optional<string>>(null);
 

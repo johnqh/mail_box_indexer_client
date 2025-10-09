@@ -4,6 +4,7 @@ import {
   IndexerClient,
   type ReferralCodeResponse,
 } from '../network/IndexerClient';
+import type { SignatureAuth } from '../types';
 
 /**
  * Hook for getting or creating referral code for a wallet
@@ -21,7 +22,7 @@ import {
  * );
  *
  * // Get or create referral code
- * await fetchReferralCode(walletAddress, signature, message);
+ * await fetchReferralCode(walletAddress, { signature, message });
  * console.log(referralCode?.referralCode); // "ABC123DEF"
  * ```
  */
@@ -34,16 +35,12 @@ export const useReferralCode = (endpointUrl: string, dev: boolean) => {
   const client = new IndexerClient(endpointUrl, dev);
 
   const fetchReferralCode = useCallback(
-    async (walletAddress: string, signature: string, message: string) => {
+    async (walletAddress: string, auth: SignatureAuth) => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await client.getReferralCode(
-          walletAddress,
-          signature,
-          message
-        );
+        const response = await client.getReferralCode(walletAddress, auth);
         setReferralCode(response);
         return response;
       } catch (err) {

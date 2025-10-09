@@ -2,13 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type NonceResponse, type Optional } from '@johnqh/types';
-import { IndexerMockData } from './mocks';
+import type { SignatureAuth } from '../types';
 
 interface UseGetNonceReturn {
   getNonce: (
     username: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<NonceResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -22,13 +21,11 @@ interface UseGetNonceReturn {
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @param devMode - Whether to use mock data on errors
  * @returns Object with getNonce function and state
  */
 export const useGetNonce = (
   endpointUrl: string,
-  dev: boolean = false,
-  devMode: boolean = false
+  dev: boolean = false
 ): UseGetNonceReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
@@ -44,21 +41,15 @@ export const useGetNonce = (
   const mutation = useMutation({
     mutationFn: async ({
       username,
-      signature,
-      message,
+      auth,
     }: {
       username: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getNonce(username, signature, message);
+        return await indexerClient.getNonce(username, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn('[DevMode] getNonce failed, returning mock data:', err);
-          return IndexerMockData.getNonce(username);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get nonce';
         setError(errorMessage);
@@ -70,10 +61,9 @@ export const useGetNonce = (
   const getNonce = useCallback(
     async (
       username: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<NonceResponse>> => {
-      return await mutation.mutateAsync({ username, signature, message });
+      return await mutation.mutateAsync({ username, auth });
     },
     [mutation]
   );

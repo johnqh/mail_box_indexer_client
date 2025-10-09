@@ -17,32 +17,6 @@ vi.mock('../../network/IndexerClient', () => {
   };
 });
 
-// Mock data
-vi.mock('../mocks', () => ({
-  IndexerMockData: {
-    getLeaderboard: vi.fn().mockReturnValue({
-      success: true,
-      data: {
-        leaderboard: [
-          {
-            walletAddress: '0x123...',
-            chainType: 'evm',
-            pointsEarned: '1000',
-          },
-        ],
-      },
-      timestamp: new Date().toISOString(),
-    }),
-    getSiteStats: vi.fn().mockReturnValue({
-      success: true,
-      data: {
-        totalPoints: '100000',
-        totalUsers: 500,
-      },
-      timestamp: new Date().toISOString(),
-    }),
-  },
-}));
 
 describe('useIndexerPoints', () => {
   // Create a wrapper with QueryClient for testing
@@ -89,7 +63,7 @@ describe('useIndexerPoints', () => {
   describe('getPointsLeaderboard', () => {
     it('should fetch leaderboard successfully', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -103,7 +77,7 @@ describe('useIndexerPoints', () => {
 
     it('should use default count of 10', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -112,13 +86,13 @@ describe('useIndexerPoints', () => {
       expect(mockGetPointsLeaderboard).toHaveBeenCalledWith(10);
     });
 
-    it('should handle errors in normal mode', async () => {
+    it('should handle errors', async () => {
       mockGetPointsLeaderboard.mockRejectedValueOnce(
         new Error('Network error')
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -131,26 +105,9 @@ describe('useIndexerPoints', () => {
       });
     });
 
-    it('should fall back to mock data in dev mode on error', async () => {
-      mockGetPointsLeaderboard.mockRejectedValueOnce(
-        new Error('Network error')
-      );
-
-      const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, true),
-        { wrapper: createWrapper() }
-      );
-
-      const leaderboard = await result.current.getPointsLeaderboard(10);
-
-      expect(leaderboard).toBeDefined();
-      expect(leaderboard.success).toBe(true);
-      expect(result.current.error).toBeNull();
-    });
-
     it('should set loading state', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -166,7 +123,7 @@ describe('useIndexerPoints', () => {
   describe('getPointsSiteStats', () => {
     it('should fetch site stats successfully', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -179,13 +136,13 @@ describe('useIndexerPoints', () => {
       expect(mockGetPointsSiteStats).toHaveBeenCalled();
     });
 
-    it('should handle errors in normal mode', async () => {
+    it('should handle errors', async () => {
       mockGetPointsSiteStats.mockRejectedValueOnce(
         new Error('Service unavailable')
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -197,23 +154,6 @@ describe('useIndexerPoints', () => {
         expect(result.current.error).toBe('Service unavailable');
       });
     });
-
-    it('should fall back to mock data in dev mode on error', async () => {
-      mockGetPointsSiteStats.mockRejectedValueOnce(
-        new Error('Service unavailable')
-      );
-
-      const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, true),
-        { wrapper: createWrapper() }
-      );
-
-      const stats = await result.current.getPointsSiteStats();
-
-      expect(stats).toBeDefined();
-      expect(stats.success).toBe(true);
-      expect(result.current.error).toBeNull();
-    });
   });
 
   describe('error handling', () => {
@@ -223,7 +163,7 @@ describe('useIndexerPoints', () => {
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false, false),
+        () => useIndexerPoints('https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 

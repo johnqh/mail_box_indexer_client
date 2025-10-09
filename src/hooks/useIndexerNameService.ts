@@ -8,6 +8,7 @@ import type {
   NameServiceResponse,
 } from '@johnqh/types';
 import { IndexerClient } from '../network/IndexerClient';
+import type { SignatureAuth } from '../types';
 
 // Query stale times (5 minutes for name service resolution)
 const STALE_TIMES = {
@@ -21,8 +22,7 @@ const STALE_TIMES = {
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @param walletAddress - Wallet address to query names for
- * @param signature - Wallet signature for authentication
- * @param message - Signed message for authentication
+ * @param auth - Authentication credentials (signature and message)
  * @param options - Additional React Query options
  * @returns Query result with names data
  *
@@ -32,8 +32,7 @@ const STALE_TIMES = {
  *   'https://indexer.0xmail.box',
  *   false,
  *   '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
- *   signature,
- *   message
+ *   { signature, message }
  * );
  *
  * if (data?.success) {
@@ -45,8 +44,7 @@ export const useWalletNames = (
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
-  signature: string,
-  message: string,
+  auth: SignatureAuth,
   options?: UseQueryOptions<NameServiceResponse>
 ): UseQueryResult<NameServiceResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
@@ -54,10 +52,10 @@ export const useWalletNames = (
   return useQuery({
     queryKey: ['indexer', 'wallet-names', walletAddress],
     queryFn: async (): Promise<NameServiceResponse> => {
-      return await client.getWalletNames(walletAddress, signature, message);
+      return await client.getWalletNames(walletAddress, auth);
     },
     staleTime: STALE_TIMES.NAME_SERVICE_RESOLUTION,
-    enabled: !!walletAddress && !!signature && !!message,
+    enabled: !!walletAddress && !!auth.signature && !!auth.message,
     ...options,
   });
 };

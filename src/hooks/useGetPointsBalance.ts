@@ -2,13 +2,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type Optional, type PointsResponse } from '@johnqh/types';
-import { IndexerMockData } from './mocks';
+import type { SignatureAuth } from '../types';
 
 interface UseGetPointsBalanceReturn {
   getPointsBalance: (
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<PointsResponse>>;
   isLoading: boolean;
   error: Optional<string>;
@@ -22,13 +21,11 @@ interface UseGetPointsBalanceReturn {
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @param devMode - Whether to use mock data on errors
  * @returns Object with getPointsBalance function and state
  */
 export const useGetPointsBalance = (
   endpointUrl: string,
-  dev: boolean = false,
-  devMode: boolean = false
+  dev: boolean = false
 ): UseGetPointsBalanceReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
@@ -44,28 +41,15 @@ export const useGetPointsBalance = (
   const mutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<PointsResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsBalance(
-          walletAddress,
-          signature,
-          message
-        );
+        return await indexerClient.getPointsBalance(walletAddress, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getPointsBalance failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getPointsBalance(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points balance';
         setError(errorMessage);
@@ -77,10 +61,9 @@ export const useGetPointsBalance = (
   const getPointsBalance = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<PointsResponse>> => {
-      return await mutation.mutateAsync({ walletAddress, signature, message });
+      return await mutation.mutateAsync({ walletAddress, auth });
     },
     [mutation]
   );

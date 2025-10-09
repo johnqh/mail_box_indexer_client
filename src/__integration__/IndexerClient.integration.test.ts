@@ -8,6 +8,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { IndexerClient } from '../network/IndexerClient';
+import type { SignatureAuth } from '../types';
 
 describe('IndexerClient Integration Tests', () => {
   let client: IndexerClient;
@@ -118,10 +119,10 @@ describe('IndexerClient Integration Tests', () => {
       const chainId = 1; // Ethereum mainnet
 
       const response = await client.getMessage(
+        chainId,
         testWallet,
         domain,
-        url,
-        chainId
+        url
       );
 
       expect(response).toBeDefined();
@@ -144,7 +145,7 @@ describe('IndexerClient Integration Tests', () => {
       const ensName = 'vitalik.eth';
 
       try {
-        const response = await client.resolveName(ensName, 'evm');
+        const response = await client.resolveNameToAddress(ensName);
 
         expect(response).toBeDefined();
         expect(response.success).toBe(true);
@@ -161,9 +162,10 @@ describe('IndexerClient Integration Tests', () => {
 
     it('should get wallet names for address', async () => {
       const testAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'; // vitalik.eth
+      const auth: SignatureAuth = { message: 'test message', signature: 'test signature' };
 
       try {
-        const response = await client.getWalletNames(testAddress);
+        const response = await client.getWalletNames(testAddress, auth);
 
         expect(response).toBeDefined();
         expect(response.success).toBe(true);
@@ -185,9 +187,10 @@ describe('IndexerClient Integration Tests', () => {
   describe('Referral System', () => {
     it('should get referral code for wallet', async () => {
       const testWallet = '0x742d35Cc6285C9D3C0ef5BAdF3a70b1E95c1e6Bb';
+      const auth: SignatureAuth = { message: 'test message', signature: 'test signature' };
 
       try {
-        const response = await client.getReferralCode(testWallet, 'evm');
+        const response = await client.getReferralCode(testWallet, auth);
 
         expect(response).toBeDefined();
         expect(response.success).toBe(true);
@@ -205,10 +208,10 @@ describe('IndexerClient Integration Tests', () => {
     }, 10000);
 
     it('should get referral stats', async () => {
-      const testWallet = '0x742d35Cc6285C9D3C0ef5BAdF3a70b1E95c1e6Bb';
+      const testReferralCode = 'ABC123XYZ'; // Example 9-character referral code
 
       try {
-        const response = await client.getReferralStats(testWallet, 'evm');
+        const response = await client.getReferralStats(testReferralCode);
 
         expect(response).toBeDefined();
         expect(response.success).toBe(true);

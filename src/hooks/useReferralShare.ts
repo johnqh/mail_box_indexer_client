@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useReferralCode } from './useReferralCode';
+import type { SignatureAuth } from '../types';
 
 /**
  * Hook for managing referral code sharing
@@ -20,8 +21,7 @@ import { useReferralCode } from './useReferralCode';
  * const shareUrl = await getShareUrl(
  *   'https://0xmail.box',
  *   walletAddress,
- *   signature,
- *   message
+ *   { signature, message }
  * );
  * // Returns: "https://0xmail.box?referral=ABC123DEF"
  * ```
@@ -36,22 +36,16 @@ export const useReferralShare = (endpointUrl: string, dev: boolean) => {
    * Get referral code and append to share URL
    * @param baseUrl - The URL to share
    * @param walletAddress - User's wallet address
-   * @param signature - Wallet signature
-   * @param message - Signed message
+   * @param auth - Authentication credentials (signature and message)
    * @returns URL with referral code appended
    */
   const getShareUrl = useCallback(
     async (
       baseUrl: string,
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<string> => {
-      const response = await fetchReferralCode(
-        walletAddress,
-        signature,
-        message
-      );
+      const response = await fetchReferralCode(walletAddress, auth);
       const url = new URL(baseUrl);
       url.searchParams.set('referral', response.data.referralCode);
       return url.toString();

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
+import type { SignatureAuth } from '../types';
 import {
   type AddressValidationResponse,
   type DelegatedFromResponse,
@@ -14,7 +15,6 @@ import {
   type SignInMessageResponse,
   type SiteStatsResponse,
 } from '@johnqh/types';
-import { IndexerMockData } from './mocks';
 
 interface UseIndexerMailReturn {
   isLoading: boolean;
@@ -36,39 +36,32 @@ interface UseIndexerMailReturn {
   // Signature-protected endpoints
   getWalletAccounts: (
     walletAddress: string,
-    signature: string,
-    message: string,
+    auth: SignatureAuth,
     referralCode?: string
   ) => Promise<Optional<EmailAccountsResponse>>;
   getDelegatedTo: (
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<DelegatedToResponse>>;
   getDelegatedFrom: (
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<DelegatedFromResponse>>;
   createNonce: (
     username: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<NonceResponse>>;
   getNonce: (
     username: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<NonceResponse>>;
   getEntitlement: (
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<EntitlementResponse>>;
   getPointsBalance: (
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ) => Promise<Optional<PointsResponse>>;
   clearError: () => void;
 }
@@ -81,8 +74,7 @@ interface UseIndexerMailReturn {
  */
 const useIndexerMail = (
   endpointUrl: string,
-  dev: boolean = false,
-  devMode: boolean = false
+  dev: boolean = false
 ): UseIndexerMailReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
@@ -105,13 +97,6 @@ const useIndexerMail = (
       try {
         return await indexerClient.validateUsername(username);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] validateUsername failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getValidation(username);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Validation failed';
         setError(errorMessage);
@@ -142,17 +127,6 @@ const useIndexerMail = (
           url
         );
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getSigningMessage failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getSigningMessage(
-            walletAddress,
-            chainId,
-            domain
-          );
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';
         setError(errorMessage);
@@ -170,13 +144,6 @@ const useIndexerMail = (
       try {
         return await indexerClient.getPointsLeaderboard(count);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getPointsLeaderboard failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getLeaderboard();
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get leaderboard';
         setError(errorMessage);
@@ -192,13 +159,6 @@ const useIndexerMail = (
       try {
         return await indexerClient.getPointsSiteStats();
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getPointsSiteStats failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getSiteStats();
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get site stats';
         setError(errorMessage);
@@ -211,31 +171,21 @@ const useIndexerMail = (
   const getWalletAccountsMutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
       referralCode,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
       referralCode?: string;
     }): Promise<Optional<EmailAccountsResponse>> => {
       setError(null);
       try {
         return await indexerClient.getWalletAccounts(
           walletAddress,
-          signature,
-          message,
+          auth,
           referralCode
         );
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getWalletAccounts failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getWalletAccounts(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get wallet accounts';
         setError(errorMessage);
@@ -248,28 +198,15 @@ const useIndexerMail = (
   const getDelegatedToMutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<DelegatedToResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getDelegatedTo(
-          walletAddress,
-          signature,
-          message
-        );
+        return await indexerClient.getDelegatedTo(walletAddress, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getDelegatedTo failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getDelegatedTo(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated to';
         setError(errorMessage);
@@ -282,28 +219,15 @@ const useIndexerMail = (
   const getDelegatedFromMutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<DelegatedFromResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getDelegatedFrom(
-          walletAddress,
-          signature,
-          message
-        );
+        return await indexerClient.getDelegatedFrom(walletAddress, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getDelegatedFrom failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getDelegatedFrom(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated from';
         setError(errorMessage);
@@ -316,24 +240,15 @@ const useIndexerMail = (
   const createNonceMutation = useMutation({
     mutationFn: async ({
       username,
-      signature,
-      message,
+      auth,
     }: {
       username: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.createNonce(username, signature, message);
+        return await indexerClient.createNonce(username, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] createNonce failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.createNonce(username);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to create nonce';
         setError(errorMessage);
@@ -346,21 +261,15 @@ const useIndexerMail = (
   const getNonceMutation = useMutation({
     mutationFn: async ({
       username,
-      signature,
-      message,
+      auth,
     }: {
       username: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<NonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getNonce(username, signature, message);
+        return await indexerClient.getNonce(username, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn('[DevMode] getNonce failed, returning mock data:', err);
-          return IndexerMockData.getNonce(username);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get nonce';
         setError(errorMessage);
@@ -373,28 +282,15 @@ const useIndexerMail = (
   const getEntitlementMutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<EntitlementResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getEntitlement(
-          walletAddress,
-          signature,
-          message
-        );
+        return await indexerClient.getEntitlement(walletAddress, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getEntitlement failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getEntitlement(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get entitlement';
         setError(errorMessage);
@@ -407,28 +303,15 @@ const useIndexerMail = (
   const getPointsBalanceMutation = useMutation({
     mutationFn: async ({
       walletAddress,
-      signature,
-      message,
+      auth,
     }: {
       walletAddress: string;
-      signature: string;
-      message: string;
+      auth: SignatureAuth;
     }): Promise<Optional<PointsResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsBalance(
-          walletAddress,
-          signature,
-          message
-        );
+        return await indexerClient.getPointsBalance(walletAddress, auth);
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getPointsBalance failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getPointsBalance(walletAddress);
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points balance';
         setError(errorMessage);
@@ -478,16 +361,14 @@ const useIndexerMail = (
   const getWalletAccounts = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string,
+      auth: SignatureAuth,
       referralCode?: string
     ): Promise<Optional<EmailAccountsResponse>> => {
       const params: {
         walletAddress: string;
-        signature: string;
-        message: string;
+        auth: SignatureAuth;
         referralCode?: string;
-      } = { walletAddress, signature, message };
+      } = { walletAddress, auth };
       if (referralCode !== undefined) {
         params.referralCode = referralCode;
       }
@@ -499,13 +380,11 @@ const useIndexerMail = (
   const getDelegatedTo = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<DelegatedToResponse>> => {
       return await getDelegatedToMutation.mutateAsync({
         walletAddress,
-        signature,
-        message,
+        auth,
       });
     },
     [getDelegatedToMutation]
@@ -514,13 +393,11 @@ const useIndexerMail = (
   const getDelegatedFrom = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<DelegatedFromResponse>> => {
       return await getDelegatedFromMutation.mutateAsync({
         walletAddress,
-        signature,
-        message,
+        auth,
       });
     },
     [getDelegatedFromMutation]
@@ -529,13 +406,11 @@ const useIndexerMail = (
   const createNonce = useCallback(
     async (
       username: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<NonceResponse>> => {
       return await createNonceMutation.mutateAsync({
         username,
-        signature,
-        message,
+        auth,
       });
     },
     [createNonceMutation]
@@ -544,13 +419,11 @@ const useIndexerMail = (
   const getNonce = useCallback(
     async (
       username: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<NonceResponse>> => {
       return await getNonceMutation.mutateAsync({
         username,
-        signature,
-        message,
+        auth,
       });
     },
     [getNonceMutation]
@@ -559,13 +432,11 @@ const useIndexerMail = (
   const getEntitlement = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<EntitlementResponse>> => {
       return await getEntitlementMutation.mutateAsync({
         walletAddress,
-        signature,
-        message,
+        auth,
       });
     },
     [getEntitlementMutation]
@@ -574,13 +445,11 @@ const useIndexerMail = (
   const getPointsBalance = useCallback(
     async (
       walletAddress: string,
-      signature: string,
-      message: string
+      auth: SignatureAuth
     ): Promise<Optional<PointsResponse>> => {
       return await getPointsBalanceMutation.mutateAsync({
         walletAddress,
-        signature,
-        message,
+        auth,
       });
     },
     [getPointsBalanceMutation]

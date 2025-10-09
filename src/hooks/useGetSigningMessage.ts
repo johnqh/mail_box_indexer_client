@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import { type Optional, type SignInMessageResponse } from '@johnqh/types';
-import { IndexerMockData } from './mocks';
 
 interface UseGetSigningMessageReturn {
   getSigningMessage: (
@@ -23,13 +22,11 @@ interface UseGetSigningMessageReturn {
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @param devMode - Whether to use mock data on errors
  * @returns Object with getSigningMessage function and state
  */
 export const useGetSigningMessage = (
   endpointUrl: string,
-  dev: boolean = false,
-  devMode: boolean = false
+  dev: boolean = false
 ): UseGetSigningMessageReturn => {
   const [error, setError] = useState<Optional<string>>(null);
 
@@ -63,17 +60,6 @@ export const useGetSigningMessage = (
           url
         );
       } catch (err) {
-        if (devMode) {
-          console.warn(
-            '[DevMode] getSigningMessage failed, returning mock data:',
-            err
-          );
-          return IndexerMockData.getSigningMessage(
-            walletAddress,
-            chainId,
-            domain
-          );
-        }
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';
         setError(errorMessage);

@@ -15,6 +15,7 @@ import type {
   SignInMessageResponse,
   SiteStatsResponse,
 } from '@johnqh/types';
+import type { SignatureAuth } from '../types';
 
 /**
  * Network request options
@@ -325,13 +326,10 @@ export class IndexerClient {
    * Encodes the message using encodeURIComponent for HTTP header transmission
    * The indexer will decode it using decodeURIComponent
    */
-  private createAuthHeaders(
-    signature: string,
-    message: string
-  ): Record<string, string> {
+  private createAuthHeaders(auth: SignatureAuth): Record<string, string> {
     return {
-      'x-signature': signature.replace(/[\r\n]/g, ''), // Remove any newlines from signature
-      'x-message': encodeURIComponent(message), // Encode message for HTTP header
+      'x-signature': auth.signature.replace(/[\r\n]/g, ''), // Remove any newlines from signature
+      'x-message': encodeURIComponent(auth.message), // Encode message for HTTP header
     };
   }
 
@@ -341,20 +339,18 @@ export class IndexerClient {
    */
   async getWalletAccounts(
     walletAddress: string,
-    signature: string,
-    message: string,
+    auth: SignatureAuth,
     referralCode?: string
   ): Promise<EmailAccountsResponse> {
     console.log('[IndexerClient] getWalletAccounts called with:', {
       walletAddress,
-      signatureLength: signature?.length,
-      messageLength: message?.length,
+      auth,
       referralCode,
       baseUrl: this.baseUrl,
       endpoint: `/wallets/${encodeURIComponent(walletAddress)}/accounts`,
     });
 
-    const headers = this.createAuthHeaders(signature, message);
+    const headers = this.createAuthHeaders(auth);
 
     // Add referral code header if provided
     if (referralCode) {
@@ -381,13 +377,12 @@ export class IndexerClient {
    */
   async getDelegatedTo(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<DelegatedToResponse> {
     const response = await this.get<DelegatedToResponse>(
       `/delegations/from/${encodeURIComponent(walletAddress)}`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -406,13 +401,12 @@ export class IndexerClient {
    */
   async getDelegatedFrom(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<DelegatedFromResponse> {
     const response = await this.get<DelegatedFromResponse>(
       `/delegations/to/${encodeURIComponent(walletAddress)}`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -431,14 +425,13 @@ export class IndexerClient {
    */
   async createNonce(
     username: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<NonceResponse> {
     const response = await this.post<NonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
       {},
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -457,13 +450,12 @@ export class IndexerClient {
    */
   async getNonce(
     username: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<NonceResponse> {
     const response = await this.get<NonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -482,13 +474,12 @@ export class IndexerClient {
    */
   async getEntitlement(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<EntitlementResponse> {
     const response = await this.get<EntitlementResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/entitlements/`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -507,13 +498,12 @@ export class IndexerClient {
    */
   async getPointsBalance(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<PointsResponse> {
     const response = await this.get<PointsResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/points`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -532,13 +522,11 @@ export class IndexerClient {
    */
   async getReferralCode(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<ReferralCodeResponse> {
     console.log('[IndexerClient] getReferralCode called with:', {
       walletAddress,
-      signatureLength: signature?.length,
-      messageLength: message?.length,
+      auth,
       endpoint: `/wallets/${encodeURIComponent(walletAddress)}/referral`,
     });
 
@@ -546,7 +534,7 @@ export class IndexerClient {
       `/wallets/${encodeURIComponent(walletAddress)}/referral`,
       {},
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 
@@ -598,13 +586,12 @@ export class IndexerClient {
    */
   async getWalletNames(
     walletAddress: string,
-    signature: string,
-    message: string
+    auth: SignatureAuth
   ): Promise<NameServiceResponse> {
     const response = await this.get<NameServiceResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/names`,
       {
-        headers: this.createAuthHeaders(signature, message),
+        headers: this.createAuthHeaders(auth),
       }
     );
 

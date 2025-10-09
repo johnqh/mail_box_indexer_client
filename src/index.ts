@@ -73,6 +73,9 @@ export type {
   WebhookResponse,
 } from './utils/indexer-webhooks';
 
+// Local types
+export type { SignatureAuth } from './types';
+
 // Re-export types from @johnqh/types for convenience
 export type {
   AddressValidationResponse,

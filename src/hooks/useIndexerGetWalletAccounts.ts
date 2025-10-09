@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type EmailAccountsResponse } from '@johnqh/types';
+import { type IndexerEmailAccountsResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
 /**
@@ -41,8 +41,8 @@ export const useIndexerGetWalletAccounts = (
   walletAddress: string,
   auth: IndexerUserAuth,
   referralCode?: string,
-  options?: UseQueryOptions<EmailAccountsResponse>
-): UseQueryResult<EmailAccountsResponse> => {
+  options?: UseQueryOptions<IndexerEmailAccountsResponse>
+): UseQueryResult<IndexerEmailAccountsResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
@@ -53,7 +53,7 @@ export const useIndexerGetWalletAccounts = (
       auth.signature,
       referralCode,
     ],
-    queryFn: async (): Promise<EmailAccountsResponse> => {
+    queryFn: async (): Promise<IndexerEmailAccountsResponse> => {
       return await client.getWalletAccounts(walletAddress, auth, referralCode);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

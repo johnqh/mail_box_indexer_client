@@ -4,21 +4,21 @@
  */
 
 import type {
-  AddressValidationResponse,
   ChainType,
-  DelegatedFromResponse,
-  DelegatedToResponse,
-  EmailAccountsResponse,
-  EntitlementResponse,
-  LeaderboardResponse,
-  NonceResponse,
-  PointsResponse,
-  SignInMessageResponse,
-  SiteStatsResponse,
+  IndexerAddressValidationResponse,
+  IndexerDelegatedFromResponse,
+  IndexerDelegatedToResponse,
+  IndexerEmailAccountsResponse,
+  IndexerEntitlementResponse,
+  IndexerLeaderboardResponse,
+  IndexerNonceResponse,
+  IndexerPointsResponse,
+  IndexerSignInMessageResponse,
+  IndexerSiteStatsResponse,
 } from '@johnqh/types';
 
 export class IndexerMockData {
-  static getLeaderboard(count: number = 10): LeaderboardResponse {
+  static getLeaderboard(count: number = 10): IndexerLeaderboardResponse {
     return {
       success: true,
       data: {
@@ -48,7 +48,7 @@ export class IndexerMockData {
     };
   }
 
-  static getSiteStats(): SiteStatsResponse {
+  static getSiteStats(): IndexerSiteStatsResponse {
     return {
       success: true,
       data: {
@@ -61,7 +61,7 @@ export class IndexerMockData {
     };
   }
 
-  static getValidation(username: string): AddressValidationResponse {
+  static getValidation(username: string): IndexerAddressValidationResponse {
     return {
       success: true,
       data: {
@@ -78,7 +78,7 @@ export class IndexerMockData {
     walletAddress: string,
     chainId: number,
     domain: string
-  ): SignInMessageResponse {
+  ): IndexerSignInMessageResponse {
     return {
       success: true,
       data: {
@@ -92,7 +92,9 @@ export class IndexerMockData {
     };
   }
 
-  static getWalletAccounts(walletAddress: string): EmailAccountsResponse {
+  static getWalletAccounts(
+    walletAddress: string
+  ): IndexerEmailAccountsResponse {
     return {
       success: true,
       data: {
@@ -109,7 +111,7 @@ export class IndexerMockData {
     };
   }
 
-  static getDelegatedTo(walletAddress: string): DelegatedToResponse {
+  static getDelegatedTo(walletAddress: string): IndexerDelegatedToResponse {
     return {
       success: true,
       data: {
@@ -123,7 +125,9 @@ export class IndexerMockData {
     };
   }
 
-  static getDelegatedFrom(_walletAddress: string): DelegatedFromResponse {
+  static getDelegatedFrom(
+    _walletAddress: string
+  ): IndexerDelegatedFromResponse {
     return {
       success: true,
       data: {
@@ -134,7 +138,7 @@ export class IndexerMockData {
     };
   }
 
-  static createNonce(_username: string): NonceResponse {
+  static createNonce(_username: string): IndexerNonceResponse {
     return {
       success: true,
       data: {
@@ -145,7 +149,7 @@ export class IndexerMockData {
     };
   }
 
-  static getNonce(_username: string): NonceResponse {
+  static getNonce(_username: string): IndexerNonceResponse {
     return {
       success: true,
       data: {
@@ -156,7 +160,7 @@ export class IndexerMockData {
     };
   }
 
-  static getEntitlement(walletAddress: string): EntitlementResponse {
+  static getEntitlement(walletAddress: string): IndexerEntitlementResponse {
     return {
       success: true,
       data: {
@@ -177,7 +181,7 @@ export class IndexerMockData {
     };
   }
 
-  static getPointsBalance(walletAddress: string): PointsResponse {
+  static getPointsBalance(walletAddress: string): IndexerPointsResponse {
     return {
       success: true,
       data: {

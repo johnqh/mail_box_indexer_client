@@ -12,9 +12,9 @@ import {
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import type {
-  LeaderboardResponse,
+  IndexerLeaderboardResponse,
+  IndexerSiteStatsResponse,
   Optional,
-  SiteStatsResponse,
 } from '@johnqh/types';
 
 /**
@@ -46,13 +46,13 @@ export function useIndexerPointsLeaderboard(
   endpointUrl: string,
   dev: boolean,
   count: number = 10,
-  options?: UseQueryOptions<LeaderboardResponse>
-): UseQueryResult<LeaderboardResponse> {
+  options?: UseQueryOptions<IndexerLeaderboardResponse>
+): UseQueryResult<IndexerLeaderboardResponse> {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-leaderboard', count],
-    queryFn: async (): Promise<LeaderboardResponse> => {
+    queryFn: async (): Promise<IndexerLeaderboardResponse> => {
       return await client.getPointsLeaderboard(count);
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
@@ -85,13 +85,13 @@ export function useIndexerPointsLeaderboard(
 export function useIndexerPointsSiteStats(
   endpointUrl: string,
   dev: boolean,
-  options?: UseQueryOptions<SiteStatsResponse>
-): UseQueryResult<SiteStatsResponse> {
+  options?: UseQueryOptions<IndexerSiteStatsResponse>
+): UseQueryResult<IndexerSiteStatsResponse> {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-site-stats'],
-    queryFn: async (): Promise<SiteStatsResponse> => {
+    queryFn: async (): Promise<IndexerSiteStatsResponse> => {
       return await client.getPointsSiteStats();
     },
     staleTime: 5 * 60 * 1000, // 5 minutes - site stats don't change as frequently
@@ -117,7 +117,9 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
 
   // Mutation for getting leaderboard
   const leaderboardMutation = useMutation({
-    mutationFn: async (count: number = 10): Promise<LeaderboardResponse> => {
+    mutationFn: async (
+      count: number = 10
+    ): Promise<IndexerLeaderboardResponse> => {
       setError(null);
       try {
         const result = await indexerClient.getPointsLeaderboard(count);
@@ -133,7 +135,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
 
   // Mutation for getting site stats
   const siteStatsMutation = useMutation({
-    mutationFn: async (): Promise<SiteStatsResponse> => {
+    mutationFn: async (): Promise<IndexerSiteStatsResponse> => {
       setError(null);
       try {
         const result = await indexerClient.getPointsSiteStats();
@@ -148,7 +150,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
   });
 
   const getPointsLeaderboard = useCallback(
-    async (count: number = 10): Promise<LeaderboardResponse> => {
+    async (count: number = 10): Promise<IndexerLeaderboardResponse> => {
       const result = await leaderboardMutation.mutateAsync(count);
       return result;
     },
@@ -156,7 +158,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
   );
 
   const getPointsSiteStats =
-    useCallback(async (): Promise<SiteStatsResponse> => {
+    useCallback(async (): Promise<IndexerSiteStatsResponse> => {
       const result = await siteStatsMutation.mutateAsync();
       return result;
     }, [siteStatsMutation]);

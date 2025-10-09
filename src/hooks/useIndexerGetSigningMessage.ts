@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type Optional, type SignInMessageResponse } from '@johnqh/types';
+import {
+  type IndexerSignInMessageResponse,
+  type Optional,
+} from '@johnqh/types';
 
 interface UseIndexerGetSigningMessageReturn {
   getSigningMessage: (
@@ -9,7 +12,7 @@ interface UseIndexerGetSigningMessageReturn {
     chainId: number,
     domain: string,
     url: string
-  ) => Promise<Optional<SignInMessageResponse>>;
+  ) => Promise<Optional<IndexerSignInMessageResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
@@ -54,7 +57,7 @@ export const useIndexerGetSigningMessage = (
       chainId: number;
       domain: string;
       url: string;
-    }): Promise<Optional<SignInMessageResponse>> => {
+    }): Promise<Optional<IndexerSignInMessageResponse>> => {
       setError(null);
       try {
         return await indexerClient.getMessage(
@@ -78,7 +81,7 @@ export const useIndexerGetSigningMessage = (
       chainId: number,
       domain: string,
       url: string
-    ): Promise<Optional<SignInMessageResponse>> => {
+    ): Promise<Optional<IndexerSignInMessageResponse>> => {
       return await mutation.mutateAsync({
         walletAddress,
         chainId,

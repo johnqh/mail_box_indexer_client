@@ -1,12 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type AddressValidationResponse, type Optional } from '@johnqh/types';
+import {
+  type IndexerAddressValidationResponse,
+  type Optional,
+} from '@johnqh/types';
 
 interface UseIndexerValidateUsernameReturn {
   validateUsername: (
     username: string
-  ) => Promise<Optional<AddressValidationResponse>>;
+  ) => Promise<Optional<IndexerAddressValidationResponse>>;
   isLoading: boolean;
   error: Optional<string>;
   clearError: () => void;
@@ -42,7 +45,7 @@ export const useIndexerValidateUsername = (
   const mutation = useMutation({
     mutationFn: async (
       username: string
-    ): Promise<Optional<AddressValidationResponse>> => {
+    ): Promise<Optional<IndexerAddressValidationResponse>> => {
       setError(null);
       try {
         return await indexerClient.validateUsername(username);
@@ -56,7 +59,9 @@ export const useIndexerValidateUsername = (
   });
 
   const validateUsername = useCallback(
-    async (username: string): Promise<Optional<AddressValidationResponse>> => {
+    async (
+      username: string
+    ): Promise<Optional<IndexerAddressValidationResponse>> => {
       return await mutation.mutateAsync(username);
     },
     [mutation]

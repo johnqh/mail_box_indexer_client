@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type EntitlementResponse } from '@johnqh/types';
+import { type IndexerEntitlementResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
 /**
@@ -38,13 +38,13 @@ export const useIndexerGetEntitlement = (
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<EntitlementResponse>
-): UseQueryResult<EntitlementResponse> => {
+  options?: UseQueryOptions<IndexerEntitlementResponse>
+): UseQueryResult<IndexerEntitlementResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'entitlement', walletAddress, auth.signature],
-    queryFn: async (): Promise<EntitlementResponse> => {
+    queryFn: async (): Promise<IndexerEntitlementResponse> => {
       return await client.getEntitlement(walletAddress, auth);
     },
     staleTime: 10 * 60 * 1000, // 10 minutes - entitlements don't change often

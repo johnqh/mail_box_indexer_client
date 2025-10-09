@@ -7,10 +7,13 @@
 
 import { IndexerClient } from '../network/IndexerClient';
 import type { AppConfig } from '@johnqh/types';
-import type { LeaderboardResponse, SiteStatsResponse } from '@johnqh/types';
+import type {
+  IndexerLeaderboardResponse,
+  IndexerSiteStatsResponse,
+} from '@johnqh/types';
 
 // Legacy response types for backward compatibility
-interface IndexerLeaderboardResponse {
+interface IndexerIndexerLeaderboardResponse {
   success: boolean;
   leaderboard?: any[];
   message?: string;
@@ -78,13 +81,13 @@ class IndexerService {
    */
   public async getLeaderboard(
     count: number = 10
-  ): Promise<IndexerLeaderboardResponse> {
+  ): Promise<IndexerIndexerLeaderboardResponse> {
     const cacheKey = this.getCacheKey('leaderboard', count);
-    const cached = this.getCache<IndexerLeaderboardResponse>(cacheKey);
+    const cached = this.getCache<IndexerIndexerLeaderboardResponse>(cacheKey);
     if (cached) return cached;
 
     try {
-      const response: LeaderboardResponse =
+      const response: IndexerLeaderboardResponse =
         await this.indexerClient.getPointsLeaderboard(count);
 
       const result = {
@@ -109,7 +112,7 @@ class IndexerService {
     if (cached) return cached;
 
     try {
-      const response: SiteStatsResponse =
+      const response: IndexerSiteStatsResponse =
         await this.indexerClient.getPointsSiteStats();
 
       const result = {

@@ -4,8 +4,8 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import type {
-  NameResolutionResponse,
-  NameServiceResponse,
+  IndexerNameResolutionResponse,
+  IndexerNameServiceResponse,
 } from '@johnqh/types';
 import { IndexerClient } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
@@ -45,13 +45,13 @@ export const useWalletNames = (
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<NameServiceResponse>
-): UseQueryResult<NameServiceResponse> => {
+  options?: UseQueryOptions<IndexerNameServiceResponse>
+): UseQueryResult<IndexerNameServiceResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'wallet-names', walletAddress],
-    queryFn: async (): Promise<NameServiceResponse> => {
+    queryFn: async (): Promise<IndexerNameServiceResponse> => {
       return await client.getWalletNames(walletAddress, auth);
     },
     staleTime: STALE_TIMES.NAME_SERVICE_RESOLUTION,
@@ -88,13 +88,13 @@ export const useResolveNameToAddress = (
   endpointUrl: string,
   dev: boolean,
   name: string,
-  options?: UseQueryOptions<NameResolutionResponse>
-): UseQueryResult<NameResolutionResponse> => {
+  options?: UseQueryOptions<IndexerNameResolutionResponse>
+): UseQueryResult<IndexerNameResolutionResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'resolve-name', name],
-    queryFn: async (): Promise<NameResolutionResponse> => {
+    queryFn: async (): Promise<IndexerNameResolutionResponse> => {
       return await client.resolveNameToAddress(name);
     },
     staleTime: STALE_TIMES.NAME_SERVICE_RESOLUTION,

@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type DelegatedToResponse } from '@johnqh/types';
+import { type IndexerDelegatedToResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
 /**
@@ -38,13 +38,13 @@ export const useIndexerGetDelegatedTo = (
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<DelegatedToResponse>
-): UseQueryResult<DelegatedToResponse> => {
+  options?: UseQueryOptions<IndexerDelegatedToResponse>
+): UseQueryResult<IndexerDelegatedToResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'delegated-to', walletAddress, auth.signature],
-    queryFn: async (): Promise<DelegatedToResponse> => {
+    queryFn: async (): Promise<IndexerDelegatedToResponse> => {
       return await client.getDelegatedTo(walletAddress, auth);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

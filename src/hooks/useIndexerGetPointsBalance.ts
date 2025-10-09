@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type PointsResponse } from '@johnqh/types';
+import { type IndexerPointsResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
 /**
@@ -39,13 +39,13 @@ export const useIndexerGetPointsBalance = (
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<PointsResponse>
-): UseQueryResult<PointsResponse> => {
+  options?: UseQueryOptions<IndexerPointsResponse>
+): UseQueryResult<IndexerPointsResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-balance', walletAddress, auth.signature],
-    queryFn: async (): Promise<PointsResponse> => {
+    queryFn: async (): Promise<IndexerPointsResponse> => {
       return await client.getPointsBalance(walletAddress, auth);
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - points change frequently

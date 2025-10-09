@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type NonceResponse } from '@johnqh/types';
+import { type IndexerNonceResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
 /**
@@ -38,13 +38,13 @@ export const useIndexerGetNonce = (
   dev: boolean,
   username: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<NonceResponse>
-): UseQueryResult<NonceResponse> => {
+  options?: UseQueryOptions<IndexerNonceResponse>
+): UseQueryResult<IndexerNonceResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
   return useQuery({
     queryKey: ['indexer', 'nonce', username, auth.signature],
-    queryFn: async (): Promise<NonceResponse> => {
+    queryFn: async (): Promise<IndexerNonceResponse> => {
       return await client.getNonce(username, auth);
     },
     staleTime: 1 * 60 * 1000, // 1 minute - nonces are short-lived

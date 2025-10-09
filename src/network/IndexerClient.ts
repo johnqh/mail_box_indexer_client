@@ -1,19 +1,19 @@
 import axios from 'axios';
 import type {
-  AddressValidationResponse,
   ChainType,
-  DelegatedFromResponse,
-  DelegatedToResponse,
-  EmailAccountsResponse,
-  EntitlementResponse,
-  LeaderboardResponse,
-  NameResolutionResponse,
-  NameServiceResponse,
-  NonceResponse,
+  IndexerAddressValidationResponse,
+  IndexerDelegatedFromResponse,
+  IndexerDelegatedToResponse,
+  IndexerEmailAccountsResponse,
+  IndexerEntitlementResponse,
+  IndexerLeaderboardResponse,
+  IndexerNameResolutionResponse,
+  IndexerNameServiceResponse,
+  IndexerNonceResponse,
+  IndexerPointsResponse,
+  IndexerSignInMessageResponse,
+  IndexerSiteStatsResponse,
   Optional,
-  PointsResponse,
-  SignInMessageResponse,
-  SiteStatsResponse,
 } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
 
@@ -240,8 +240,10 @@ export class IndexerClient {
    * Validate username format (public endpoint)
    * GET /users/:username/validate
    */
-  async validateUsername(username: string): Promise<AddressValidationResponse> {
-    const response = await this.get<AddressValidationResponse>(
+  async validateUsername(
+    username: string
+  ): Promise<IndexerAddressValidationResponse> {
+    const response = await this.get<IndexerAddressValidationResponse>(
       `/users/${encodeURIComponent(username)}/validate`
     );
 
@@ -251,7 +253,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as AddressValidationResponse;
+    return response.data as IndexerAddressValidationResponse;
   }
 
   /**
@@ -263,14 +265,14 @@ export class IndexerClient {
     walletAddress: string,
     domain: string,
     url: string
-  ): Promise<SignInMessageResponse> {
+  ): Promise<IndexerSignInMessageResponse> {
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       domain,
       url,
     });
 
-    const response = await this.get<SignInMessageResponse>(
+    const response = await this.get<IndexerSignInMessageResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/message?${queryParams.toString()}`
     );
 
@@ -280,15 +282,17 @@ export class IndexerClient {
       );
     }
 
-    return response.data as SignInMessageResponse;
+    return response.data as IndexerSignInMessageResponse;
   }
 
   /**
    * Get points leaderboard (public endpoint)
    * GET /points/leaderboard/:count
    */
-  async getPointsLeaderboard(count: number = 10): Promise<LeaderboardResponse> {
-    const response = await this.get<LeaderboardResponse>(
+  async getPointsLeaderboard(
+    count: number = 10
+  ): Promise<IndexerLeaderboardResponse> {
+    const response = await this.get<IndexerLeaderboardResponse>(
       `/points/leaderboard/${count}`
     );
 
@@ -298,15 +302,16 @@ export class IndexerClient {
       );
     }
 
-    return response.data as LeaderboardResponse;
+    return response.data as IndexerLeaderboardResponse;
   }
 
   /**
    * Get site-wide statistics (public endpoint)
    * GET /points/site-stats
    */
-  async getPointsSiteStats(): Promise<SiteStatsResponse> {
-    const response = await this.get<SiteStatsResponse>('/points/site-stats');
+  async getPointsSiteStats(): Promise<IndexerSiteStatsResponse> {
+    const response =
+      await this.get<IndexerSiteStatsResponse>('/points/site-stats');
 
     if (!response.ok) {
       throw new Error(
@@ -314,7 +319,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as SiteStatsResponse;
+    return response.data as IndexerSiteStatsResponse;
   }
 
   // =============================================================================
@@ -341,7 +346,7 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth,
     referralCode?: string
-  ): Promise<EmailAccountsResponse> {
+  ): Promise<IndexerEmailAccountsResponse> {
     console.log('[IndexerClient] getWalletAccounts called with:', {
       walletAddress,
       auth,
@@ -357,7 +362,7 @@ export class IndexerClient {
       headers['x-referral'] = referralCode;
     }
 
-    const response = await this.get<EmailAccountsResponse>(
+    const response = await this.get<IndexerEmailAccountsResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/accounts`,
       { headers }
     );
@@ -368,7 +373,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as EmailAccountsResponse;
+    return response.data as IndexerEmailAccountsResponse;
   }
 
   /**
@@ -378,8 +383,8 @@ export class IndexerClient {
   async getDelegatedTo(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<DelegatedToResponse> {
-    const response = await this.get<DelegatedToResponse>(
+  ): Promise<IndexerDelegatedToResponse> {
+    const response = await this.get<IndexerDelegatedToResponse>(
       `/delegations/from/${encodeURIComponent(walletAddress)}`,
       {
         headers: this.createAuthHeaders(auth),
@@ -392,7 +397,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as DelegatedToResponse;
+    return response.data as IndexerDelegatedToResponse;
   }
 
   /**
@@ -402,8 +407,8 @@ export class IndexerClient {
   async getDelegatedFrom(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<DelegatedFromResponse> {
-    const response = await this.get<DelegatedFromResponse>(
+  ): Promise<IndexerDelegatedFromResponse> {
+    const response = await this.get<IndexerDelegatedFromResponse>(
       `/delegations/to/${encodeURIComponent(walletAddress)}`,
       {
         headers: this.createAuthHeaders(auth),
@@ -416,7 +421,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as DelegatedFromResponse;
+    return response.data as IndexerDelegatedFromResponse;
   }
 
   /**
@@ -426,8 +431,8 @@ export class IndexerClient {
   async createNonce(
     username: string,
     auth: IndexerUserAuth
-  ): Promise<NonceResponse> {
-    const response = await this.post<NonceResponse>(
+  ): Promise<IndexerNonceResponse> {
+    const response = await this.post<IndexerNonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
       {},
       {
@@ -441,7 +446,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as NonceResponse;
+    return response.data as IndexerNonceResponse;
   }
 
   /**
@@ -451,8 +456,8 @@ export class IndexerClient {
   async getNonce(
     username: string,
     auth: IndexerUserAuth
-  ): Promise<NonceResponse> {
-    const response = await this.get<NonceResponse>(
+  ): Promise<IndexerNonceResponse> {
+    const response = await this.get<IndexerNonceResponse>(
       `/users/${encodeURIComponent(username)}/nonce`,
       {
         headers: this.createAuthHeaders(auth),
@@ -465,7 +470,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as NonceResponse;
+    return response.data as IndexerNonceResponse;
   }
 
   /**
@@ -475,8 +480,8 @@ export class IndexerClient {
   async getEntitlement(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<EntitlementResponse> {
-    const response = await this.get<EntitlementResponse>(
+  ): Promise<IndexerEntitlementResponse> {
+    const response = await this.get<IndexerEntitlementResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/entitlements/`,
       {
         headers: this.createAuthHeaders(auth),
@@ -489,7 +494,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as EntitlementResponse;
+    return response.data as IndexerEntitlementResponse;
   }
 
   /**
@@ -499,8 +504,8 @@ export class IndexerClient {
   async getPointsBalance(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<PointsResponse> {
-    const response = await this.get<PointsResponse>(
+  ): Promise<IndexerPointsResponse> {
+    const response = await this.get<IndexerPointsResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/points`,
       {
         headers: this.createAuthHeaders(auth),
@@ -513,7 +518,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as PointsResponse;
+    return response.data as IndexerPointsResponse;
   }
 
   /**
@@ -587,8 +592,8 @@ export class IndexerClient {
   async getWalletNames(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<NameServiceResponse> {
-    const response = await this.get<NameServiceResponse>(
+  ): Promise<IndexerNameServiceResponse> {
+    const response = await this.get<IndexerNameServiceResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/names`,
       {
         headers: this.createAuthHeaders(auth),
@@ -601,15 +606,17 @@ export class IndexerClient {
       );
     }
 
-    return response.data as NameServiceResponse;
+    return response.data as IndexerNameServiceResponse;
   }
 
   /**
    * Resolve ENS/SNS name to wallet address (public endpoint)
    * GET /wallets/named/:name
    */
-  async resolveNameToAddress(name: string): Promise<NameResolutionResponse> {
-    const response = await this.get<NameResolutionResponse>(
+  async resolveNameToAddress(
+    name: string
+  ): Promise<IndexerNameResolutionResponse> {
+    const response = await this.get<IndexerNameResolutionResponse>(
       `/wallets/named/${encodeURIComponent(name)}`
     );
 
@@ -619,7 +626,7 @@ export class IndexerClient {
       );
     }
 
-    return response.data as NameResolutionResponse;
+    return response.data as IndexerNameResolutionResponse;
   }
 
   // Note: The following endpoints are IP-restricted and only accessible from WildDuck server:

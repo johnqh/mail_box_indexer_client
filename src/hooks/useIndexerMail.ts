@@ -3,17 +3,17 @@ import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
 import {
-  type AddressValidationResponse,
-  type DelegatedFromResponse,
-  type DelegatedToResponse,
-  type EmailAccountsResponse,
-  type EntitlementResponse,
-  type LeaderboardResponse,
-  type NonceResponse,
+  type IndexerAddressValidationResponse,
+  type IndexerDelegatedFromResponse,
+  type IndexerDelegatedToResponse,
+  type IndexerEmailAccountsResponse,
+  type IndexerEntitlementResponse,
+  type IndexerLeaderboardResponse,
+  type IndexerNonceResponse,
+  type IndexerPointsResponse,
+  type IndexerSignInMessageResponse,
+  type IndexerSiteStatsResponse,
   type Optional,
-  type PointsResponse,
-  type SignInMessageResponse,
-  type SiteStatsResponse,
 } from '@johnqh/types';
 
 interface UseIndexerMailReturn {
@@ -22,47 +22,47 @@ interface UseIndexerMailReturn {
   // Public endpoints (no auth required)
   validateUsername: (
     username: string
-  ) => Promise<Optional<AddressValidationResponse>>;
+  ) => Promise<Optional<IndexerAddressValidationResponse>>;
   getSigningMessage: (
     walletAddress: string,
     chainId: number,
     domain: string,
     url: string
-  ) => Promise<Optional<SignInMessageResponse>>;
+  ) => Promise<Optional<IndexerSignInMessageResponse>>;
   getPointsLeaderboard: (
     count?: number
-  ) => Promise<Optional<LeaderboardResponse>>;
-  getPointsSiteStats: () => Promise<Optional<SiteStatsResponse>>;
+  ) => Promise<Optional<IndexerLeaderboardResponse>>;
+  getPointsSiteStats: () => Promise<Optional<IndexerSiteStatsResponse>>;
   // Signature-protected endpoints
   getWalletAccounts: (
     walletAddress: string,
     auth: IndexerUserAuth,
     referralCode?: string
-  ) => Promise<Optional<EmailAccountsResponse>>;
+  ) => Promise<Optional<IndexerEmailAccountsResponse>>;
   getDelegatedTo: (
     walletAddress: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<DelegatedToResponse>>;
+  ) => Promise<Optional<IndexerDelegatedToResponse>>;
   getDelegatedFrom: (
     walletAddress: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<DelegatedFromResponse>>;
+  ) => Promise<Optional<IndexerDelegatedFromResponse>>;
   createNonce: (
     username: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<NonceResponse>>;
+  ) => Promise<Optional<IndexerNonceResponse>>;
   getNonce: (
     username: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<NonceResponse>>;
+  ) => Promise<Optional<IndexerNonceResponse>>;
   getEntitlement: (
     walletAddress: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<EntitlementResponse>>;
+  ) => Promise<Optional<IndexerEntitlementResponse>>;
   getPointsBalance: (
     walletAddress: string,
     auth: IndexerUserAuth
-  ) => Promise<Optional<PointsResponse>>;
+  ) => Promise<Optional<IndexerPointsResponse>>;
   clearError: () => void;
 }
 
@@ -109,7 +109,7 @@ const useIndexerMail = (
   const validateUsernameMutation = useMutation({
     mutationFn: async (
       username: string
-    ): Promise<Optional<AddressValidationResponse>> => {
+    ): Promise<Optional<IndexerAddressValidationResponse>> => {
       setError(null);
       try {
         return await indexerClient.validateUsername(username);
@@ -134,7 +134,7 @@ const useIndexerMail = (
       chainId: number;
       domain: string;
       url: string;
-    }): Promise<Optional<SignInMessageResponse>> => {
+    }): Promise<Optional<IndexerSignInMessageResponse>> => {
       setError(null);
       try {
         return await indexerClient.getMessage(
@@ -156,7 +156,7 @@ const useIndexerMail = (
   const getPointsLeaderboardMutation = useMutation({
     mutationFn: async (
       count: number = 10
-    ): Promise<Optional<LeaderboardResponse>> => {
+    ): Promise<Optional<IndexerLeaderboardResponse>> => {
       setError(null);
       try {
         return await indexerClient.getPointsLeaderboard(count);
@@ -171,7 +171,7 @@ const useIndexerMail = (
 
   // Mutation for getPointsSiteStats
   const getPointsSiteStatsMutation = useMutation({
-    mutationFn: async (): Promise<Optional<SiteStatsResponse>> => {
+    mutationFn: async (): Promise<Optional<IndexerSiteStatsResponse>> => {
       setError(null);
       try {
         return await indexerClient.getPointsSiteStats();
@@ -194,7 +194,7 @@ const useIndexerMail = (
       walletAddress: string;
       auth: IndexerUserAuth;
       referralCode?: string;
-    }): Promise<Optional<EmailAccountsResponse>> => {
+    }): Promise<Optional<IndexerEmailAccountsResponse>> => {
       setError(null);
       try {
         return await indexerClient.getWalletAccounts(
@@ -219,7 +219,7 @@ const useIndexerMail = (
     }: {
       walletAddress: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<DelegatedToResponse>> => {
+    }): Promise<Optional<IndexerDelegatedToResponse>> => {
       setError(null);
       try {
         return await indexerClient.getDelegatedTo(walletAddress, auth);
@@ -240,7 +240,7 @@ const useIndexerMail = (
     }: {
       walletAddress: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<DelegatedFromResponse>> => {
+    }): Promise<Optional<IndexerDelegatedFromResponse>> => {
       setError(null);
       try {
         return await indexerClient.getDelegatedFrom(walletAddress, auth);
@@ -261,7 +261,7 @@ const useIndexerMail = (
     }: {
       username: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<NonceResponse>> => {
+    }): Promise<Optional<IndexerNonceResponse>> => {
       setError(null);
       try {
         return await indexerClient.createNonce(username, auth);
@@ -282,7 +282,7 @@ const useIndexerMail = (
     }: {
       username: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<NonceResponse>> => {
+    }): Promise<Optional<IndexerNonceResponse>> => {
       setError(null);
       try {
         return await indexerClient.getNonce(username, auth);
@@ -303,7 +303,7 @@ const useIndexerMail = (
     }: {
       walletAddress: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<EntitlementResponse>> => {
+    }): Promise<Optional<IndexerEntitlementResponse>> => {
       setError(null);
       try {
         return await indexerClient.getEntitlement(walletAddress, auth);
@@ -324,7 +324,7 @@ const useIndexerMail = (
     }: {
       walletAddress: string;
       auth: IndexerUserAuth;
-    }): Promise<Optional<PointsResponse>> => {
+    }): Promise<Optional<IndexerPointsResponse>> => {
       setError(null);
       try {
         return await indexerClient.getPointsBalance(walletAddress, auth);
@@ -339,7 +339,9 @@ const useIndexerMail = (
 
   // Wrapper functions
   const validateUsername = useCallback(
-    async (username: string): Promise<Optional<AddressValidationResponse>> => {
+    async (
+      username: string
+    ): Promise<Optional<IndexerAddressValidationResponse>> => {
       return await validateUsernameMutation.mutateAsync(username);
     },
     [validateUsernameMutation]
@@ -351,7 +353,7 @@ const useIndexerMail = (
       chainId: number,
       domain: string,
       url: string
-    ): Promise<Optional<SignInMessageResponse>> => {
+    ): Promise<Optional<IndexerSignInMessageResponse>> => {
       return await getSigningMessageMutation.mutateAsync({
         walletAddress,
         chainId,
@@ -363,14 +365,16 @@ const useIndexerMail = (
   );
 
   const getPointsLeaderboard = useCallback(
-    async (count: number = 10): Promise<Optional<LeaderboardResponse>> => {
+    async (
+      count: number = 10
+    ): Promise<Optional<IndexerLeaderboardResponse>> => {
       return await getPointsLeaderboardMutation.mutateAsync(count);
     },
     [getPointsLeaderboardMutation]
   );
 
   const getPointsSiteStats = useCallback(async (): Promise<
-    Optional<SiteStatsResponse>
+    Optional<IndexerSiteStatsResponse>
   > => {
     return await getPointsSiteStatsMutation.mutateAsync();
   }, [getPointsSiteStatsMutation]);
@@ -380,7 +384,7 @@ const useIndexerMail = (
       walletAddress: string,
       auth: IndexerUserAuth,
       referralCode?: string
-    ): Promise<Optional<EmailAccountsResponse>> => {
+    ): Promise<Optional<IndexerEmailAccountsResponse>> => {
       const params: {
         walletAddress: string;
         auth: IndexerUserAuth;
@@ -398,7 +402,7 @@ const useIndexerMail = (
     async (
       walletAddress: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<DelegatedToResponse>> => {
+    ): Promise<Optional<IndexerDelegatedToResponse>> => {
       return await getDelegatedToMutation.mutateAsync({
         walletAddress,
         auth,
@@ -411,7 +415,7 @@ const useIndexerMail = (
     async (
       walletAddress: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<DelegatedFromResponse>> => {
+    ): Promise<Optional<IndexerDelegatedFromResponse>> => {
       return await getDelegatedFromMutation.mutateAsync({
         walletAddress,
         auth,
@@ -424,7 +428,7 @@ const useIndexerMail = (
     async (
       username: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<NonceResponse>> => {
+    ): Promise<Optional<IndexerNonceResponse>> => {
       return await createNonceMutation.mutateAsync({
         username,
         auth,
@@ -437,7 +441,7 @@ const useIndexerMail = (
     async (
       username: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<NonceResponse>> => {
+    ): Promise<Optional<IndexerNonceResponse>> => {
       return await getNonceMutation.mutateAsync({
         username,
         auth,
@@ -450,7 +454,7 @@ const useIndexerMail = (
     async (
       walletAddress: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<EntitlementResponse>> => {
+    ): Promise<Optional<IndexerEntitlementResponse>> => {
       return await getEntitlementMutation.mutateAsync({
         walletAddress,
         auth,
@@ -463,7 +467,7 @@ const useIndexerMail = (
     async (
       walletAddress: string,
       auth: IndexerUserAuth
-    ): Promise<Optional<PointsResponse>> => {
+    ): Promise<Optional<IndexerPointsResponse>> => {
       return await getPointsBalanceMutation.mutateAsync({
         walletAddress,
         auth,

@@ -1,77 +1,54 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type NonceResponse, type Optional } from '@johnqh/types';
+import { type NonceResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
-
-interface UseIndexerGetNonceReturn {
-  getNonce: (
-    username: string,
-    auth: IndexerUserAuth
-  ) => Promise<Optional<NonceResponse>>;
-  isLoading: boolean;
-  error: Optional<string>;
-  clearError: () => void;
-}
 
 /**
  * React hook for getting existing authentication nonce
  * Requires wallet signature for authentication
- * Uses React Query for better state management and error handling
+ * Uses React Query useQuery for automatic caching and refetching
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getNonce function and state
+ * @param username - Email username (without @domain)
+ * @param auth - Authentication credentials (signature and message)
+ * @param options - Additional React Query options
+ * @returns Query result with nonce data
+ *
+ * @example
+ * ```typescript
+ * const { data, isLoading, error } = useIndexerGetNonce(
+ *   'https://indexer.0xmail.box',
+ *   false,
+ *   'myuser',
+ *   { signature, message }
+ * );
+ *
+ * if (data?.success) {
+ *   console.log('Nonce:', data.data.nonce);
+ * }
+ * ```
  */
 export const useIndexerGetNonce = (
   endpointUrl: string,
-  dev: boolean = false
-): UseIndexerGetNonceReturn => {
-  const [error, setError] = useState<Optional<string>>(null);
+  dev: boolean,
+  username: string,
+  auth: IndexerUserAuth,
+  options?: UseQueryOptions<NonceResponse>
+): UseQueryResult<NonceResponse> => {
+  const client = new IndexerClient(endpointUrl, dev);
 
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const mutation = useMutation({
-    mutationFn: async ({
-      username,
-      auth,
-    }: {
-      username: string;
-      auth: IndexerUserAuth;
-    }): Promise<Optional<NonceResponse>> => {
-      setError(null);
-      try {
-        return await indexerClient.getNonce(username, auth);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get nonce';
-        setError(errorMessage);
-        throw err;
-      }
+  return useQuery({
+    queryKey: ['indexer', 'nonce', username, auth.signature],
+    queryFn: async (): Promise<NonceResponse> => {
+      return await client.getNonce(username, auth);
     },
+    staleTime: 1 * 60 * 1000, // 1 minute - nonces are short-lived
+    enabled: !!username && !!auth.signature && !!auth.message,
+    ...options,
   });
-
-  const getNonce = useCallback(
-    async (
-      username: string,
-      auth: IndexerUserAuth
-    ): Promise<Optional<NonceResponse>> => {
-      return await mutation.mutateAsync({ username, auth });
-    },
-    [mutation]
-  );
-
-  return {
-    getNonce,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
 };

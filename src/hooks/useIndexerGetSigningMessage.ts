@@ -18,11 +18,15 @@ interface UseIndexerGetSigningMessageReturn {
 /**
  * React hook for getting signing message for wallet authentication
  * Public endpoint - no authentication required
- * Uses React Query for better state management and error handling
+ * Uses React Query useMutation to ensure fresh message each time (no caching)
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @returns Object with getSigningMessage function and state
+ *
+ * @note This uses useMutation instead of useQuery to always fetch fresh messages
+ * without caching, even though it's a GET endpoint. This ensures each authentication
+ * attempt gets a new signing message.
  */
 export const useIndexerGetSigningMessage = (
   endpointUrl: string,

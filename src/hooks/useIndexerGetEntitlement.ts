@@ -1,77 +1,54 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type EntitlementResponse, type Optional } from '@johnqh/types';
+import { type EntitlementResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
-
-interface UseIndexerGetEntitlementReturn {
-  getEntitlement: (
-    walletAddress: string,
-    auth: IndexerUserAuth
-  ) => Promise<Optional<EntitlementResponse>>;
-  isLoading: boolean;
-  error: Optional<string>;
-  clearError: () => void;
-}
 
 /**
  * React hook for checking wallet entitlement status
  * Requires wallet signature for authentication
- * Uses React Query for better state management and error handling
+ * Uses React Query useQuery for automatic caching and refetching
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getEntitlement function and state
+ * @param walletAddress - Wallet address to check
+ * @param auth - Authentication credentials (signature and message)
+ * @param options - Additional React Query options
+ * @returns Query result with entitlement data
+ *
+ * @example
+ * ```typescript
+ * const { data, isLoading, error } = useIndexerGetEntitlement(
+ *   'https://indexer.0xmail.box',
+ *   false,
+ *   walletAddress,
+ *   { signature, message }
+ * );
+ *
+ * if (data?.success) {
+ *   console.log('Has Entitlement:', data.data.hasEntitlement);
+ * }
+ * ```
  */
 export const useIndexerGetEntitlement = (
   endpointUrl: string,
-  dev: boolean = false
-): UseIndexerGetEntitlementReturn => {
-  const [error, setError] = useState<Optional<string>>(null);
+  dev: boolean,
+  walletAddress: string,
+  auth: IndexerUserAuth,
+  options?: UseQueryOptions<EntitlementResponse>
+): UseQueryResult<EntitlementResponse> => {
+  const client = new IndexerClient(endpointUrl, dev);
 
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const mutation = useMutation({
-    mutationFn: async ({
-      walletAddress,
-      auth,
-    }: {
-      walletAddress: string;
-      auth: IndexerUserAuth;
-    }): Promise<Optional<EntitlementResponse>> => {
-      setError(null);
-      try {
-        return await indexerClient.getEntitlement(walletAddress, auth);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get entitlement';
-        setError(errorMessage);
-        throw err;
-      }
+  return useQuery({
+    queryKey: ['indexer', 'entitlement', walletAddress, auth.signature],
+    queryFn: async (): Promise<EntitlementResponse> => {
+      return await client.getEntitlement(walletAddress, auth);
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes - entitlements don't change often
+    enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    ...options,
   });
-
-  const getEntitlement = useCallback(
-    async (
-      walletAddress: string,
-      auth: IndexerUserAuth
-    ): Promise<Optional<EntitlementResponse>> => {
-      return await mutation.mutateAsync({ walletAddress, auth });
-    },
-    [mutation]
-  );
-
-  return {
-    getEntitlement,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
 };

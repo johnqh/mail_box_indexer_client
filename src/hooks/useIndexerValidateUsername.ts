@@ -15,11 +15,14 @@ interface UseIndexerValidateUsernameReturn {
 /**
  * React hook for validating usernames
  * Public endpoint - no authentication required
- * Uses React Query for better state management and error handling
+ * Uses React Query useMutation for on-demand validation (no caching)
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @returns Object with validateUsername function and state
+ *
+ * @note This uses useMutation instead of useQuery because validation is typically
+ * called on-demand (e.g., onBlur in a form) and should not be cached.
  */
 export const useIndexerValidateUsername = (
   endpointUrl: string,

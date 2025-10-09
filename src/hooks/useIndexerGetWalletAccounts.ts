@@ -1,93 +1,63 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type EmailAccountsResponse, type Optional } from '@johnqh/types';
+import { type EmailAccountsResponse } from '@johnqh/types';
 import type { IndexerUserAuth } from '../types';
-
-interface UseIndexerGetWalletAccountsReturn {
-  getWalletAccounts: (
-    walletAddress: string,
-    auth: IndexerUserAuth,
-    referralCode?: string
-  ) => Promise<Optional<EmailAccountsResponse>>;
-  isLoading: boolean;
-  error: Optional<string>;
-  clearError: () => void;
-}
 
 /**
  * React hook for fetching wallet accounts from Indexer API
  * Requires wallet signature for authentication
- * Uses React Query for better state management and error handling
+ * Uses React Query useQuery for automatic caching and refetching
  *
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
- * @returns Object with getWalletAccounts function and state
+ * @param walletAddress - Wallet address to query
+ * @param auth - Authentication credentials (signature and message)
+ * @param referralCode - Optional referral code for new user registration
+ * @param options - Additional React Query options
+ * @returns Query result with wallet accounts data
+ *
+ * @example
+ * ```typescript
+ * const { data, isLoading, error, refetch } = useIndexerGetWalletAccounts(
+ *   'https://indexer.0xmail.box',
+ *   false,
+ *   walletAddress,
+ *   { signature, message },
+ *   referralCode
+ * );
+ *
+ * if (data?.success) {
+ *   console.log('Accounts:', data.data.accounts);
+ * }
+ * ```
  */
 export const useIndexerGetWalletAccounts = (
   endpointUrl: string,
-  dev: boolean = false
-): UseIndexerGetWalletAccountsReturn => {
-  const [error, setError] = useState<Optional<string>>(null);
+  dev: boolean,
+  walletAddress: string,
+  auth: IndexerUserAuth,
+  referralCode?: string,
+  options?: UseQueryOptions<EmailAccountsResponse>
+): UseQueryResult<EmailAccountsResponse> => {
+  const client = new IndexerClient(endpointUrl, dev);
 
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const mutation = useMutation({
-    mutationFn: async ({
+  return useQuery({
+    queryKey: [
+      'indexer',
+      'wallet-accounts',
       walletAddress,
-      auth,
+      auth.signature,
       referralCode,
-    }: {
-      walletAddress: string;
-      auth: IndexerUserAuth;
-      referralCode?: string;
-    }): Promise<Optional<EmailAccountsResponse>> => {
-      setError(null);
-      try {
-        return await indexerClient.getWalletAccounts(
-          walletAddress,
-          auth,
-          referralCode
-        );
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Failed to get wallet accounts';
-        setError(errorMessage);
-        throw err;
-      }
+    ],
+    queryFn: async (): Promise<EmailAccountsResponse> => {
+      return await client.getWalletAccounts(walletAddress, auth, referralCode);
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    ...options,
   });
-
-  const getWalletAccounts = useCallback(
-    async (
-      walletAddress: string,
-      auth: IndexerUserAuth,
-      referralCode?: string
-    ): Promise<Optional<EmailAccountsResponse>> => {
-      const params: {
-        walletAddress: string;
-        auth: IndexerUserAuth;
-        referralCode?: string;
-      } = { walletAddress, auth };
-      if (referralCode !== undefined) {
-        params.referralCode = referralCode;
-      }
-      return await mutation.mutateAsync(params);
-    },
-    [mutation]
-  );
-
-  return {
-    getWalletAccounts,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
 };

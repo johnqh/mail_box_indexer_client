@@ -71,6 +71,23 @@ interface UseIndexerMailReturn {
  * Includes both public endpoints and signature-protected endpoints
  * Uses React Query for better state management, caching, and error handling
  * Note: IP-restricted endpoints (using IPHelper) are not included as they're only accessible from WildDuck server
+ *
+ * @deprecated This legacy monolithic hook is kept for backward compatibility only.
+ * For new code, use the individual hooks instead:
+ * - useIndexerValidateUsername (GET)
+ * - useIndexerGetSigningMessage (GET)
+ * - useIndexerPointsLeaderboard (GET)
+ * - useIndexerPointsSiteStats (GET)
+ * - useIndexerGetWalletAccounts (GET)
+ * - useIndexerGetDelegatedTo (GET)
+ * - useIndexerGetDelegatedFrom (GET)
+ * - useIndexerCreateNonce (POST)
+ * - useIndexerGetNonce (GET)
+ * - useIndexerGetEntitlement (GET)
+ * - useIndexerGetPointsBalance (GET)
+ *
+ * The individual hooks use React Query's useQuery for GET endpoints (with automatic caching)
+ * and useMutation for POST endpoints, following React Query best practices.
  */
 const useIndexerMail = (
   endpointUrl: string,

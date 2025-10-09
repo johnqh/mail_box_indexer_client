@@ -22,7 +22,7 @@ describe('Hooks Integration Tests', () => {
   describe('useIndexerPoints', () => {
     it('should fetch real leaderboard data', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       // Initially should not be loading
@@ -45,7 +45,7 @@ describe('Hooks Integration Tests', () => {
 
     it('should fetch real site stats', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       const stats = await result.current.getPointsSiteStats();
@@ -62,7 +62,7 @@ describe('Hooks Integration Tests', () => {
 
     it('should handle consecutive requests', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       // Make multiple requests in sequence
@@ -84,7 +84,7 @@ describe('Hooks Integration Tests', () => {
     it('should handle errors and clear them', async () => {
       // Use invalid URL to force error
       const { result } = renderHook(() =>
-        useIndexerPoints('https://invalid-endpoint-xyz.com', false, false)
+        useIndexerPoints('https://invalid-endpoint-xyz.com', false)
       );
 
       try {
@@ -107,21 +107,20 @@ describe('Hooks Integration Tests', () => {
       });
     }, 15000);
 
-    it('should work in devMode with fallback', async () => {
+    it('should work in dev mode', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, true) // devMode enabled
+        useIndexerPoints(indexerUrl!, true) // dev enabled
       );
 
       const leaderboard = await result.current.getPointsLeaderboard(10);
 
-      // Should get data (either from API or mock fallback)
+      // Should get data from API
       expect(leaderboard).toBeDefined();
       expect(leaderboard.success).toBe(true);
       expect(leaderboard.data?.leaderboard).toBeDefined();
 
-      // Error should not be set even if API fails
       await waitFor(() => {
-        expect(result.current.error).toBeNull();
+        expect(result.current.isLoading).toBe(false);
       });
     }, 15000);
   });
@@ -129,7 +128,7 @@ describe('Hooks Integration Tests', () => {
   describe('Real-world Usage Patterns', () => {
     it('should handle rapid successive calls', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       // Simulate rapid user interactions
@@ -149,7 +148,7 @@ describe('Hooks Integration Tests', () => {
 
     it('should maintain stable client instance', async () => {
       const { result, rerender } = renderHook(
-        ({ url }) => useIndexerPoints(url, false, false),
+        ({ url }) => useIndexerPoints(url, false),
         {
           initialProps: { url: indexerUrl! },
         }
@@ -167,7 +166,7 @@ describe('Hooks Integration Tests', () => {
 
     it('should handle different counts for leaderboard', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       const counts = [5, 10, 20, 50];
@@ -193,7 +192,7 @@ describe('Hooks Integration Tests', () => {
   describe('Data Validation', () => {
     it('should return properly formatted leaderboard data', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       const leaderboard = await result.current.getPointsLeaderboard(10);
@@ -218,7 +217,7 @@ describe('Hooks Integration Tests', () => {
 
     it('should return properly formatted site stats', async () => {
       const { result } = renderHook(() =>
-        useIndexerPoints(indexerUrl!, false, false)
+        useIndexerPoints(indexerUrl!, false)
       );
 
       const stats = await result.current.getPointsSiteStats();

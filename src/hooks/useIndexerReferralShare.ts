@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useIndexerReferralCode } from './useIndexerReferralCode';
 import type { IndexerUserAuth } from '../types';
 
@@ -51,10 +51,15 @@ export const useIndexerReferralShare = (endpointUrl: string, dev: boolean) => {
     [fetchReferralCode]
   );
 
-  return {
-    referralCode: referralCode?.data?.referralCode,
-    isLoading,
-    error,
-    getShareUrl,
-  };
+  const code = referralCode?.data?.referralCode;
+
+  return useMemo(
+    () => ({
+      referralCode: code,
+      isLoading,
+      error,
+      getShareUrl,
+    }),
+    [code, isLoading, error, getShareUrl]
+  );
 };

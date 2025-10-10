@@ -489,24 +489,42 @@ const useIndexerMail = (
     getEntitlementMutation.isPending ||
     getPointsBalanceMutation.isPending;
 
-  return {
-    isLoading,
-    error,
-    // Public endpoints
-    validateUsername,
-    getSigningMessage,
-    getPointsLeaderboard,
-    getPointsSiteStats,
-    // Signature-protected endpoints
-    getWalletAccounts,
-    getDelegatedTo,
-    getDelegatedFrom,
-    createNonce,
-    getNonce,
-    getEntitlement,
-    getPointsBalance,
-    clearError,
-  };
+  return useMemo(
+    () => ({
+      isLoading,
+      error,
+      // Public endpoints
+      validateUsername,
+      getSigningMessage,
+      getPointsLeaderboard,
+      getPointsSiteStats,
+      // Signature-protected endpoints
+      getWalletAccounts,
+      getDelegatedTo,
+      getDelegatedFrom,
+      createNonce,
+      getNonce,
+      getEntitlement,
+      getPointsBalance,
+      clearError,
+    }),
+    [
+      isLoading,
+      error,
+      validateUsername,
+      getSigningMessage,
+      getPointsLeaderboard,
+      getPointsSiteStats,
+      getWalletAccounts,
+      getDelegatedTo,
+      getDelegatedFrom,
+      createNonce,
+      getNonce,
+      getEntitlement,
+      getPointsBalance,
+      clearError,
+    ]
+  );
 };
 
 export { useIndexerMail, type UseIndexerMailReturn };

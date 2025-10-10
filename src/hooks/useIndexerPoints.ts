@@ -166,16 +166,19 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
   const isLoading =
     leaderboardMutation.isPending || siteStatsMutation.isPending;
 
-  return {
-    // Public API endpoints only
-    getPointsLeaderboard,
-    getPointsSiteStats,
-    // State
-    isLoading,
-    error,
-    clearError,
+  return useMemo(
+    () => ({
+      // Public API endpoints only
+      getPointsLeaderboard,
+      getPointsSiteStats,
+      // State
+      isLoading,
+      error,
+      clearError,
 
-    // Note: The following methods have been removed as they require signature verification:
-    // - getPointsBalance (requires signature verification - not usable by client applications)
-  };
+      // Note: The following methods have been removed as they require signature verification:
+      // - getPointsBalance (requires signature verification - not usable by client applications)
+    }),
+    [getPointsLeaderboard, getPointsSiteStats, isLoading, error, clearError]
+  );
 }

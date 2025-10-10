@@ -92,10 +92,15 @@ export const useIndexerGetSigningMessage = (
     [mutation]
   );
 
-  return {
-    getSigningMessage,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
+  const isLoading = mutation.isPending;
+
+  return useMemo(
+    () => ({
+      getSigningMessage,
+      isLoading,
+      error,
+      clearError,
+    }),
+    [getSigningMessage, isLoading, error, clearError]
+  );
 };

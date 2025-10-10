@@ -68,10 +68,15 @@ export const useIndexerCreateNonce = (
     [mutation]
   );
 
-  return {
-    createNonce,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
+  const isLoading = mutation.isPending;
+
+  return useMemo(
+    () => ({
+      createNonce,
+      isLoading,
+      error,
+      clearError,
+    }),
+    [createNonce, isLoading, error, clearError]
+  );
 };

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Optional } from '@johnqh/types';
 import {
   IndexerClient,
@@ -65,12 +65,15 @@ export const useIndexerReferralCode = (endpointUrl: string, dev: boolean) => {
     setIsLoading(false);
   }, []);
 
-  return {
-    referralCode,
-    isLoading,
-    error,
-    fetchReferralCode,
-    clearError,
-    reset,
-  };
+  return useMemo(
+    () => ({
+      referralCode,
+      isLoading,
+      error,
+      fetchReferralCode,
+      clearError,
+      reset,
+    }),
+    [referralCode, isLoading, error, fetchReferralCode, clearError, reset]
+  );
 };

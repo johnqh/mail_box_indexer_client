@@ -67,10 +67,15 @@ export const useIndexerValidateUsername = (
     [mutation]
   );
 
-  return {
-    validateUsername,
-    isLoading: mutation.isPending,
-    error,
-    clearError,
-  };
+  const isLoading = mutation.isPending;
+
+  return useMemo(
+    () => ({
+      validateUsername,
+      isLoading,
+      error,
+      clearError,
+    }),
+    [validateUsername, isLoading, error, clearError]
+  );
 };

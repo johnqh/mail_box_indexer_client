@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Optional } from '@johnqh/types';
 
 // Platform-specific globals
@@ -93,11 +93,22 @@ export const useIndexerReferralConsumption = () => {
     setPendingReferralCode(code);
   }, []);
 
-  return {
-    pendingReferralCode,
-    hasPendingCode: !!pendingReferralCode,
-    consumeReferralCode,
-    clearReferralCode,
-    setReferralCode,
-  };
+  const hasPendingCode = !!pendingReferralCode;
+
+  return useMemo(
+    () => ({
+      pendingReferralCode,
+      hasPendingCode,
+      consumeReferralCode,
+      clearReferralCode,
+      setReferralCode,
+    }),
+    [
+      pendingReferralCode,
+      hasPendingCode,
+      consumeReferralCode,
+      clearReferralCode,
+      setReferralCode,
+    ]
+  );
 };

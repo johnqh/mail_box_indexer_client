@@ -23,7 +23,7 @@ npm install @johnqh/indexer_client
 ### Peer Dependencies
 
 ```bash
-npm install react @tanstack/react-query axios
+npm install react @tanstack/react-query
 ```
 
 ## Quick Start

@@ -335,6 +335,7 @@ export class IndexerClient {
     return {
       'x-signature': auth.signature.replace(/[\r\n]/g, ''), // Remove any newlines from signature
       'x-message': encodeURIComponent(auth.message), // Encode message for HTTP header
+      'x-signer': auth.signer, // Wallet address that signed the message
     };
   }
 

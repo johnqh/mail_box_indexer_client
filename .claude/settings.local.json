@@ -14,7 +14,11 @@
       "Bash(npm run type-check:*)",
       "Bash(npm run typecheck:*)",
       "Bash(git mv:*)",
-      "Read(//Users/johnhuang/0xmail/mail_box_indexer/**)"
+      "Read(//Users/johnhuang/0xmail/mail_box_indexer/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm version:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

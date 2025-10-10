@@ -9,4 +9,5 @@
 export interface IndexerUserAuth {
   message: string;
   signature: string;
+  signer: string;
 }

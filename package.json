@@ -1,6 +1,6 @@
 {
   "name": "@johnqh/indexer_client",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "React and React Native compatible client library for 0xMail indexer API with TypeScript support",
   "type": "module",
   "main": "dist/index.js",

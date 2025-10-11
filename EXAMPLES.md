@@ -633,10 +633,10 @@ function EmailAccounts({ wallet, signature, message }) {
 ### Using Referral Hook
 
 ```typescript
-import { useReferralCode } from '@johnqh/indexer_client';
+import { useIndexerReferralCode } from '@johnqh/indexer_client';
 
 function ReferralCodeDisplay({ wallet, signature, message }) {
-  const { data, isLoading } = useReferralCode(
+  const { data, isLoading } = useIndexerReferralCode(
     'https://indexer.0xmail.box',
     false,
     wallet,

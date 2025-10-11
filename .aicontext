@@ -1,0 +1,59 @@
+# AI Context - Quick Reference
+
+This file helps AI assistants quickly understand the project structure.
+
+## Essential Documentation (Read First)
+1. **AI_DEVELOPMENT_GUIDE.md** - Comprehensive guide for AI-assisted development
+2. **API.md** - Complete API endpoint documentation
+3. **EXAMPLES.md** - Code examples for all features
+4. **README.md** - Project overview and quick start
+
+## Project Summary
+- **Name**: @johnqh/indexer_client
+- **Type**: TypeScript client library for 0xMail Indexer API
+- **Version**: 0.0.18
+- **Compatibility**: React and React Native
+- **Backend**: ../mail_box_indexer (Ponder-based blockchain indexer)
+
+## Key Conventions
+- **Hook Naming**: All hooks MUST start with `useIndexer` prefix
+- **Types**: Import from `@johnqh/types@1.8.20`
+- **Testing**: Use vitest, write tests for all features
+- **Exports**: Update both `src/hooks/index.ts` AND `src/index.ts`
+
+## Quick Commands
+```bash
+npm run check-all      # Run all checks before committing
+npm run build          # Build for production
+npm run test          # Run tests in watch mode
+npm run lint          # Lint code
+npm run typecheck     # Type checking
+```
+
+## File Structure
+```
+src/
+├── network/       # IndexerClient - HTTP client
+├── business/      # IndexerService - Business logic + caching
+├── hooks/         # React hooks using @tanstack/react-query
+├── utils/         # Helper classes and factory functions
+└── index.ts       # Main entry point
+```
+
+## Authentication Pattern
+Protected endpoints require:
+- x-signature: Wallet signature
+- x-message: URL-encoded SIWE/SIWS message
+- x-dev: "true" for dev mode (optional)
+
+## Common Tasks
+1. **Adding an endpoint**: Update IndexerClient → Create hook → Export → Add tests → Update docs
+2. **Fixing bugs**: Run tests → Fix → Update tests → Run check-all
+3. **Updating docs**: Keep API.md, EXAMPLES.md, and README.md in sync
+
+## Don't Forget
+- Hook names need "Indexer" prefix
+- Export new hooks in both index files
+- Update documentation for new features
+- Run `npm run check-all` before committing
+- Never use `any` type - use proper types from @johnqh/types

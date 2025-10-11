@@ -24,9 +24,9 @@ React Hooks (@tanstack/react-query)
     ├─ useIndexerMail (accounts, delegations, nonces)
     ├─ useIndexerPoints (balance, leaderboard, stats)
     ├─ useIndexerNameService (ENS/SNS resolution)
-    ├─ useReferralCode (generate referral code)
-    ├─ useReferralStats (view referral statistics)
-    └─ useReferralConsumption (use referral code)
+    ├─ useIndexerReferralCode (generate referral code)
+    ├─ useIndexerReferralStats (view referral statistics)
+    └─ useIndexerReferralConsumption (use referral code)
     ↓
 React/React Native Components
 ```
@@ -70,8 +70,8 @@ src/
 
 ## Key Dependencies
 
-- `@johnqh/types@1.8.14` - Shared type definitions
-- `@johnqh/di@1.3.19` - Dependency injection
+- `@johnqh/types@1.8.20` - Shared type definitions
+- `@johnqh/di@1.4.5` - Dependency injection
 - `@tanstack/react-query@5.90.2` - Data fetching/caching
 - `axios@1.12.2` - HTTP client
 - `react@19.2.0` - Peer dependency
@@ -437,7 +437,7 @@ When adding features, update these files:
 
 Keep `@johnqh/types` version aligned:
 - Backend uses: 1.8.9
-- Client uses: 1.8.14
+- Client uses: 1.8.20
 
 Monitor for breaking changes when updating.
 

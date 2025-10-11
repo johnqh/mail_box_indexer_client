@@ -147,11 +147,11 @@ const { data, isLoading } = useIndexerPoints(
 );
 ```
 
-#### useReferralCode
+#### useIndexerReferralCode
 ```typescript
-import { useReferralCode } from '@johnqh/indexer_client';
+import { useIndexerReferralCode } from '@johnqh/indexer_client';
 
-const { data, isLoading } = useReferralCode(
+const { data, isLoading } = useIndexerReferralCode(
   endpointUrl,
   dev,
   walletAddress,
@@ -160,11 +160,11 @@ const { data, isLoading } = useReferralCode(
 );
 ```
 
-#### useReferralStats
+#### useIndexerReferralStats
 ```typescript
-import { useReferralStats } from '@johnqh/indexer_client';
+import { useIndexerReferralStats } from '@johnqh/indexer_client';
 
-const { data, isLoading } = useReferralStats(
+const { data, isLoading } = useIndexerReferralStats(
   endpointUrl,
   dev,
   referralCode
@@ -571,6 +571,6 @@ For questions and support:
 
 ## Version
 
-Current version: **0.0.1**
+Current version: **0.0.18**
 
 See [COVERAGE.md](COVERAGE.md) for implementation roadmap.

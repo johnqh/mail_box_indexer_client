@@ -27,7 +27,6 @@ export {
 
 // Referral hooks
 export * from './useIndexerReferralCode';
-export * from './useIndexerReferralShare';
 export * from './useIndexerReferralConsumption';
 export * from './useIndexerReferralStats';
 

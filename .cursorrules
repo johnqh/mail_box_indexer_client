@@ -1,0 +1,145 @@
+# Cursor AI Rules for @johnqh/indexer_client
+
+## Project Context
+This is a TypeScript client library for the 0xMail Indexer API, compatible with React and React Native.
+Backend is located at ../mail_box_indexer (Ponder-based blockchain indexer).
+
+## Code Style & Conventions
+
+### TypeScript
+- Always use strict TypeScript with no `any` types
+- Import types from `@johnqh/types` package
+- Use `Optional<T>` from `@johnqh/types` for optional properties
+- All API responses follow `ApiResponse<T>` structure with success/data/error
+
+### Naming Conventions
+- Files: camelCase for utilities, PascalCase for classes
+- Hooks: Must start with `useIndexer` prefix (e.g., `useIndexerPoints`, not `usePoints`)
+- Classes: PascalCase (e.g., `IndexerClient`)
+- Functions: camelCase
+- Constants: UPPER_SNAKE_CASE
+
+### File Organization
+```
+src/
+├── network/       # HTTP client (IndexerClient)
+├── business/      # Business logic with caching (IndexerService)
+├── hooks/         # React hooks (@tanstack/react-query)
+├── utils/         # Helper classes and factories
+└── index.ts       # Main exports
+```
+
+### React Hooks Pattern
+All hooks must:
+1. Use `@tanstack/react-query`'s `useQuery` or `useMutation`
+2. Include proper queryKey for caching
+3. Set staleTime to 5 minutes for data queries
+4. Support dev mode for mock data
+5. Handle loading and error states
+6. Be prefixed with `useIndexer`
+
+Example hook structure:
+```typescript
+import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
+import { IndexerClient } from '../network/IndexerClient';
+import type { SomeResponse } from '@johnqh/types';
+
+export const useIndexerSomething = (
+  endpointUrl: string,
+  dev: boolean,
+  param: string,
+  options?: UseQueryOptions<SomeResponse>
+): UseQueryResult<SomeResponse> => {
+  const client = new IndexerClient(endpointUrl, dev);
+
+  return useQuery({
+    queryKey: ['indexer', 'something', param],
+    queryFn: () => client.getSomething(param),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!param,
+    ...options,
+  });
+};
+```
+
+### IndexerClient Method Pattern
+```typescript
+async getSomething(
+  param: string,
+  signature?: string,
+  message?: string
+): Promise<SomeResponse> {
+  return this.request<SomeResponse>({
+    method: 'GET',
+    url: `/api/something/${param}`,
+    requiresAuth: !!signature, // true if signature provided
+    signature,
+    message
+  });
+}
+```
+
+## Authentication
+All protected endpoints require:
+- `x-signature`: Wallet signature (EVM or Solana)
+- `x-message`: URL-encoded SIWE/SIWS message
+- `x-dev`: "true" for development mode (optional)
+
+Solana chain IDs are negative: -101 (mainnet), -102 (devnet), -103 (testnet)
+
+## Testing Requirements
+When adding features, you must:
+1. Write unit tests in `__tests__/` directory
+2. Use vitest for testing
+3. Test both success and error cases
+4. Mock external dependencies
+5. Run `npm run check-all` before committing
+
+## Documentation Requirements
+When adding features, update:
+1. JSDoc comments in code
+2. API.md - Add endpoint documentation
+3. EXAMPLES.md - Add usage examples
+4. README.md - Update feature list if applicable
+5. HOOKS_DOCUMENTATION.md - Document new hooks
+
+## Common Gotchas
+1. Hook names MUST include "Indexer" prefix
+2. Referral codes can only be applied ONCE per wallet
+3. Message must be URL-encoded in headers
+4. All hooks need proper queryKey for cache management
+5. Dev mode should never be used in production
+6. Always export new hooks from src/hooks/index.ts AND src/index.ts
+
+## Dependencies
+- @johnqh/types@1.8.20 - Shared type definitions (keep aligned)
+- @johnqh/di@1.4.5 - Dependency injection
+- @tanstack/react-query@5.90.2 - Data fetching
+- axios@1.12.2 - HTTP client
+- react@19.2.0 - Peer dependency
+
+## Build & Development
+```bash
+npm run build          # Compile TypeScript
+npm run test          # Run tests in watch mode
+npm run test:run      # Run tests once
+npm run typecheck     # Type checking
+npm run lint          # Lint code
+npm run check-all     # Run all checks
+```
+
+## AI Assistant Guidelines
+1. Always read AI_DEVELOPMENT_GUIDE.md first for comprehensive context
+2. Check API.md for endpoint specifications
+3. Follow existing patterns in similar files
+4. Use the exact hook naming convention with "Indexer" prefix
+5. Keep dependency versions in sync with package.json
+6. Update documentation when adding features
+7. Never log signatures or messages (security)
+
+## Related Documentation
+- AI_DEVELOPMENT_GUIDE.md - Comprehensive guide for AI assistants
+- API.md - Complete API endpoint documentation
+- EXAMPLES.md - Code examples for all features
+- COVERAGE.md - API implementation status
+- Backend: ../mail_box_indexer

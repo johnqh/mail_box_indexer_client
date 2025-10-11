@@ -21,16 +21,19 @@ import type { IndexerUserAuth } from '../types';
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useIndexerGetEntitlement(
+ * const { data, isLoading, error, refetch } = useIndexerGetEntitlement(
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
- *   { signature, message }
+ *   { signature, message, signer: walletAddress }
  * );
  *
  * if (data?.success) {
  *   console.log('Has Entitlement:', data.data.hasEntitlement);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useIndexerGetEntitlement = (

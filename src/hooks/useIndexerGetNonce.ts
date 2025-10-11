@@ -21,16 +21,19 @@ import type { IndexerUserAuth } from '../types';
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useIndexerGetNonce(
+ * const { data, isLoading, error, refetch } = useIndexerGetNonce(
  *   'https://indexer.0xmail.box',
  *   false,
  *   'myuser',
- *   { signature, message }
+ *   { signature, message, signer: walletAddress }
  * );
  *
  * if (data?.success) {
  *   console.log('Nonce:', data.data.nonce);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useIndexerGetNonce = (

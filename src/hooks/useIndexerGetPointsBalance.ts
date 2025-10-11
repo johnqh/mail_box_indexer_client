@@ -25,13 +25,16 @@ import type { IndexerUserAuth } from '../types';
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
- *   { signature, message }
+ *   { signature, message, signer: walletAddress }
  * );
  *
  * if (data?.success) {
  *   console.log('Total Points:', data.data.totalPoints);
  *   console.log('Breakdown:', data.data.breakdown);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useIndexerGetPointsBalance = (

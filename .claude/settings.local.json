@@ -18,7 +18,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npm version:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

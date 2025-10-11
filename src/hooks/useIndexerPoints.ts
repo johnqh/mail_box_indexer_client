@@ -40,6 +40,9 @@ import type {
  *     console.log(`${user.rank}. ${user.walletAddress}: ${user.totalPoints} points`);
  *   });
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export function useIndexerPointsLeaderboard(
@@ -71,7 +74,7 @@ export function useIndexerPointsLeaderboard(
  *
  * @example
  * ```tsx
- * const { data, isLoading, error } = useIndexerPointsSiteStats(
+ * const { data, isLoading, error, refetch } = useIndexerPointsSiteStats(
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -80,6 +83,9 @@ export function useIndexerPointsLeaderboard(
  *   console.log('Total Users:', data.data.totalUsers);
  *   console.log('Total Points:', data.data.totalPoints);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export function useIndexerPointsSiteStats(

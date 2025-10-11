@@ -28,16 +28,19 @@ const STALE_TIMES = {
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useWalletNames(
+ * const { data, isLoading, error, refetch } = useWalletNames(
  *   'https://indexer.0xmail.box',
  *   false,
  *   '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
- *   { signature, message }
+ *   { signature, message, signer: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' }
  * );
  *
  * if (data?.success) {
  *   console.log('Names:', data.data.names); // ['vitalik.eth', 'example.eth']
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useWalletNames = (
@@ -72,7 +75,7 @@ export const useWalletNames = (
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useResolveNameToAddress(
+ * const { data, isLoading, error, refetch } = useResolveNameToAddress(
  *   'https://indexer.0xmail.box',
  *   false,
  *   'vitalik.eth'
@@ -82,6 +85,9 @@ export const useWalletNames = (
  *   console.log('Wallet:', data.data.address);
  *   console.log('Chain:', data.data.chainType);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useResolveNameToAddress = (

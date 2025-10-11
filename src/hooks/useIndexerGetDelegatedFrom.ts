@@ -21,16 +21,19 @@ import type { IndexerUserAuth } from '../types';
  *
  * @example
  * ```typescript
- * const { data, isLoading, error } = useIndexerGetDelegatedFrom(
+ * const { data, isLoading, error, refetch } = useIndexerGetDelegatedFrom(
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
- *   { signature, message }
+ *   { signature, message, signer: walletAddress }
  * );
  *
  * if (data?.success) {
  *   console.log('Delegators:', data.data.delegations);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useIndexerGetDelegatedFrom = (

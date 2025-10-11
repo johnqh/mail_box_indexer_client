@@ -26,13 +26,16 @@ import type { IndexerUserAuth } from '../types';
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
- *   { signature, message },
+ *   { signature, message, signer: walletAddress },
  *   referralCode
  * );
  *
  * if (data?.success) {
  *   console.log('Accounts:', data.data.accounts);
  * }
+ *
+ * // Force refresh the data
+ * await refetch();
  * ```
  */
 export const useIndexerGetWalletAccounts = (

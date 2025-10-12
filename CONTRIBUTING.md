@@ -1,4 +1,4 @@
-# Contributing to @johnqh/indexer_client
+# Contributing to @0xmail/indexer_client
 
 Thank you for your interest in contributing to the 0xMail Indexer Client! This document provides guidelines and best practices for contributing.
 
@@ -134,20 +134,20 @@ npm run clean            # Clean build artifacts
    }
    ```
 
-2. **Import types from @johnqh/types**
+2. **Import types from @sudobility/types**
    ```typescript
    // ✅ Good
-   import type { PointsResponse, ReferralCodeResponse } from '@johnqh/types';
+   import type { PointsResponse, ReferralCodeResponse } from '@sudobility/types';
 
    // ❌ Bad
    interface PointsResponse {
-     // Defining types that already exist in @johnqh/types
+     // Defining types that already exist in @sudobility/types
    }
    ```
 
 3. **Use Optional<T> for optional fields**
    ```typescript
-   import type { Optional } from '@johnqh/types';
+   import type { Optional } from '@sudobility/types';
 
    interface MyData {
      required: string;
@@ -171,7 +171,7 @@ We use ESLint and Prettier for code formatting. Run `npm run lint:fix` before co
 ```typescript
 // 1. External imports
 import { useQuery } from '@tanstack/react-query';
-import type { PointsResponse } from '@johnqh/types';
+import type { PointsResponse } from '@sudobility/types';
 
 // 2. Internal imports
 import { IndexerClient } from '../network/IndexerClient';
@@ -375,7 +375,7 @@ Brief description of changes
    ```typescript
    // src/hooks/useNewFeature.ts
    import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
-   import type { NewResponse } from '@johnqh/types';
+   import type { NewResponse } from '@sudobility/types';
    import { IndexerClient } from '../network/IndexerClient';
 
    export const useNewFeature = (
@@ -486,12 +486,12 @@ Before implementing a client feature:
 
 1. Check backend route exists in `../mail_box_indexer/api/`
 2. Review backend implementation in `../mail_box_indexer/src/lib/`
-3. Verify request/response types in `@johnqh/types`
+3. Verify request/response types in `@sudobility/types`
 4. Test against actual backend (not just mocks)
 
 ### Type Synchronization
 
-Keep `@johnqh/types` version aligned with backend:
+Keep `@sudobility/types` version aligned with backend:
 
 - Backend: Check `../mail_box_indexer/package.json`
 - Client: Update `package.json` to match
@@ -511,4 +511,4 @@ Keep `@johnqh/types` version aligned with backend:
 - Focus on constructive feedback
 - Assume good intentions
 
-Thank you for contributing to @johnqh/indexer_client!
+Thank you for contributing to @0xmail/indexer_client!

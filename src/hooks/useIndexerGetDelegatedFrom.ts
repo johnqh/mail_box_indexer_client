@@ -4,7 +4,7 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type IndexerDelegatedFromResponse } from '@johnqh/types';
+import { type IndexerDelegatedFromResponse } from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
 
 /**

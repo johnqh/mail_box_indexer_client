@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Optional } from '@johnqh/types';
+import type { Optional } from '@sudobility/types';
 import {
   IndexerClient,
   type ReferralCodeResponse,

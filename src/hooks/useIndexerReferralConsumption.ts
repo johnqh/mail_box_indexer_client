@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Optional } from '@johnqh/types';
+import { Optional } from '@sudobility/types';
 
 // Platform-specific globals
 declare const localStorage: Storage;

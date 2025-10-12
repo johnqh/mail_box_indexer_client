@@ -15,7 +15,7 @@ import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
   Optional,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 /**
  * React hook for fetching points leaderboard (public endpoint)

@@ -12,7 +12,7 @@ on:
       - closed
 
 env:
-  NPM_MODULE_NAME: "@johnqh/indexer_client"
+  NPM_MODULE_NAME: "@0xmail/indexer_client"
 
 jobs:
   test:
@@ -30,9 +30,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          registry-url: "https://registry.npmjs.org"
+
+      - name: "Setup .npmrc for restricted packages"
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          echo "@sudobility:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "@0xmail:registry=https://registry.npmjs.org/" >> .npmrc
 
       - name: "Install dependencies"
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: "Run type checking"
         run: npm run typecheck
@@ -106,6 +115,12 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
+      - name: "Setup .npmrc for restricted packages"
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          echo "@sudobility:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "@0xmail:registry=https://registry.npmjs.org/" >> .npmrc
+
       - name: "Verify package version"
         run: |
           echo "Using version: ${{ needs.check_for_release.outputs.version }}"
@@ -113,6 +128,8 @@ jobs:
 
       - name: "Install dependencies"
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: "Run tests with coverage"
         run: npm run test:coverage
@@ -140,7 +157,7 @@ jobs:
             TypeScript client library for the 0xMail Indexer API. Compatible with React and React Native applications.
 
             ### Features
-            - ✅ Complete Type Safety - Full TypeScript support with @johnqh/types
+            - ✅ Complete Type Safety - Full TypeScript support with @sudobility/types
             - ✅ React Integration - Built-in hooks using @tanstack/react-query
             - ✅ Multi-Chain Support - EVM and Solana blockchains
             - ✅ Authentication - SIWE/SIWS signature verification
@@ -152,17 +169,17 @@ jobs:
 
             ### Installation
             ```bash
-            npm install @johnqh/indexer_client@${{ needs.check_for_release.outputs.version }}
+            npm install @0xmail/indexer_client@${{ needs.check_for_release.outputs.version }}
             ```
 
             ### Peer Dependencies
             ```bash
-            npm install react @tanstack/react-query axios
+            npm install react @tanstack/react-query axios @sudobility/di @sudobility/types
             ```
 
             ### Quick Start
             ```typescript
-            import { useIndexerPoints } from '@johnqh/indexer_client';
+            import { useIndexerPoints } from '@0xmail/indexer_client';
 
             function PointsDisplay() {
               const { getPointsLeaderboard } = useIndexerPoints('https://indexer.0xmail.box');
@@ -189,7 +206,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Publish to NPM"
-        run: npm publish --access public
+        run: npm publish --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -197,7 +214,7 @@ jobs:
         if: success()
         run: |
           echo "🚀 Release ${{ needs.check_for_release.outputs.version }} deployed successfully!"
-          echo "• NPM: https://www.npmjs.com/package/@johnqh/indexer_client/v/${{ needs.check_for_release.outputs.version }}"
+          echo "• NPM: https://www.npmjs.com/package/@0xmail/indexer_client/v/${{ needs.check_for_release.outputs.version }}"
           echo "• GitHub: https://github.com/${{ github.repository }}/releases/tag/${{ needs.check_for_release.outputs.version_tag }}"
           echo "• Documentation: https://github.com/${{ github.repository }}#readme"
 

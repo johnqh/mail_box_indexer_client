@@ -19,13 +19,13 @@ Complete examples for common use cases with the 0xMail Indexer Client.
 ### Installing the Package
 
 ```bash
-npm install @johnqh/indexer_client @johnqh/types @tanstack/react-query axios
+npm install @0xmail/indexer_client @sudobility/types @tanstack/react-query axios
 ```
 
 ### Creating a Client Instance
 
 ```typescript
-import { IndexerClient } from '@johnqh/indexer_client';
+import { IndexerClient } from '@0xmail/indexer_client';
 
 const client = new IndexerClient(
   'https://indexer.0xmail.box',  // Endpoint URL
@@ -62,7 +62,7 @@ function App() {
 ### Step 1: Validate Wallet Address
 
 ```typescript
-import { IndexerClient } from '@johnqh/indexer_client';
+import { IndexerClient } from '@0xmail/indexer_client';
 
 const client = new IndexerClient('https://indexer.0xmail.box', false);
 
@@ -553,7 +553,7 @@ names.forEach(name => console.log(`- ${name}`));
 ### Using Points Hook
 
 ```typescript
-import { useIndexerPoints } from '@johnqh/indexer_client';
+import { useIndexerPoints } from '@0xmail/indexer_client';
 
 function PointsDisplay({ wallet, signature, message }) {
   const { data, isLoading, error } = useIndexerPoints(
@@ -583,7 +583,7 @@ function PointsDisplay({ wallet, signature, message }) {
 ### Using Mail Hook
 
 ```typescript
-import { useIndexerMail } from '@johnqh/indexer_client';
+import { useIndexerMail } from '@0xmail/indexer_client';
 
 function EmailAccounts({ wallet, signature, message }) {
   const { data, isLoading, refetch } = useIndexerMail(
@@ -633,7 +633,7 @@ function EmailAccounts({ wallet, signature, message }) {
 ### Using Referral Hook
 
 ```typescript
-import { useIndexerReferralCode } from '@johnqh/indexer_client';
+import { useIndexerReferralCode } from '@0xmail/indexer_client';
 
 function ReferralCodeDisplay({ wallet, signature, message }) {
   const { data, isLoading } = useIndexerReferralCode(
@@ -793,7 +793,7 @@ function App() {
 ```typescript
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { IndexerClient, useIndexerMail, useIndexerPoints } from '@johnqh/indexer_client';
+import { IndexerClient, useIndexerMail, useIndexerPoints } from '@0xmail/indexer_client';
 import { ethers } from 'ethers';
 
 const queryClient = new QueryClient();

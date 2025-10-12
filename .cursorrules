@@ -1,4 +1,4 @@
-# Cursor AI Rules for @johnqh/indexer_client
+# Cursor AI Rules for @0xmail/indexer_client
 
 ## Project Context
 This is a TypeScript client library for the 0xMail Indexer API, compatible with React and React Native.
@@ -8,8 +8,8 @@ Backend is located at ../mail_box_indexer (Ponder-based blockchain indexer).
 
 ### TypeScript
 - Always use strict TypeScript with no `any` types
-- Import types from `@johnqh/types` package
-- Use `Optional<T>` from `@johnqh/types` for optional properties
+- Import types from `@sudobility/types` package
+- Use `Optional<T>` from `@sudobility/types` for optional properties
 - All API responses follow `ApiResponse<T>` structure with success/data/error
 
 ### Naming Conventions
@@ -42,7 +42,7 @@ Example hook structure:
 ```typescript
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import type { SomeResponse } from '@johnqh/types';
+import type { SomeResponse } from '@sudobility/types';
 
 export const useIndexerSomething = (
   endpointUrl: string,
@@ -112,8 +112,8 @@ When adding features, update:
 6. Always export new hooks from src/hooks/index.ts AND src/index.ts
 
 ## Dependencies
-- @johnqh/types@1.8.20 - Shared type definitions (keep aligned)
-- @johnqh/di@1.4.5 - Dependency injection
+- @sudobility/types@1.8.20 - Shared type definitions (keep aligned)
+- @sudobility/di@1.4.5 - Dependency injection
 - @tanstack/react-query@5.90.2 - Data fetching
 - axios@1.12.2 - HTTP client
 - react@19.2.0 - Peer dependency

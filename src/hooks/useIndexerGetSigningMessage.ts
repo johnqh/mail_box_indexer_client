@@ -4,7 +4,7 @@ import { IndexerClient } from '../network/IndexerClient';
 import {
   type IndexerSignInMessageResponse,
   type Optional,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 interface UseIndexerGetSigningMessageReturn {
   getSigningMessage: (

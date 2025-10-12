@@ -4,7 +4,7 @@ import { IndexerClient } from '../network/IndexerClient';
 import {
   type IndexerAddressValidationResponse,
   type Optional,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 interface UseIndexerValidateUsernameReturn {
   validateUsername: (

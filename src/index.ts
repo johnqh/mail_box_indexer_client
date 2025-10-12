@@ -18,7 +18,7 @@ export * from './utils';
 // Local types
 export type { IndexerUserAuth } from './types';
 
-// Re-export types from @johnqh/types for convenience
+// Re-export types from @sudobility/types for convenience
 export type {
   IndexerAddressValidationResponse,
   ChainType,
@@ -34,4 +34,4 @@ export type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
-} from '@johnqh/types';
+} from '@sudobility/types';

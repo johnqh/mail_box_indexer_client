@@ -1,10 +1,10 @@
-# @johnqh/indexer_client
+# @0xmail/indexer_client
 
 TypeScript client library for the 0xMail Indexer API. Compatible with React and React Native applications.
 
 ## Features
 
-- ✅ **Complete Type Safety** - Full TypeScript support with `@johnqh/types`
+- ✅ **Complete Type Safety** - Full TypeScript support with `@sudobility/types`
 - ✅ **React Integration** - Built-in hooks using `@tanstack/react-query`
 - ✅ **Multi-Chain Support** - EVM and Solana blockchains
 - ✅ **Authentication** - SIWE/SIWS signature verification
@@ -17,13 +17,13 @@ TypeScript client library for the 0xMail Indexer API. Compatible with React and 
 ## Installation
 
 ```bash
-npm install @johnqh/indexer_client
+npm install @0xmail/indexer_client
 ```
 
 ### Peer Dependencies
 
 ```bash
-npm install react @tanstack/react-query axios @johnqh/di @johnqh/types
+npm install react @tanstack/react-query axios @sudobility/di @sudobility/types
 ```
 
 ## Quick Start
@@ -53,7 +53,7 @@ function App() {
 ### 2. Use Hooks
 
 ```typescript
-import { useIndexerPoints } from '@johnqh/indexer_client';
+import { useIndexerPoints } from '@0xmail/indexer_client';
 
 function PointsDisplay({ wallet, signature, message }) {
   const { data, isLoading } = useIndexerPoints(
@@ -98,7 +98,7 @@ See [COVERAGE.md](COVERAGE.md) for complete endpoint matrix.
 Low-level HTTP client for direct API access:
 
 ```typescript
-import { IndexerClient } from '@johnqh/indexer_client';
+import { IndexerClient } from '@0xmail/indexer_client';
 
 const client = new IndexerClient('https://indexer.0xmail.box', false);
 
@@ -123,7 +123,7 @@ High-level hooks with automatic caching and refetching:
 
 #### useIndexerMail
 ```typescript
-import { useIndexerMail } from '@johnqh/indexer_client';
+import { useIndexerMail } from '@0xmail/indexer_client';
 
 const { data, isLoading, error, refetch } = useIndexerMail(
   endpointUrl,
@@ -136,7 +136,7 @@ const { data, isLoading, error, refetch } = useIndexerMail(
 
 #### useIndexerPoints
 ```typescript
-import { useIndexerPoints } from '@johnqh/indexer_client';
+import { useIndexerPoints } from '@0xmail/indexer_client';
 
 const { data, isLoading } = useIndexerPoints(
   endpointUrl,
@@ -149,7 +149,7 @@ const { data, isLoading } = useIndexerPoints(
 
 #### useIndexerReferralCode
 ```typescript
-import { useIndexerReferralCode } from '@johnqh/indexer_client';
+import { useIndexerReferralCode } from '@0xmail/indexer_client';
 
 const { data, isLoading } = useIndexerReferralCode(
   endpointUrl,
@@ -162,7 +162,7 @@ const { data, isLoading } = useIndexerReferralCode(
 
 #### useIndexerReferralStats
 ```typescript
-import { useIndexerReferralStats } from '@johnqh/indexer_client';
+import { useIndexerReferralStats } from '@0xmail/indexer_client';
 
 const { data, isLoading } = useIndexerReferralStats(
   endpointUrl,
@@ -173,7 +173,7 @@ const { data, isLoading } = useIndexerReferralStats(
 
 #### useWalletNames / useResolveNameToAddress
 ```typescript
-import { useWalletNames, useResolveNameToAddress } from '@johnqh/indexer_client';
+import { useWalletNames, useResolveNameToAddress } from '@0xmail/indexer_client';
 
 // Get all names for a wallet
 const { data: names } = useWalletNames(
@@ -198,7 +198,7 @@ const { data: resolved } = useResolveNameToAddress(
 Caching wrapper for public endpoints:
 
 ```typescript
-import { IndexerService } from '@johnqh/indexer_client';
+import { IndexerService } from '@0xmail/indexer_client';
 
 const config = {
   indexerBackendUrl: 'https://indexer.0xmail.box'
@@ -223,7 +223,7 @@ import {
   createIndexerGraphQL,
   createIndexerWebhook,
   createIndexerHelpers
-} from '@johnqh/indexer_client';
+} from '@0xmail/indexer_client';
 
 const config = {
   indexerBackendUrl: 'https://indexer.0xmail.box'
@@ -393,7 +393,7 @@ if (!result.success) {
 
 ## TypeScript Support
 
-All types are imported from `@johnqh/types`:
+All types are imported from `@sudobility/types`:
 
 ```typescript
 import type {
@@ -403,7 +403,7 @@ import type {
   ReferralCodeResponse,
   LeaderboardResponse,
   // ... and more
-} from '@johnqh/indexer_client';
+} from '@0xmail/indexer_client';
 ```
 
 ## Testing

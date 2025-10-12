@@ -4,7 +4,7 @@ This guide is designed to help AI assistants (like Claude Code) quickly understa
 
 ## Project Overview
 
-**Project:** `@johnqh/indexer_client`
+**Project:** `@0xmail/indexer_client`
 **Type:** TypeScript client library for 0xMail Indexer API
 **Compatibility:** React and React Native
 **Backend:** Located at `../mail_box_indexer` (Ponder-based blockchain indexer)
@@ -70,8 +70,8 @@ src/
 
 ## Key Dependencies
 
-- `@johnqh/types@1.8.20` - Shared type definitions
-- `@johnqh/di@1.4.5` - Dependency injection
+- `@sudobility/types@1.8.20` - Shared type definitions
+- `@sudobility/di@1.4.5` - Dependency injection
 - `@tanstack/react-query@5.90.2` - Data fetching/caching
 - `axios@1.12.2` - HTTP client
 - `react@19.2.0` - Peer dependency
@@ -79,7 +79,7 @@ src/
 ## Backend Reference
 
 The backend (`../mail_box_indexer`) uses:
-- **@johnqh/types@1.8.9** (slightly older version)
+- **@sudobility/types@1.8.9** (slightly older version)
 - Ponder 0.13.9 (blockchain indexing framework)
 - Hono 4.9.9 (HTTP router)
 - PostgreSQL (via pg)
@@ -317,19 +317,19 @@ describe('useNewFeature', () => {
 
 ## Type Safety Guidelines
 
-1. **Always use types from `@johnqh/types`:**
+1. **Always use types from `@sudobility/types`:**
 ```typescript
 import type {
   AddressValidationResponse,
   PointsResponse,
   ReferralCodeResponse
-} from '@johnqh/types';
+} from '@sudobility/types';
 ```
 
 2. **Never use `any`** - Use `unknown` and type guards instead
 3. **Optional properties use `Optional<T>` type:**
 ```typescript
-import type { Optional } from '@johnqh/types';
+import type { Optional } from '@sudobility/types';
 ```
 
 ## Error Handling
@@ -435,7 +435,7 @@ When adding features, update these files:
 
 ### Version Sync
 
-Keep `@johnqh/types` version aligned:
+Keep `@sudobility/types` version aligned:
 - Backend uses: 1.8.9
 - Client uses: 1.8.20
 
@@ -500,14 +500,14 @@ When working on this project:
 3. **Follow patterns** - Consistency is key
 4. **Write tests** - All new features need tests
 5. **Update docs** - Keep documentation in sync
-6. **Check types** - Use `@johnqh/types` for all API types
+6. **Check types** - Use `@sudobility/types` for all API types
 7. **Run checks** - `npm run check-all` before committing
 
 ## Resources
 
 - **Backend Repo:** `../mail_box_indexer`
 - **API Documentation:** `API.md`
-- **Shared Types:** `@johnqh/types` package
+- **Shared Types:** `@sudobility/types` package
 - **React Query Docs:** https://tanstack.com/query/latest
 - **Ponder Docs:** https://ponder.sh
 
@@ -517,4 +517,4 @@ When working on this project:
 2. Review backend implementation in `../mail_box_indexer`
 3. Look at existing patterns in similar files
 4. Run tests to see expected behavior
-5. Check type definitions in `@johnqh/types`
+5. Check type definitions in `@sudobility/types`

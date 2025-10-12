@@ -9,7 +9,7 @@ This file helps AI assistants quickly understand the project structure.
 4. **README.md** - Project overview and quick start
 
 ## Project Summary
-- **Name**: @johnqh/indexer_client
+- **Name**: @0xmail/indexer_client
 - **Type**: TypeScript client library for 0xMail Indexer API
 - **Version**: 0.0.18
 - **Compatibility**: React and React Native
@@ -17,7 +17,7 @@ This file helps AI assistants quickly understand the project structure.
 
 ## Key Conventions
 - **Hook Naming**: All hooks MUST start with `useIndexer` prefix
-- **Types**: Import from `@johnqh/types@1.8.20`
+- **Types**: Import from `@sudobility/types@1.8.20`
 - **Testing**: Use vitest, write tests for all features
 - **Exports**: Update both `src/hooks/index.ts` AND `src/index.ts`
 
@@ -56,4 +56,4 @@ Protected endpoints require:
 - Export new hooks in both index files
 - Update documentation for new features
 - Run `npm run check-all` before committing
-- Never use `any` type - use proper types from @johnqh/types
+- Never use `any` type - use proper types from @sudobility/types

@@ -3,7 +3,7 @@
  * These functions use the IndexerClient by default for easy integration
  */
 
-import type { AppConfig } from '@johnqh/types';
+import type { AppConfig } from '@sudobility/types';
 import { IndexerClient } from '../network/IndexerClient';
 import { createIndexerAdminHelper, IndexerAdminHelper } from './indexer-admin';
 import {

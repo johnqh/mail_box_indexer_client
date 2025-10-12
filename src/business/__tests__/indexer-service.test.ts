@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IndexerService } from '../indexer-service';
-import type { AppConfig } from '@johnqh/types';
+import type { AppConfig } from '@sudobility/types';
 
 describe('IndexerService', () => {
   let service: IndexerService;

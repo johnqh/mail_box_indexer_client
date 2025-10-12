@@ -21,7 +21,16 @@
       "Bash(git push:*)",
       "Bash(for:*)",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(do sed -i '' 's/@johnqh\\/indexer_client/@0xmail\\/indexer_client/g' \"$file\")",
+      "Bash(do sed -i '' 's/@johnqh\\/types/@sudobility\\/types/g' \"$file\")",
+      "Bash(do sed -i '' 's/@johnqh\\/di/@sudobility\\/di/g' \"$file\")",
+      "Bash(npm install)",
+      "Bash(if [ -z \"$NPM_TOKEN\" ])",
+      "Bash(then echo \"NPM_TOKEN is NOT set\")",
+      "Bash(else echo \"NPM_TOKEN is set\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

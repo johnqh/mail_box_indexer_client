@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { IndexerClient } from '../network/IndexerClient';
-import { type IndexerNonceResponse, type Optional } from '@johnqh/types';
+import { type IndexerNonceResponse, type Optional } from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
 
 interface UseIndexerCreateNonceReturn {

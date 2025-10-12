@@ -6,11 +6,11 @@
  */
 
 import { IndexerClient } from '../network/IndexerClient';
-import type { AppConfig } from '@johnqh/types';
+import type { AppConfig } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 // Legacy response types for backward compatibility
 interface IndexerIndexerLeaderboardResponse {

@@ -14,7 +14,7 @@ import {
   type IndexerSignInMessageResponse,
   type IndexerSiteStatsResponse,
   type Optional,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 interface UseIndexerMailReturn {
   isLoading: boolean;

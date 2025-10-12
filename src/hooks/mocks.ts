@@ -15,7 +15,7 @@ import type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
-} from '@johnqh/types';
+} from '@sudobility/types';
 
 export class IndexerMockData {
   static getLeaderboard(count: number = 10): IndexerLeaderboardResponse {

@@ -14,7 +14,7 @@ import type {
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
   Optional,
-} from '@johnqh/types';
+} from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
 
 /**

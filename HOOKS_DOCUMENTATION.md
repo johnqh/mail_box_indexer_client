@@ -1,6 +1,6 @@
 # 0xMail Indexer Client - Hooks Documentation
 
-This document provides comprehensive documentation for all React hooks in the `@0xmail/indexer_client` package. The hooks provide a React-friendly interface to interact with the 0xMail indexer API.
+This document provides comprehensive documentation for all React hooks in the `@sudobility/indexer_client` package. The hooks provide a React-friendly interface to interact with the 0xMail indexer API.
 
 ## Table of Contents
 
@@ -144,7 +144,7 @@ interface AddressValidationResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerValidateUsername } from '@0xmail/indexer_client';
+import { useIndexerValidateUsername } from '@sudobility/indexer_client';
 
 function ValidateUsernameForm() {
   const { validateUsername, isLoading, error, clearError } =
@@ -251,8 +251,8 @@ interface SignInMessageResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetSigningMessage } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetSigningMessage } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, chainId: number }) {
   const { getSigningMessage, isLoading, error } =
@@ -385,7 +385,7 @@ interface SiteStatsResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerPoints } from '@0xmail/indexer_client';
+import { useIndexerPoints } from '@sudobility/indexer_client';
 
 function PointsLeaderboard() {
   const { getPointsLeaderboard, getPointsSiteStats, isLoading, error } =
@@ -494,7 +494,7 @@ interface NameResolutionResponse {
 #### Example Usage
 
 ```typescript
-import { useResolveNameToAddress } from '@0xmail/indexer_client';
+import { useResolveNameToAddress } from '@sudobility/indexer_client';
 
 function NameResolver() {
   const [name, setName] = useState('vitalik.eth');
@@ -584,7 +584,7 @@ interface ReferralStatsResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerReferralStats } from '@0xmail/indexer_client';
+import { useIndexerReferralStats } from '@sudobility/indexer_client';
 
 function ReferralStatsDisplay({ referralCode }: { referralCode: string }) {
   const { stats, isLoading, error, fetchStats } =
@@ -696,8 +696,8 @@ interface EmailAccountsResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetWalletAccounts, useIndexerReferralConsumption } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetWalletAccounts, useIndexerReferralConsumption } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function WalletAccountsViewer({
   walletAddress,
@@ -836,8 +836,8 @@ interface PointsResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetPointsBalance } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetPointsBalance } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function UserPointsDisplay({
   walletAddress,
@@ -951,8 +951,8 @@ interface EntitlementResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetEntitlement } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetEntitlement } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function PremiumFeatureGate({
   walletAddress,
@@ -1060,8 +1060,8 @@ interface DelegatedToResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetDelegatedTo } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetDelegatedTo } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function DelegationStatus({
   walletAddress,
@@ -1170,8 +1170,8 @@ interface DelegatedFromResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetDelegatedFrom } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetDelegatedFrom } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function DelegatedAccountsList({
   walletAddress,
@@ -1282,8 +1282,8 @@ interface NonceResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerCreateNonce } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerCreateNonce } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function EmailAuthFlow({
   username,
@@ -1366,8 +1366,8 @@ interface UseIndexerGetNonceReturn {
 #### Example Usage
 
 ```typescript
-import { useIndexerGetNonce } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerGetNonce } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function CheckExistingNonce({
   username,
@@ -1460,8 +1460,8 @@ interface NameServiceResponse {
 #### Example Usage
 
 ```typescript
-import { useWalletNames } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useWalletNames } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function WalletNamesDisplay({
   walletAddress,
@@ -1552,8 +1552,8 @@ interface ReferralCodeResponse {
 #### Example Usage
 
 ```typescript
-import { useIndexerReferralCode } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerReferralCode } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function ReferralCodeManager({
   walletAddress,
@@ -1635,8 +1635,8 @@ interface UseIndexerReferralShareReturn {
 #### Example Usage
 
 ```typescript
-import { useIndexerReferralShare } from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+import { useIndexerReferralShare } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function ShareReferralButton({
   walletAddress,
@@ -1721,8 +1721,8 @@ interface UseIndexerReferralConsumptionReturn {
 import {
   useIndexerReferralConsumption,
   useIndexerGetWalletAccounts
-} from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function App() {
   // This hook automatically checks URL on mount
@@ -1883,7 +1883,7 @@ interface UseIndexerMailReturn {
 #### Example Usage
 
 ```typescript
-import { useIndexerMail } from '@0xmail/indexer_client';
+import { useIndexerMail } from '@sudobility/indexer_client';
 
 // This works but is NOT recommended
 function LegacyComponent() {
@@ -1904,7 +1904,7 @@ function LegacyComponent() {
 import {
   useIndexerValidateUsername,
   useIndexerGetWalletAccounts
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 
 // This is the recommended approach
 function ModernComponent() {
@@ -1928,8 +1928,8 @@ function ModernComponent() {
 import {
   useIndexerGetSigningMessage,
   useIndexerGetWalletAccounts
-} from '@0xmail/indexer_client';
-import type { IndexerUserAuth } from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/indexer_client';
 
 function AuthenticatedApp({ walletAddress, chainId }: Props) {
   const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
@@ -1991,7 +1991,7 @@ import {
   useIndexerReferralCode,
   useIndexerReferralShare,
   useIndexerReferralStats
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 
 function ReferralSystem({ walletAddress, auth }: Props) {
   // Handle incoming referrals
@@ -2060,7 +2060,7 @@ function ReferralSystem({ walletAddress, auth }: Props) {
 import {
   useIndexerGetPointsBalance,
   useIndexerPoints
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 
 function PointsDashboard({ walletAddress, auth }: Props) {
   const { getPointsBalance } = useIndexerGetPointsBalance(
@@ -2170,7 +2170,7 @@ import type {
   SiteStatsResponse,
   ReferralCodeResponse,
   ReferralStatsResponse,
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 ```
 
 ---

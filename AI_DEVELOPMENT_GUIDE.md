@@ -4,7 +4,7 @@ This guide is designed to help AI assistants (like Claude Code) quickly understa
 
 ## Project Overview
 
-**Project:** `@0xmail/indexer_client`
+**Project:** `@sudobility/indexer_client`
 **Type:** TypeScript client library for 0xMail Indexer API
 **Compatibility:** React and React Native
 **Backend:** Located at `../mail_box_indexer` (Ponder-based blockchain indexer)

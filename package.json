@@ -1,5 +1,5 @@
 {
-  "name": "@0xmail/indexer_client",
+  "name": "@sudobility/indexer_client",
   "version": "0.0.20",
   "description": "React and React Native compatible client library for 0xMail indexer API with TypeScript support",
   "type": "module",

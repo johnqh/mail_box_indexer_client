@@ -1,4 +1,4 @@
-# Contributing to @0xmail/indexer_client
+# Contributing to @sudobility/indexer_client
 
 Thank you for your interest in contributing to the 0xMail Indexer Client! This document provides guidelines and best practices for contributing.
 
@@ -511,4 +511,4 @@ Keep `@sudobility/types` version aligned with backend:
 - Focus on constructive feedback
 - Assume good intentions
 
-Thank you for contributing to @0xmail/indexer_client!
+Thank you for contributing to @sudobility/indexer_client!

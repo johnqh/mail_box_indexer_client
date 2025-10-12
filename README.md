@@ -1,4 +1,4 @@
-# @0xmail/indexer_client
+# @sudobility/indexer_client
 
 TypeScript client library for the 0xMail Indexer API. Compatible with React and React Native applications.
 
@@ -17,7 +17,7 @@ TypeScript client library for the 0xMail Indexer API. Compatible with React and 
 ## Installation
 
 ```bash
-npm install @0xmail/indexer_client
+npm install @sudobility/indexer_client
 ```
 
 ### Peer Dependencies
@@ -53,7 +53,7 @@ function App() {
 ### 2. Use Hooks
 
 ```typescript
-import { useIndexerPoints } from '@0xmail/indexer_client';
+import { useIndexerPoints } from '@sudobility/indexer_client';
 
 function PointsDisplay({ wallet, signature, message }) {
   const { data, isLoading } = useIndexerPoints(
@@ -98,7 +98,7 @@ See [COVERAGE.md](COVERAGE.md) for complete endpoint matrix.
 Low-level HTTP client for direct API access:
 
 ```typescript
-import { IndexerClient } from '@0xmail/indexer_client';
+import { IndexerClient } from '@sudobility/indexer_client';
 
 const client = new IndexerClient('https://indexer.0xmail.box', false);
 
@@ -123,7 +123,7 @@ High-level hooks with automatic caching and refetching:
 
 #### useIndexerMail
 ```typescript
-import { useIndexerMail } from '@0xmail/indexer_client';
+import { useIndexerMail } from '@sudobility/indexer_client';
 
 const { data, isLoading, error, refetch } = useIndexerMail(
   endpointUrl,
@@ -136,7 +136,7 @@ const { data, isLoading, error, refetch } = useIndexerMail(
 
 #### useIndexerPoints
 ```typescript
-import { useIndexerPoints } from '@0xmail/indexer_client';
+import { useIndexerPoints } from '@sudobility/indexer_client';
 
 const { data, isLoading } = useIndexerPoints(
   endpointUrl,
@@ -149,7 +149,7 @@ const { data, isLoading } = useIndexerPoints(
 
 #### useIndexerReferralCode
 ```typescript
-import { useIndexerReferralCode } from '@0xmail/indexer_client';
+import { useIndexerReferralCode } from '@sudobility/indexer_client';
 
 const { data, isLoading } = useIndexerReferralCode(
   endpointUrl,
@@ -162,7 +162,7 @@ const { data, isLoading } = useIndexerReferralCode(
 
 #### useIndexerReferralStats
 ```typescript
-import { useIndexerReferralStats } from '@0xmail/indexer_client';
+import { useIndexerReferralStats } from '@sudobility/indexer_client';
 
 const { data, isLoading } = useIndexerReferralStats(
   endpointUrl,
@@ -173,7 +173,7 @@ const { data, isLoading } = useIndexerReferralStats(
 
 #### useWalletNames / useResolveNameToAddress
 ```typescript
-import { useWalletNames, useResolveNameToAddress } from '@0xmail/indexer_client';
+import { useWalletNames, useResolveNameToAddress } from '@sudobility/indexer_client';
 
 // Get all names for a wallet
 const { data: names } = useWalletNames(
@@ -198,7 +198,7 @@ const { data: resolved } = useResolveNameToAddress(
 Caching wrapper for public endpoints:
 
 ```typescript
-import { IndexerService } from '@0xmail/indexer_client';
+import { IndexerService } from '@sudobility/indexer_client';
 
 const config = {
   indexerBackendUrl: 'https://indexer.0xmail.box'
@@ -223,7 +223,7 @@ import {
   createIndexerGraphQL,
   createIndexerWebhook,
   createIndexerHelpers
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 
 const config = {
   indexerBackendUrl: 'https://indexer.0xmail.box'
@@ -403,7 +403,7 @@ import type {
   ReferralCodeResponse,
   LeaderboardResponse,
   // ... and more
-} from '@0xmail/indexer_client';
+} from '@sudobility/indexer_client';
 ```
 
 ## Testing

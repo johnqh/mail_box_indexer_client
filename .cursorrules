@@ -1,4 +1,4 @@
-# Cursor AI Rules for @0xmail/indexer_client
+# Cursor AI Rules for @sudobility/indexer_client
 
 ## Project Context
 This is a TypeScript client library for the 0xMail Indexer API, compatible with React and React Native.

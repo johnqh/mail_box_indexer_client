@@ -9,7 +9,7 @@ This file helps AI assistants quickly understand the project structure.
 4. **README.md** - Project overview and quick start
 
 ## Project Summary
-- **Name**: @0xmail/indexer_client
+- **Name**: @sudobility/indexer_client
 - **Type**: TypeScript client library for 0xMail Indexer API
 - **Version**: 0.0.18
 - **Compatibility**: React and React Native

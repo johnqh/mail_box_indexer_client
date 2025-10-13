@@ -94,6 +94,81 @@ export interface ReferralStatsResponse {
 }
 
 /**
+ * Mail template data
+ */
+export interface MailTemplate {
+  id: string;
+  userId: string;
+  templateName: string;
+  bodyContent: string;
+  isActive: boolean;
+  usageCount: number;
+  lastUsedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Mail template create request
+ */
+export interface MailTemplateCreateRequest {
+  templateName: string;
+  bodyContent: string;
+}
+
+/**
+ * Mail template update request
+ */
+export interface MailTemplateUpdateRequest {
+  templateName?: string;
+  bodyContent?: string;
+}
+
+/**
+ * Mail template response (single template)
+ */
+export interface MailTemplateResponse {
+  success: boolean;
+  template: MailTemplate;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Mail templates list response
+ */
+export interface MailTemplatesListResponse {
+  success: boolean;
+  templates: MailTemplate[];
+  total: number;
+  hasMore: boolean;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Mail template delete response
+ */
+export interface MailTemplateDeleteResponse {
+  success: boolean;
+  message: string;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Mail templates list query parameters
+ */
+export interface MailTemplatesListParams {
+  active?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+/**
  * Indexer API client for public endpoints only
  * Only includes endpoints that client applications can actually use without server-side authentication
  */
@@ -628,6 +703,149 @@ export class IndexerClient {
     }
 
     return response.data as IndexerNameResolutionResponse;
+  }
+
+  // =============================================================================
+  // MAIL TEMPLATE ENDPOINTS (Require wallet signature)
+  // =============================================================================
+
+  /**
+   * Create a new mail template (requires signature)
+   * POST /wallets/:walletAddress/templates
+   */
+  async createMailTemplate(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    template: MailTemplateCreateRequest
+  ): Promise<MailTemplateResponse> {
+    const response = await this.post<MailTemplateResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/templates`,
+      template,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create template: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as MailTemplateResponse;
+  }
+
+  /**
+   * Get list of templates for a wallet (requires signature)
+   * GET /wallets/:walletAddress/templates
+   */
+  async getMailTemplates(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    params?: MailTemplatesListParams
+  ): Promise<MailTemplatesListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.active !== undefined) {
+      queryParams.append('active', params.active.toString());
+    }
+    if (params?.limit !== undefined) {
+      queryParams.append('limit', params.limit.toString());
+    }
+    if (params?.offset !== undefined) {
+      queryParams.append('offset', params.offset.toString());
+    }
+
+    const queryString = queryParams.toString();
+    const url = `/wallets/${encodeURIComponent(walletAddress)}/templates${queryString ? `?${queryString}` : ''}`;
+
+    const response = await this.get<MailTemplatesListResponse>(url, {
+      headers: this.createAuthHeaders(auth),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get templates: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as MailTemplatesListResponse;
+  }
+
+  /**
+   * Get a single template by ID (requires signature)
+   * GET /wallets/:walletAddress/templates/:templateId
+   */
+  async getMailTemplate(
+    walletAddress: string,
+    templateId: string,
+    auth: IndexerUserAuth
+  ): Promise<MailTemplateResponse> {
+    const response = await this.get<MailTemplateResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get template: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as MailTemplateResponse;
+  }
+
+  /**
+   * Update a template (requires signature)
+   * PUT /wallets/:walletAddress/templates/:templateId
+   */
+  async updateMailTemplate(
+    walletAddress: string,
+    templateId: string,
+    auth: IndexerUserAuth,
+    updates: MailTemplateUpdateRequest
+  ): Promise<MailTemplateResponse> {
+    const response = await this.put<MailTemplateResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
+      updates,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to update template: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as MailTemplateResponse;
+  }
+
+  /**
+   * Delete a template (soft delete, requires signature)
+   * DELETE /wallets/:walletAddress/templates/:templateId
+   */
+  async deleteMailTemplate(
+    walletAddress: string,
+    templateId: string,
+    auth: IndexerUserAuth
+  ): Promise<MailTemplateDeleteResponse> {
+    const response = await this.delete<MailTemplateDeleteResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to delete template: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as MailTemplateDeleteResponse;
   }
 
   // Note: The following endpoints are IP-restricted and only accessible from WildDuck server:

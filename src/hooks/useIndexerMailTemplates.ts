@@ -4,11 +4,11 @@ import {
   IndexerClient,
   type MailTemplate,
   type MailTemplateCreateRequest,
-  type MailTemplateUpdateRequest,
-  type MailTemplateResponse,
-  type MailTemplatesListResponse,
   type MailTemplateDeleteResponse,
+  type MailTemplateResponse,
   type MailTemplatesListParams,
+  type MailTemplatesListResponse,
+  type MailTemplateUpdateRequest,
 } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
 
@@ -55,10 +55,7 @@ import type { IndexerUserAuth } from '../types';
  * await deleteTemplate(walletAddress, templateId, auth);
  * ```
  */
-export const useIndexerMailTemplates = (
-  endpointUrl: string,
-  dev: boolean
-) => {
+export const useIndexerMailTemplates = (endpointUrl: string, dev: boolean) => {
   const [templates, setTemplates] =
     useState<Optional<MailTemplatesListResponse>>(null);
   const [template, setTemplate] = useState<Optional<MailTemplate>>(null);

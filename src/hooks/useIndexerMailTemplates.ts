@@ -82,7 +82,9 @@ export const useIndexerMailTemplates = (endpointUrl: string, dev: boolean) => {
           auth,
           templateData
         );
-        setTemplate(response.template);
+        if (response.data) {
+          setTemplate(response.data.template);
+        }
         return response;
       } catch (err) {
         const errorMessage =
@@ -146,7 +148,9 @@ export const useIndexerMailTemplates = (endpointUrl: string, dev: boolean) => {
           templateId,
           auth
         );
-        setTemplate(response.template);
+        if (response.data) {
+          setTemplate(response.data.template);
+        }
         return response;
       } catch (err) {
         const errorMessage =
@@ -180,7 +184,9 @@ export const useIndexerMailTemplates = (endpointUrl: string, dev: boolean) => {
           auth,
           updates
         );
-        setTemplate(response.template);
+        if (response.data) {
+          setTemplate(response.data.template);
+        }
         return response;
       } catch (err) {
         const errorMessage =

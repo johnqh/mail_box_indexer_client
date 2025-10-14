@@ -13,6 +13,14 @@ import type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
+  IndexerTemplateData,
+  IndexerTemplateDeleteResponse,
+  IndexerTemplateListResponse,
+  IndexerTemplateResponse,
+  IndexerWebhookData,
+  IndexerWebhookDeleteResponse,
+  IndexerWebhookListResponse,
+  IndexerWebhookResponse,
   Optional,
 } from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
@@ -94,25 +102,16 @@ export interface ReferralStatsResponse {
 }
 
 /**
- * Mail template data
+ * Mail template data - re-export from @sudobility/types
  */
-export interface MailTemplate {
-  id: string;
-  userId: string;
-  templateName: string;
-  bodyContent: string;
-  isActive: boolean;
-  usageCount: number;
-  lastUsedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+export type MailTemplate = IndexerTemplateData;
 
 /**
  * Mail template create request
  */
 export interface MailTemplateCreateRequest {
   templateName: string;
+  subject: string;
   bodyContent: string;
 }
 
@@ -121,43 +120,24 @@ export interface MailTemplateCreateRequest {
  */
 export interface MailTemplateUpdateRequest {
   templateName?: string;
+  subject?: string;
   bodyContent?: string;
 }
 
 /**
- * Mail template response (single template)
+ * Mail template response (single template) - re-export from @sudobility/types
  */
-export interface MailTemplateResponse {
-  success: boolean;
-  template: MailTemplate;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type MailTemplateResponse = IndexerTemplateResponse;
 
 /**
- * Mail templates list response
+ * Mail templates list response - re-export from @sudobility/types
  */
-export interface MailTemplatesListResponse {
-  success: boolean;
-  templates: MailTemplate[];
-  total: number;
-  hasMore: boolean;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type MailTemplatesListResponse = IndexerTemplateListResponse;
 
 /**
- * Mail template delete response
+ * Mail template delete response - re-export from @sudobility/types
  */
-export interface MailTemplateDeleteResponse {
-  success: boolean;
-  message: string;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type MailTemplateDeleteResponse = IndexerTemplateDeleteResponse;
 
 /**
  * Mail templates list query parameters
@@ -169,18 +149,9 @@ export interface MailTemplatesListParams {
 }
 
 /**
- * Webhook data
+ * Webhook data - re-export from @sudobility/types
  */
-export interface Webhook {
-  id: string;
-  userId: string;
-  webhookUrl: string;
-  isActive: boolean;
-  triggerCount: number;
-  lastTriggeredAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+export type Webhook = IndexerWebhookData;
 
 /**
  * Webhook create request
@@ -190,39 +161,19 @@ export interface WebhookCreateRequest {
 }
 
 /**
- * Webhook response (single webhook)
+ * Webhook response (single webhook) - re-export from @sudobility/types
  */
-export interface WebhookResponse {
-  success: boolean;
-  webhook: Webhook;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type WebhookResponse = IndexerWebhookResponse;
 
 /**
- * Webhooks list response
+ * Webhooks list response - re-export from @sudobility/types
  */
-export interface WebhooksListResponse {
-  success: boolean;
-  webhooks: Webhook[];
-  total: number;
-  hasMore: boolean;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type WebhooksListResponse = IndexerWebhookListResponse;
 
 /**
- * Webhook delete response
+ * Webhook delete response - re-export from @sudobility/types
  */
-export interface WebhookDeleteResponse {
-  success: boolean;
-  message: string;
-  verified: boolean;
-  error?: string;
-  timestamp: string;
-}
+export type WebhookDeleteResponse = IndexerWebhookDeleteResponse;
 
 /**
  * Webhooks list query parameters

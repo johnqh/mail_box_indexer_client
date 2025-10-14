@@ -76,8 +76,11 @@ describe('useIndexerMailWebhooks', () => {
 
       const mockResponse = {
         success: true,
-        webhook: mockWebhook,
-        verified: true,
+        data: {
+          webhook: mockWebhook,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -160,10 +163,13 @@ describe('useIndexerMailWebhooks', () => {
 
       const mockResponse = {
         success: true,
-        webhooks: mockWebhooks,
-        total: 2,
-        hasMore: false,
-        verified: true,
+        data: {
+          webhooks: mockWebhooks,
+          total: 2,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -213,10 +219,13 @@ describe('useIndexerMailWebhooks', () => {
     it('should handle pagination parameters', async () => {
       const mockResponse = {
         success: true,
-        webhooks: [],
-        total: 100,
-        hasMore: true,
-        verified: true,
+        data: {
+          webhooks: [],
+          total: 100,
+          hasMore: true,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -257,8 +266,11 @@ describe('useIndexerMailWebhooks', () => {
 
       const mockResponse = {
         success: true,
-        webhook: mockWebhook,
-        verified: true,
+        data: {
+          webhook: mockWebhook,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -309,8 +321,11 @@ describe('useIndexerMailWebhooks', () => {
     it('should delete webhook successfully', async () => {
       const mockResponse = {
         success: true,
-        message: 'Webhook deleted successfully',
-        verified: true,
+        data: {
+          message: 'Webhook deleted successfully',
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -341,8 +356,11 @@ describe('useIndexerMailWebhooks', () => {
     it('should clear current webhook if it was deleted', async () => {
       const mockResponse = {
         success: true,
-        message: 'Webhook deleted successfully',
-        verified: true,
+        data: {
+          message: 'Webhook deleted successfully',
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -367,8 +385,11 @@ describe('useIndexerMailWebhooks', () => {
       // Simulate getting a webhook first
       mockGetWebhook.mockResolvedValueOnce({
         success: true,
-        webhook: initialWebhook,
-        verified: true,
+        data: {
+          webhook: initialWebhook,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       });
 
@@ -444,21 +465,24 @@ describe('useIndexerMailWebhooks', () => {
     it('should reset all state', async () => {
       const mockResponse = {
         success: true,
-        webhooks: [
-          {
-            id: 'webhook-1',
-            userId: mockWalletAddress.toLowerCase(),
-            webhookUrl: 'https://example.com/webhook',
-            isActive: true,
-            triggerCount: 5,
-            lastTriggeredAt: null,
-            createdAt: '2025-10-13T00:00:00.000Z',
-            updatedAt: '2025-10-13T00:00:00.000Z',
-          },
-        ],
-        total: 1,
-        hasMore: false,
-        verified: true,
+        data: {
+          webhooks: [
+            {
+              id: 'webhook-1',
+              userId: mockWalletAddress.toLowerCase(),
+              webhookUrl: 'https://example.com/webhook',
+              isActive: true,
+              triggerCount: 5,
+              lastTriggeredAt: null,
+              createdAt: '2025-10-13T00:00:00.000Z',
+              updatedAt: '2025-10-13T00:00:00.000Z',
+            },
+          ],
+          total: 1,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -491,10 +515,13 @@ describe('useIndexerMailWebhooks', () => {
     it('should include auth headers in all requests', async () => {
       const mockResponse = {
         success: true,
-        webhooks: [],
-        total: 0,
-        hasMore: false,
-        verified: true,
+        data: {
+          webhooks: [],
+          total: 0,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 

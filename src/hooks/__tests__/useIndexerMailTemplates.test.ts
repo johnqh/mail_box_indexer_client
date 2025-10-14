@@ -70,6 +70,7 @@ describe('useIndexerMailTemplates', () => {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
         templateName: 'Test Template',
+        subject: 'Test Subject',
         bodyContent: 'Test body content',
         isActive: true,
         usageCount: 0,
@@ -80,8 +81,11 @@ describe('useIndexerMailTemplates', () => {
 
       const mockResponse = {
         success: true,
-        template: mockTemplate,
-        verified: true,
+        data: {
+          template: mockTemplate,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -93,6 +97,7 @@ describe('useIndexerMailTemplates', () => {
 
       const templateData = {
         templateName: 'Test Template',
+        subject: 'Test Subject',
         bodyContent: 'Test body content',
       };
 
@@ -125,6 +130,7 @@ describe('useIndexerMailTemplates', () => {
 
       const templateData = {
         templateName: 'Test Template',
+        subject: 'Test Subject',
         bodyContent: 'Test body',
       };
 
@@ -150,6 +156,7 @@ describe('useIndexerMailTemplates', () => {
           id: 'template-1',
           userId: mockWalletAddress.toLowerCase(),
           templateName: 'Template 1',
+          subject: 'Subject 1',
           bodyContent: 'Body 1',
           isActive: true,
           usageCount: 5,
@@ -161,6 +168,7 @@ describe('useIndexerMailTemplates', () => {
           id: 'template-2',
           userId: mockWalletAddress.toLowerCase(),
           templateName: 'Template 2',
+          subject: 'Subject 2',
           bodyContent: 'Body 2',
           isActive: true,
           usageCount: 3,
@@ -172,10 +180,13 @@ describe('useIndexerMailTemplates', () => {
 
       const mockResponse = {
         success: true,
-        templates: mockTemplates,
-        total: 2,
-        hasMore: false,
-        verified: true,
+        data: {
+          templates: mockTemplates,
+          total: 2,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -225,10 +236,13 @@ describe('useIndexerMailTemplates', () => {
     it('should handle pagination parameters', async () => {
       const mockResponse = {
         success: true,
-        templates: [],
-        total: 100,
-        hasMore: true,
-        verified: true,
+        data: {
+          templates: [],
+          total: 100,
+          hasMore: true,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -260,6 +274,7 @@ describe('useIndexerMailTemplates', () => {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
         templateName: 'Test Template',
+        subject: 'Test Subject',
         bodyContent: 'Test body content',
         isActive: true,
         usageCount: 10,
@@ -270,8 +285,11 @@ describe('useIndexerMailTemplates', () => {
 
       const mockResponse = {
         success: true,
-        template: mockTemplate,
-        verified: true,
+        data: {
+          template: mockTemplate,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -328,6 +346,7 @@ describe('useIndexerMailTemplates', () => {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
         templateName: 'Updated Template',
+        subject: 'Test Subject',
         bodyContent: 'Original body',
         isActive: true,
         usageCount: 10,
@@ -338,8 +357,11 @@ describe('useIndexerMailTemplates', () => {
 
       const mockResponse = {
         success: true,
-        template: mockTemplate,
-        verified: true,
+        data: {
+          template: mockTemplate,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -399,8 +421,11 @@ describe('useIndexerMailTemplates', () => {
     it('should delete template successfully', async () => {
       const mockResponse = {
         success: true,
-        message: 'Template deleted successfully',
-        verified: true,
+        data: {
+          message: 'Template deleted successfully',
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -478,22 +503,26 @@ describe('useIndexerMailTemplates', () => {
     it('should reset all state', async () => {
       const mockResponse = {
         success: true,
-        templates: [
-          {
-            id: 'template-1',
-            userId: mockWalletAddress.toLowerCase(),
-            templateName: 'Template 1',
-            bodyContent: 'Body 1',
-            isActive: true,
-            usageCount: 5,
-            lastUsedAt: null,
-            createdAt: '2025-10-13T00:00:00.000Z',
-            updatedAt: '2025-10-13T00:00:00.000Z',
-          },
-        ],
-        total: 1,
-        hasMore: false,
-        verified: true,
+        data: {
+          templates: [
+            {
+              id: 'template-1',
+              userId: mockWalletAddress.toLowerCase(),
+              templateName: 'Template 1',
+              subject: 'Subject 1',
+              bodyContent: 'Body 1',
+              isActive: true,
+              usageCount: 5,
+              lastUsedAt: null,
+              createdAt: '2025-10-13T00:00:00.000Z',
+              updatedAt: '2025-10-13T00:00:00.000Z',
+            },
+          ],
+          total: 1,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -526,10 +555,13 @@ describe('useIndexerMailTemplates', () => {
     it('should include auth headers in all requests', async () => {
       const mockResponse = {
         success: true,
-        templates: [],
-        total: 0,
-        hasMore: false,
-        verified: true,
+        data: {
+          templates: [],
+          total: 0,
+          hasMore: false,
+          verified: true,
+        },
+        error: null,
         timestamp: '2025-10-13T00:00:00.000Z',
       };
 
@@ -567,6 +599,7 @@ describe('useIndexerMailTemplates', () => {
         await expect(
           result.current.createTemplate(mockWalletAddress, mockAuth, {
             templateName: 'Test',
+            subject: 'Test',
             bodyContent: 'Test',
           })
         ).rejects.toBe('String error');

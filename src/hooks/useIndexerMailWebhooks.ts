@@ -74,7 +74,9 @@ export const useIndexerMailWebhooks = (endpointUrl: string, dev: boolean) => {
           auth,
           webhookData
         );
-        setWebhook(response.webhook);
+        if (response.data) {
+          setWebhook(response.data.webhook);
+        }
         return response;
       } catch (err) {
         const errorMessage =
@@ -134,7 +136,9 @@ export const useIndexerMailWebhooks = (endpointUrl: string, dev: boolean) => {
           webhookId,
           auth
         );
-        setWebhook(response.webhook);
+        if (response.data) {
+          setWebhook(response.data.webhook);
+        }
         return response;
       } catch (err) {
         const errorMessage =

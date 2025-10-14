@@ -169,6 +169,71 @@ export interface MailTemplatesListParams {
 }
 
 /**
+ * Webhook data
+ */
+export interface Webhook {
+  id: string;
+  userId: string;
+  webhookUrl: string;
+  isActive: boolean;
+  triggerCount: number;
+  lastTriggeredAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Webhook create request
+ */
+export interface WebhookCreateRequest {
+  webhookUrl: string;
+}
+
+/**
+ * Webhook response (single webhook)
+ */
+export interface WebhookResponse {
+  success: boolean;
+  webhook: Webhook;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Webhooks list response
+ */
+export interface WebhooksListResponse {
+  success: boolean;
+  webhooks: Webhook[];
+  total: number;
+  hasMore: boolean;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Webhook delete response
+ */
+export interface WebhookDeleteResponse {
+  success: boolean;
+  message: string;
+  verified: boolean;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * Webhooks list query parameters
+ */
+export interface WebhooksListParams {
+  active?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+/**
  * Indexer API client for public endpoints only
  * Only includes endpoints that client applications can actually use without server-side authentication
  */
@@ -846,6 +911,122 @@ export class IndexerClient {
     }
 
     return response.data as MailTemplateDeleteResponse;
+  }
+
+  // =============================================================================
+  // WEBHOOK ENDPOINTS (Require wallet signature)
+  // =============================================================================
+
+  /**
+   * Create a new webhook (requires signature)
+   * POST /wallets/:walletAddress/webhooks
+   */
+  async createWebhook(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    webhook: WebhookCreateRequest
+  ): Promise<WebhookResponse> {
+    const response = await this.post<WebhookResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/webhooks`,
+      webhook,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create webhook: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as WebhookResponse;
+  }
+
+  /**
+   * Get list of webhooks for a wallet (requires signature)
+   * GET /wallets/:walletAddress/webhooks
+   */
+  async getWebhooks(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    params?: WebhooksListParams
+  ): Promise<WebhooksListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.active !== undefined) {
+      queryParams.append('active', params.active.toString());
+    }
+    if (params?.limit !== undefined) {
+      queryParams.append('limit', params.limit.toString());
+    }
+    if (params?.offset !== undefined) {
+      queryParams.append('offset', params.offset.toString());
+    }
+
+    const queryString = queryParams.toString();
+    const url = `/wallets/${encodeURIComponent(walletAddress)}/webhooks${queryString ? `?${queryString}` : ''}`;
+
+    const response = await this.get<WebhooksListResponse>(url, {
+      headers: this.createAuthHeaders(auth),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get webhooks: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as WebhooksListResponse;
+  }
+
+  /**
+   * Get a single webhook by ID (requires signature)
+   * GET /wallets/:walletAddress/webhooks/:webhookId
+   */
+  async getWebhook(
+    walletAddress: string,
+    webhookId: string,
+    auth: IndexerUserAuth
+  ): Promise<WebhookResponse> {
+    const response = await this.get<WebhookResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get webhook: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as WebhookResponse;
+  }
+
+  /**
+   * Delete a webhook (soft delete, requires signature)
+   * DELETE /wallets/:walletAddress/webhooks/:webhookId
+   */
+  async deleteWebhook(
+    walletAddress: string,
+    webhookId: string,
+    auth: IndexerUserAuth
+  ): Promise<WebhookDeleteResponse> {
+    const response = await this.delete<WebhookDeleteResponse>(
+      `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to delete webhook: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data as WebhookDeleteResponse;
   }
 
   // Note: The following endpoints are IP-restricted and only accessible from WildDuck server:

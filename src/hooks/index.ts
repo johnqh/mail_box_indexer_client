@@ -33,5 +33,8 @@ export * from './useIndexerReferralStats';
 // Mail template hooks
 export * from './useIndexerMailTemplates';
 
+// Webhook hooks
+export * from './useIndexerMailWebhooks';
+
 // Mock data for testing
 export { IndexerMockData } from './mocks';

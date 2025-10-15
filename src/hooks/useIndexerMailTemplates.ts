@@ -36,8 +36,8 @@ import type { IndexerUserAuth } from '../types';
  *
  * // Create a new template
  * await createTemplate(walletAddress, auth, {
- *   templateName: 'Welcome Email',
- *   bodyContent: 'Hello {{name}}!'
+ *   name: 'Welcome Email',
+ *   body: 'Hello {{name}}!'
  * });
  *
  * // Get list of templates
@@ -48,7 +48,7 @@ import type { IndexerUserAuth } from '../types';
  *
  * // Update template
  * await updateTemplate(walletAddress, templateId, auth, {
- *   templateName: 'Updated Welcome Email'
+ *   name: 'Updated Welcome Email'
  * });
  *
  * // Delete template

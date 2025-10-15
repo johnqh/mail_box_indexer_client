@@ -13,10 +13,13 @@ import type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
+  IndexerTemplateCreateRequest,
   IndexerTemplateData,
   IndexerTemplateDeleteResponse,
   IndexerTemplateListResponse,
   IndexerTemplateResponse,
+  IndexerTemplateUpdateRequest,
+  IndexerWebhookCreateRequest,
   IndexerWebhookData,
   IndexerWebhookDeleteResponse,
   IndexerWebhookListResponse,
@@ -107,22 +110,14 @@ export interface ReferralStatsResponse {
 export type MailTemplate = IndexerTemplateData;
 
 /**
- * Mail template create request
+ * Mail template create request - re-export from @sudobility/types
  */
-export interface MailTemplateCreateRequest {
-  templateName: string;
-  subject: string;
-  bodyContent: string;
-}
+export type MailTemplateCreateRequest = IndexerTemplateCreateRequest;
 
 /**
- * Mail template update request
+ * Mail template update request - re-export from @sudobility/types
  */
-export interface MailTemplateUpdateRequest {
-  templateName?: string;
-  subject?: string;
-  bodyContent?: string;
-}
+export type MailTemplateUpdateRequest = IndexerTemplateUpdateRequest;
 
 /**
  * Mail template response (single template) - re-export from @sudobility/types
@@ -154,11 +149,9 @@ export interface MailTemplatesListParams {
 export type Webhook = IndexerWebhookData;
 
 /**
- * Webhook create request
+ * Webhook create request - re-export from @sudobility/types
  */
-export interface WebhookCreateRequest {
-  webhookUrl: string;
-}
+export type WebhookCreateRequest = IndexerWebhookCreateRequest;
 
 /**
  * Webhook response (single webhook) - re-export from @sudobility/types

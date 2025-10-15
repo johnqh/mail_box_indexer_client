@@ -69,9 +69,9 @@ describe('useIndexerMailTemplates', () => {
       const mockTemplate = {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
-        templateName: 'Test Template',
+        name: 'Test Template',
         subject: 'Test Subject',
-        bodyContent: 'Test body content',
+        body: 'Test body content',
         isActive: true,
         usageCount: 0,
         lastUsedAt: null,
@@ -96,9 +96,9 @@ describe('useIndexerMailTemplates', () => {
       );
 
       const templateData = {
-        templateName: 'Test Template',
+        name: 'Test Template',
         subject: 'Test Subject',
-        bodyContent: 'Test body content',
+        body: 'Test body content',
       };
 
       let response;
@@ -129,9 +129,9 @@ describe('useIndexerMailTemplates', () => {
       );
 
       const templateData = {
-        templateName: 'Test Template',
+        name: 'Test Template',
         subject: 'Test Subject',
-        bodyContent: 'Test body',
+        body: 'Test body',
       };
 
       await act(async () => {
@@ -155,9 +155,9 @@ describe('useIndexerMailTemplates', () => {
         {
           id: 'template-1',
           userId: mockWalletAddress.toLowerCase(),
-          templateName: 'Template 1',
+          name: 'Template 1',
           subject: 'Subject 1',
-          bodyContent: 'Body 1',
+          body: 'Body 1',
           isActive: true,
           usageCount: 5,
           lastUsedAt: '2025-10-13T00:00:00.000Z',
@@ -167,9 +167,9 @@ describe('useIndexerMailTemplates', () => {
         {
           id: 'template-2',
           userId: mockWalletAddress.toLowerCase(),
-          templateName: 'Template 2',
+          name: 'Template 2',
           subject: 'Subject 2',
-          bodyContent: 'Body 2',
+          body: 'Body 2',
           isActive: true,
           usageCount: 3,
           lastUsedAt: null,
@@ -273,9 +273,9 @@ describe('useIndexerMailTemplates', () => {
       const mockTemplate = {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
-        templateName: 'Test Template',
+        name: 'Test Template',
         subject: 'Test Subject',
-        bodyContent: 'Test body content',
+        body: 'Test body content',
         isActive: true,
         usageCount: 10,
         lastUsedAt: '2025-10-13T00:00:00.000Z',
@@ -345,9 +345,9 @@ describe('useIndexerMailTemplates', () => {
       const mockTemplate = {
         id: mockTemplateId,
         userId: mockWalletAddress.toLowerCase(),
-        templateName: 'Updated Template',
+        name: 'Updated Template',
         subject: 'Test Subject',
-        bodyContent: 'Original body',
+        body: 'Original body',
         isActive: true,
         usageCount: 10,
         lastUsedAt: '2025-10-13T00:00:00.000Z',
@@ -371,7 +371,7 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
-      const updates = { templateName: 'Updated Template' };
+      const updates = { name: 'Updated Template' };
 
       let response;
       await act(async () => {
@@ -408,7 +408,7 @@ describe('useIndexerMailTemplates', () => {
             mockWalletAddress,
             mockTemplateId,
             mockAuth,
-            { templateName: 'Updated' }
+            { name: 'Updated' }
           )
         ).rejects.toThrow(errorMessage);
       });
@@ -508,9 +508,9 @@ describe('useIndexerMailTemplates', () => {
             {
               id: 'template-1',
               userId: mockWalletAddress.toLowerCase(),
-              templateName: 'Template 1',
+              name: 'Template 1',
               subject: 'Subject 1',
-              bodyContent: 'Body 1',
+              body: 'Body 1',
               isActive: true,
               usageCount: 5,
               lastUsedAt: null,
@@ -598,9 +598,9 @@ describe('useIndexerMailTemplates', () => {
       await act(async () => {
         await expect(
           result.current.createTemplate(mockWalletAddress, mockAuth, {
-            templateName: 'Test',
+            name: 'Test',
             subject: 'Test',
-            bodyContent: 'Test',
+            body: 'Test',
           })
         ).rejects.toBe('String error');
       });

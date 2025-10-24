@@ -3,8 +3,7 @@
  * These functions are designed for admin panel usage and require special permissions
  */
 
-import type { Optional } from '@sudobility/types';
-import type { NetworkClient } from '@sudobility/di';
+import type { NetworkClient, Optional } from '@sudobility/types';
 
 // Configuration interface for indexer admin endpoints
 export interface IndexerAdminConfig {

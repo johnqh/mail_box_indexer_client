@@ -53,7 +53,7 @@
  * - Configured via `VITE_INDEXER_BACKEND_URL` environment variable
  */
 
-import type { NetworkClient } from '@sudobility/di';
+import type { NetworkClient } from '@sudobility/types';
 
 // Configuration interface for indexer GraphQL endpoint
 export interface IndexerGraphQLConfig {

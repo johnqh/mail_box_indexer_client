@@ -4,7 +4,7 @@
  * Note: These endpoints are typically called from backend services, not frontend
  */
 
-import type { NetworkClient } from '@sudobility/di';
+import type { NetworkClient } from '@sudobility/types';
 
 // Configuration interface for indexer webhook endpoints
 export interface IndexerWebhookConfig {

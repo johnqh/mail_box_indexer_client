@@ -2,6 +2,17 @@
 
 Complete examples for common use cases with the 0xMail Indexer Client.
 
+**Important:** As of version 0.0.26, all types must be imported from `@sudobility/types`, not from `@sudobility/indexer_client`. This library no longer re-exports types.
+
+```typescript
+// ✅ Correct
+import type { PointsResponse, Optional } from '@sudobility/types';
+import { useIndexerPoints } from '@sudobility/indexer_client';
+
+// ❌ Incorrect (will cause errors)
+import type { PointsResponse } from '@sudobility/indexer_client';
+```
+
 ## Table of Contents
 
 - [Basic Setup](#basic-setup)
@@ -19,8 +30,10 @@ Complete examples for common use cases with the 0xMail Indexer Client.
 ### Installing the Package
 
 ```bash
-npm install @sudobility/indexer_client @sudobility/types @tanstack/react-query axios
+npm install @sudobility/indexer_client @sudobility/types@^1.8.29 @sudobility/di@^1.4.7 @tanstack/react-query axios
 ```
+
+**Note:** You must install `@sudobility/types` as a direct dependency since types are no longer re-exported from this package.
 
 ### Creating a Client Instance
 

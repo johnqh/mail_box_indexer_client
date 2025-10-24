@@ -2,6 +2,19 @@
 
 This document provides comprehensive documentation for the 0xMail Indexer API endpoints and their implementation status in this client library.
 
+**Type Imports:** All response types referenced in this document are available in `@sudobility/types@^1.8.29`. As of v0.0.26, this client library no longer re-exports types - you must import them directly from `@sudobility/types`.
+
+```typescript
+import type {
+  AddressValidationResponse,
+  SignInMessageResponse,
+  EmailAccountsResponse,
+  PointsResponse,
+  // ... etc
+} from '@sudobility/types';
+import { IndexerClient } from '@sudobility/indexer_client';
+```
+
 ## Table of Contents
 
 - [Authentication](#authentication)

@@ -2,6 +2,13 @@
 
 Thank you for your interest in contributing to the 0xMail Indexer Client! This document provides guidelines and best practices for contributing.
 
+**Current Package Versions:**
+- `@sudobility/indexer_client` v0.0.28
+- `@sudobility/types` v1.8.29
+- `@sudobility/di` v1.4.7
+
+**Important:** This library does not re-export types from `@sudobility/types`. All type imports must come directly from `@sudobility/types`.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
@@ -494,8 +501,11 @@ Before implementing a client feature:
 Keep `@sudobility/types` version aligned with backend:
 
 - Backend: Check `../mail_box_indexer/package.json`
-- Client: Update `package.json` to match
+- Client: Current version is v1.8.29 (check `package.json`)
+- Update peer dependencies when types change
 - Document any version-specific behavior
+
+**Note:** `@sudobility/types` must be installed as a peer dependency since types are no longer re-exported from this package.
 
 ## Questions?
 

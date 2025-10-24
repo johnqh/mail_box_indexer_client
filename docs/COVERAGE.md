@@ -188,10 +188,12 @@ Last Updated: 2025-01-08
 
 | Package | Backend | Client | Status |
 |---------|---------|--------|--------|
-| @johnqh/types | 1.8.9 | 1.8.14 | ⚠️ **Version mismatch** - Should align |
-| @johnqh/di | - | 1.3.19 | ✅ Client only |
+| @sudobility/types | Check backend | v1.8.29 | ✅ Current version |
+| @sudobility/di | - | v1.4.7 | ✅ Peer dependency |
 
-**Action Required:** Update backend to use `@johnqh/types@1.8.14` or ensure backward compatibility.
+**Important:** As of v0.0.26, this library no longer re-exports types from `@sudobility/types`. Users must install `@sudobility/types` as a peer dependency and import types directly from it.
+
+**Action for Consumers:** Ensure you have `@sudobility/types@^1.8.29` installed as a dependency.
 
 ## Testing Coverage
 

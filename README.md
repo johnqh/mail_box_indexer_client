@@ -23,8 +23,12 @@ npm install @sudobility/indexer_client
 ### Peer Dependencies
 
 ```bash
-npm install react @tanstack/react-query axios @sudobility/di @sudobility/types
+npm install react @tanstack/react-query axios @sudobility/di@^1.4.7 @sudobility/types@^1.8.29
 ```
+
+**Current Versions:**
+- `@sudobility/di` v1.4.7
+- `@sudobility/types` v1.8.29
 
 ## Quick Start
 
@@ -82,14 +86,16 @@ function PointsDisplay({ wallet, signature, message }) {
 | KYC Verification | ❌ 0% | Optional feature |
 | Solana Admin | ❌ 0% | Admin tools |
 
-See [COVERAGE.md](COVERAGE.md) for complete endpoint matrix.
+See [docs/COVERAGE.md](docs/COVERAGE.md) for complete endpoint matrix.
 
 ## Documentation
 
-- **[API.md](API.md)** - Complete API endpoint documentation
-- **[EXAMPLES.md](EXAMPLES.md)** - Code examples for all features
-- **[AI_DEVELOPMENT_GUIDE.md](AI_DEVELOPMENT_GUIDE.md)** - Guide for AI-assisted development
-- **[COVERAGE.md](COVERAGE.md)** - API implementation status
+- **[docs/API.md](docs/API.md)** - Complete API endpoint documentation
+- **[docs/EXAMPLES.md](docs/EXAMPLES.md)** - Code examples for all features
+- **[docs/HOOKS_DOCUMENTATION.md](docs/HOOKS_DOCUMENTATION.md)** - Comprehensive hook documentation
+- **[docs/AI_DEVELOPMENT_GUIDE.md](docs/AI_DEVELOPMENT_GUIDE.md)** - Guide for AI-assisted development
+- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - Development and contribution guidelines
+- **[docs/COVERAGE.md](docs/COVERAGE.md)** - API implementation status
 
 ## Core Components
 
@@ -393,7 +399,7 @@ if (!result.success) {
 
 ## TypeScript Support
 
-All types are imported from `@sudobility/types`:
+All types must be imported from `@sudobility/types`:
 
 ```typescript
 import type {
@@ -402,8 +408,20 @@ import type {
   PointsResponse,
   ReferralCodeResponse,
   LeaderboardResponse,
+  Optional,
   // ... and more
-} from '@sudobility/indexer_client';
+} from '@sudobility/types';
+```
+
+**Important:** As of version 0.0.26, this library no longer re-exports types from `@sudobility/types`. You must import types directly from `@sudobility/types`:
+
+```typescript
+// ✅ Correct
+import type { PointsResponse } from '@sudobility/types';
+import { useIndexerPoints } from '@sudobility/indexer_client';
+
+// ❌ Incorrect (will cause errors)
+import type { PointsResponse } from '@sudobility/indexer_client';
 ```
 
 ## Testing
@@ -484,7 +502,7 @@ npm run clean
 - [ ] Advanced caching strategies
 - [ ] Request deduplication
 
-See [COVERAGE.md](COVERAGE.md) for detailed implementation status.
+See [docs/COVERAGE.md](docs/COVERAGE.md) for detailed implementation status.
 
 ## CI/CD
 
@@ -513,7 +531,7 @@ See [.github/workflows/README.md](.github/workflows/README.md) for detailed CI/C
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 ## Backend Repository
 
@@ -566,11 +584,11 @@ MIT
 
 For questions and support:
 - GitHub Issues: https://github.com/johnqh/mail_box_indexer_client/issues
-- Documentation: See `API.md` and `EXAMPLES.md`
+- Documentation: See `docs/API.md` and `docs/EXAMPLES.md`
 - Backend: `../mail_box_indexer`
 
 ## Version
 
-Current version: **0.0.18**
+Current version: **0.0.28**
 
-See [COVERAGE.md](COVERAGE.md) for implementation roadmap.
+See [docs/COVERAGE.md](docs/COVERAGE.md) for implementation roadmap.

@@ -70,20 +70,24 @@ src/
 
 ## Key Dependencies
 
-- `@sudobility/types@1.8.20` - Shared type definitions
-- `@sudobility/di@1.4.5` - Dependency injection
+- `@sudobility/types@1.8.29` - Shared type definitions (peer dependency)
+- `@sudobility/di@1.4.7` - Dependency injection (peer dependency)
 - `@tanstack/react-query@5.90.2` - Data fetching/caching
 - `axios@1.12.2` - HTTP client
 - `react@19.2.0` - Peer dependency
 
+**Important:** As of v0.0.26, this library NO LONGER re-exports types from `@sudobility/types`. All type imports must come directly from `@sudobility/types`.
+
 ## Backend Reference
 
 The backend (`../mail_box_indexer`) uses:
-- **@sudobility/types@1.8.9** (slightly older version)
-- Ponder 0.13.9 (blockchain indexing framework)
-- Hono 4.9.9 (HTTP router)
+- **@sudobility/types** - Check backend package.json for version (client uses v1.8.29)
+- Ponder 0.13.9+ (blockchain indexing framework)
+- Hono 4.9.9+ (HTTP router)
 - PostgreSQL (via pg)
 - Multi-chain support (EVM + Solana)
+
+**Version Synchronization:** Ensure the client's `@sudobility/types` version is compatible with the backend's version.
 
 ## Authentication Patterns
 
@@ -436,10 +440,10 @@ When adding features, update these files:
 ### Version Sync
 
 Keep `@sudobility/types` version aligned:
-- Backend uses: 1.8.9
-- Client uses: 1.8.20
+- Client uses: v1.8.29
+- Backend: Check `../mail_box_indexer/package.json`
 
-Monitor for breaking changes when updating.
+Monitor for breaking changes when updating. Since types are no longer re-exported, users must install `@sudobility/types` as a peer dependency.
 
 ## Mock Data
 

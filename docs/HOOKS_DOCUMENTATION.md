@@ -2,6 +2,21 @@
 
 This document provides comprehensive documentation for all React hooks in the `@sudobility/indexer_client` package. The hooks provide a React-friendly interface to interact with the 0xMail indexer API.
 
+**Important Type Import Change:** As of version 0.0.26, this library no longer re-exports types from `@sudobility/types`. All type imports must come directly from `@sudobility/types`:
+
+```typescript
+// ✅ Correct
+import type { PointsResponse, Optional, IndexerUserAuth } from '@sudobility/types';
+import { useIndexerPoints } from '@sudobility/indexer_client';
+
+// ❌ Incorrect (will cause errors)
+import type { PointsResponse } from '@sudobility/indexer_client';
+```
+
+**Dependencies:**
+- `@sudobility/types` v1.8.29
+- `@sudobility/di` v1.4.7
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -252,7 +267,7 @@ interface SignInMessageResponse {
 
 ```typescript
 import { useIndexerGetSigningMessage } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, chainId: number }) {
   const { getSigningMessage, isLoading, error } =
@@ -697,7 +712,7 @@ interface EmailAccountsResponse {
 
 ```typescript
 import { useIndexerGetWalletAccounts, useIndexerReferralConsumption } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function WalletAccountsViewer({
   walletAddress,
@@ -837,7 +852,7 @@ interface PointsResponse {
 
 ```typescript
 import { useIndexerGetPointsBalance } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function UserPointsDisplay({
   walletAddress,
@@ -952,7 +967,7 @@ interface EntitlementResponse {
 
 ```typescript
 import { useIndexerGetEntitlement } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function PremiumFeatureGate({
   walletAddress,
@@ -1061,7 +1076,7 @@ interface DelegatedToResponse {
 
 ```typescript
 import { useIndexerGetDelegatedTo } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function DelegationStatus({
   walletAddress,
@@ -1171,7 +1186,7 @@ interface DelegatedFromResponse {
 
 ```typescript
 import { useIndexerGetDelegatedFrom } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function DelegatedAccountsList({
   walletAddress,
@@ -1283,7 +1298,7 @@ interface NonceResponse {
 
 ```typescript
 import { useIndexerCreateNonce } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function EmailAuthFlow({
   username,
@@ -1367,7 +1382,7 @@ interface UseIndexerGetNonceReturn {
 
 ```typescript
 import { useIndexerGetNonce } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function CheckExistingNonce({
   username,
@@ -1461,7 +1476,7 @@ interface NameServiceResponse {
 
 ```typescript
 import { useWalletNames } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function WalletNamesDisplay({
   walletAddress,
@@ -1553,7 +1568,7 @@ interface ReferralCodeResponse {
 
 ```typescript
 import { useIndexerReferralCode } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function ReferralCodeManager({
   walletAddress,
@@ -1636,7 +1651,7 @@ interface UseIndexerReferralShareReturn {
 
 ```typescript
 import { useIndexerReferralShare } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function ShareReferralButton({
   walletAddress,
@@ -1722,7 +1737,7 @@ import {
   useIndexerReferralConsumption,
   useIndexerGetWalletAccounts
 } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function App() {
   // This hook automatically checks URL on mount
@@ -1929,7 +1944,7 @@ import {
   useIndexerGetSigningMessage,
   useIndexerGetWalletAccounts
 } from '@sudobility/indexer_client';
-import type { IndexerUserAuth } from '@sudobility/indexer_client';
+import type { IndexerUserAuth } from '@sudobility/types';
 
 function AuthenticatedApp({ walletAddress, chainId }: Props) {
   const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
@@ -2151,7 +2166,7 @@ Common error scenarios:
 
 ## TypeScript Support
 
-All hooks and types are fully typed. Import types from the package:
+All hooks and types are fully typed. Import types from `@sudobility/types`:
 
 ```typescript
 import type {
@@ -2170,8 +2185,11 @@ import type {
   SiteStatsResponse,
   ReferralCodeResponse,
   ReferralStatsResponse,
-} from '@sudobility/indexer_client';
+  Optional,
+} from '@sudobility/types';
 ```
+
+**Note:** These types are NOT re-exported from `@sudobility/indexer_client`. You must import them directly from `@sudobility/types`.
 
 ---
 

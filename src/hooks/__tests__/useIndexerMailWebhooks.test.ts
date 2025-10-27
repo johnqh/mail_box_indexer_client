@@ -12,12 +12,12 @@ const mockDeleteWebhook = vi.fn();
 // Mock IndexerClient
 vi.mock('../../network/IndexerClient', () => {
   return {
-    IndexerClient: vi.fn().mockImplementation(() => ({
-      createWebhook: mockCreateWebhook,
-      getWebhooks: mockGetWebhooks,
-      getWebhook: mockGetWebhook,
-      deleteWebhook: mockDeleteWebhook,
-    })),
+    IndexerClient: class {
+      createWebhook = mockCreateWebhook;
+      getWebhooks = mockGetWebhooks;
+      getWebhook = mockGetWebhook;
+      deleteWebhook = mockDeleteWebhook;
+    },
   };
 });
 

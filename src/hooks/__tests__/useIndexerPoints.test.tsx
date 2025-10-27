@@ -10,10 +10,10 @@ const mockGetPointsSiteStats = vi.fn();
 
 vi.mock('../../network/IndexerClient', () => {
   return {
-    IndexerClient: vi.fn().mockImplementation(() => ({
-      getPointsLeaderboard: mockGetPointsLeaderboard,
-      getPointsSiteStats: mockGetPointsSiteStats,
-    })),
+    IndexerClient: class {
+      getPointsLeaderboard = mockGetPointsLeaderboard;
+      getPointsSiteStats = mockGetPointsSiteStats;
+    },
   };
 });
 

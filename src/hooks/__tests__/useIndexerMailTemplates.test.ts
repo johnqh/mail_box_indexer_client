@@ -13,13 +13,13 @@ const mockDeleteMailTemplate = vi.fn();
 // Mock IndexerClient
 vi.mock('../../network/IndexerClient', () => {
   return {
-    IndexerClient: vi.fn().mockImplementation(() => ({
-      createMailTemplate: mockCreateMailTemplate,
-      getMailTemplates: mockGetMailTemplates,
-      getMailTemplate: mockGetMailTemplate,
-      updateMailTemplate: mockUpdateMailTemplate,
-      deleteMailTemplate: mockDeleteMailTemplate,
-    })),
+    IndexerClient: class {
+      createMailTemplate = mockCreateMailTemplate;
+      getMailTemplates = mockGetMailTemplates;
+      getMailTemplate = mockGetMailTemplate;
+      updateMailTemplate = mockUpdateMailTemplate;
+      deleteMailTemplate = mockDeleteMailTemplate;
+    },
   };
 });
 

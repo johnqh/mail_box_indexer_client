@@ -32,7 +32,8 @@
       "Bash(else echo \"NPM_TOKEN is set\")",
       "Bash(fi)",
       "Bash(do sed -i '' 's/@0xmail\\/indexer_client/@sudobility\\/indexer_client/g' \"$file\")",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm outdated:*)"
     ],
     "deny": [],
     "ask": []

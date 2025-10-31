@@ -973,8 +973,363 @@ export class IndexerClient {
     return response.data as WebhookDeleteResponse;
   }
 
-  // Note: The following endpoints are IP-restricted and only accessible from WildDuck server:
+  // =============================================================================
+  // OAUTH ENDPOINTS
+  // =============================================================================
+
+  /**
+   * Generate wallet authentication challenge (public endpoint)
+   * POST /auth/challenge
+   */
+  async createAuthChallenge(
+    walletIdentifier: string,
+    clientId: string,
+    redirectUri: string,
+    deviceFingerprint?: string
+  ): Promise<any> {
+    const response = await this.post<any>('/auth/challenge', {
+      wallet_identifier: walletIdentifier,
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      device_fingerprint: deviceFingerprint,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create auth challenge: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Verify wallet signature (public endpoint)
+   * POST /auth/verify
+   */
+  async verifyAuthSignature(
+    sessionId: string,
+    signature: string,
+    chainType: 'evm' | 'solana',
+    currentWallet: string
+  ): Promise<any> {
+    const response = await this.post<any>('/auth/verify', {
+      session_id: sessionId,
+      signature,
+      chain_type: chainType,
+      current_wallet: currentWallet,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to verify signature: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * OAuth authorization endpoint (requires session)
+   * GET /oauth/authorize
+   */
+  async authorizeOAuth(
+    clientId: string,
+    redirectUri: string,
+    responseType: string,
+    scope: string,
+    state: string,
+    sessionId: string,
+    codeChallenge?: string,
+    codeChallengeMethod?: string,
+    nonce?: string,
+    privacy?: string
+  ): Promise<any> {
+    const queryParams = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: responseType,
+      scope,
+      state,
+    });
+
+    if (codeChallenge) queryParams.append('code_challenge', codeChallenge);
+    if (codeChallengeMethod)
+      queryParams.append('code_challenge_method', codeChallengeMethod);
+    if (nonce) queryParams.append('nonce', nonce);
+    if (privacy) queryParams.append('privacy', privacy);
+
+    const response = await this.get<any>(
+      `/oauth/authorize?${queryParams.toString()}`,
+      {
+        headers: {
+          'X-Session-Id': sessionId,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to authorize: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Exchange authorization code for tokens (public endpoint)
+   * POST /oauth/token
+   */
+  async exchangeOAuthToken(
+    grantType: 'authorization_code' | 'refresh_token',
+    clientId: string,
+    code?: string,
+    redirectUri?: string,
+    clientSecret?: string,
+    codeVerifier?: string,
+    refreshToken?: string
+  ): Promise<any> {
+    const body: any = {
+      grant_type: grantType,
+      client_id: clientId,
+    };
+
+    if (code) body.code = code;
+    if (redirectUri) body.redirect_uri = redirectUri;
+    if (clientSecret) body.client_secret = clientSecret;
+    if (codeVerifier) body.code_verifier = codeVerifier;
+    if (refreshToken) body.refresh_token = refreshToken;
+
+    const response = await this.post<any>('/oauth/token', body);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to exchange token: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get user info from access token (requires Bearer token)
+   * GET /oauth/userinfo
+   */
+  async getOAuthUserInfo(accessToken: string): Promise<any> {
+    const response = await this.get<any>('/oauth/userinfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get user info: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Revoke OAuth token (public endpoint)
+   * POST /oauth/revoke
+   */
+  async revokeOAuthToken(token: string, tokenTypeHint?: string): Promise<void> {
+    const body: any = { token };
+    if (tokenTypeHint) body.token_type_hint = tokenTypeHint;
+
+    const response = await this.post<any>('/oauth/revoke', body);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to revoke token: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get OAuth client info (public endpoint)
+   * GET /oauth/clients/:clientId
+   */
+  async getOAuthClientInfo(clientId: string): Promise<any> {
+    const response = await this.get<any>(`/oauth/clients/${clientId}`);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get client info: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  // =============================================================================
+  // KYC ENDPOINTS
+  // =============================================================================
+
+  /**
+   * Initiate KYC verification (requires signature)
+   * POST /kyc/initiate/:walletAddress
+   */
+  async initiateKYC(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    verificationLevel: 'basic' | 'enhanced' | 'accredited'
+  ): Promise<any> {
+    const response = await this.post<any>(
+      `/kyc/initiate/${encodeURIComponent(walletAddress)}`,
+      { verificationLevel },
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to initiate KYC: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get KYC verification status (requires signature)
+   * GET /kyc/status/:walletAddress
+   */
+  async getKYCStatus(
+    walletAddress: string,
+    auth: IndexerUserAuth
+  ): Promise<any> {
+    const response = await this.get<any>(
+      `/kyc/status/${encodeURIComponent(walletAddress)}`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get KYC status: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  // =============================================================================
+  // ADDITIONAL MAIL ENDPOINTS
+  // =============================================================================
+
+  /**
+   * Check if wallet has authenticated (requires signature)
+   * GET /wallets/:walletAddress/authenticated
+   */
+  async checkAuthenticated(
+    walletAddress: string,
+    auth: IndexerUserAuth
+  ): Promise<any> {
+    const response = await this.get<any>(
+      `/wallets/${encodeURIComponent(walletAddress)}/authenticated`,
+      {
+        headers: this.createAuthHeaders(auth),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to check authentication status: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get block synchronization status for all chains (public endpoint)
+   * GET /blocks
+   */
+  async getBlockStatus(): Promise<any> {
+    const response = await this.get<any>('/blocks');
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get block status: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get wallets with permissions for a contract (public endpoint)
+   * GET /permissions/contract/:contractAddress
+   */
+  async getContractPermissions(
+    contractAddress: string,
+    chainId: number,
+    testNet: boolean = false
+  ): Promise<any> {
+    const queryParams = new URLSearchParams({
+      chainId: chainId.toString(),
+      testNet: testNet.toString(),
+    });
+
+    const response = await this.get<any>(
+      `/permissions/contract/${encodeURIComponent(contractAddress)}?${queryParams.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get contract permissions: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get contracts a wallet has permissions for (public endpoint)
+   * GET /permissions/wallet/:walletAddress
+   */
+  async getWalletPermissions(
+    walletAddress: string,
+    chainId: number,
+    testNet: boolean = false
+  ): Promise<any> {
+    const queryParams = new URLSearchParams({
+      chainId: chainId.toString(),
+      testNet: testNet.toString(),
+    });
+
+    const response = await this.get<any>(
+      `/permissions/wallet/${encodeURIComponent(walletAddress)}?${queryParams.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get wallet permissions: ${(response.data as any)?.error || 'Unknown error'}`
+      );
+    }
+
+    return response.data;
+  }
+
+  // Note: The following endpoints are NOT included as they are server-side or webhook receivers:
+  // IP-restricted endpoints (only accessible from WildDuck server):
   // - POST /wallets/:walletAddress/points/add (IPHelper validation)
   // - POST /authenticate (IPHelper validation)
   // - POST /addresses/:address/verify (IPHelper validation)
+  //
+  // Webhook receiver endpoints (called by external services):
+  // - POST /kyc/webhook (Sumsub webhook receiver)
+  // - POST /solana/webhook (Helius webhook receiver)
+  // - POST /solana/setup-webhooks (server-side webhook configuration)
+  // - GET /solana/status (server-side status)
+  // - POST /solana/test-transaction (server-side testing)
+  //
+  // OAuth discovery endpoint (used by OAuth libraries, not application code):
+  // - GET /.well-known/openid-configuration (OAuth/OIDC discovery)
 }

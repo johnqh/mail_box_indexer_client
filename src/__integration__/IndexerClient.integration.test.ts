@@ -156,7 +156,6 @@ describe('IndexerClient Integration Tests', () => {
         }
       } catch (error) {
         // ENS resolution may fail if service is unavailable
-        console.log('ENS resolution skipped:', error);
       }
     }, 15000);
 
@@ -179,7 +178,6 @@ describe('IndexerClient Integration Tests', () => {
         }
       } catch (error) {
         // Name service may not be available
-        console.log('Name service lookup skipped:', error);
       }
     }, 15000);
   });
@@ -203,7 +201,6 @@ describe('IndexerClient Integration Tests', () => {
         }
       } catch (error) {
         // Referral code may not exist for all wallets
-        console.log('Referral code lookup skipped:', error);
       }
     }, 10000);
 
@@ -226,7 +223,6 @@ describe('IndexerClient Integration Tests', () => {
         }
       } catch (error) {
         // Stats may not exist for all wallets
-        console.log('Referral stats lookup skipped:', error);
       }
     }, 10000);
   });

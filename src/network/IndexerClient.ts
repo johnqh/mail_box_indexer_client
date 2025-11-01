@@ -254,12 +254,6 @@ export class IndexerClient {
       withCredentials: false, // Ensure CORS doesn't require credentials
     };
 
-    console.log('[IndexerClient] Making request:', {
-      url: fullUrl,
-      method: axiosConfig.method,
-      headers: axiosConfig.headers,
-    });
-
     if (options?.body) {
       if (typeof options.body === 'string') {
         try {
@@ -332,9 +326,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to validate username: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] validateUsername failed:', errorMessage);
+      throw new Error(`Failed to validate username: ${errorMessage}`);
     }
 
     return response.data as IndexerAddressValidationResponse;
@@ -361,9 +355,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get message: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getMessage failed:', errorMessage);
+      throw new Error(`Failed to get message: ${errorMessage}`);
     }
 
     return response.data as IndexerSignInMessageResponse;
@@ -381,9 +375,12 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get points leaderboard: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] getPointsLeaderboard failed:',
+        errorMessage
       );
+      throw new Error(`Failed to get points leaderboard: ${errorMessage}`);
     }
 
     return response.data as IndexerLeaderboardResponse;
@@ -398,9 +395,9 @@ export class IndexerClient {
       await this.get<IndexerSiteStatsResponse>('/points/site-stats');
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get site stats: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getPointsSiteStats failed:', errorMessage);
+      throw new Error(`Failed to get site stats: ${errorMessage}`);
     }
 
     return response.data as IndexerSiteStatsResponse;
@@ -432,14 +429,6 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     referralCode?: string
   ): Promise<IndexerEmailAccountsResponse> {
-    console.log('[IndexerClient] getWalletAccounts called with:', {
-      walletAddress,
-      auth,
-      referralCode,
-      baseUrl: this.baseUrl,
-      endpoint: `/wallets/${encodeURIComponent(walletAddress)}/accounts`,
-    });
-
     const headers = this.createAuthHeaders(auth);
 
     // Add referral code header if provided
@@ -453,9 +442,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get wallet accounts: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getWalletAccounts failed:', errorMessage);
+      throw new Error(`Failed to get wallet accounts: ${errorMessage}`);
     }
 
     return response.data as IndexerEmailAccountsResponse;
@@ -477,9 +466,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get delegation: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getDelegatedTo failed:', errorMessage);
+      throw new Error(`Failed to get delegation: ${errorMessage}`);
     }
 
     return response.data as IndexerDelegatedToResponse;
@@ -501,9 +490,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get delegators: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getDelegatedFrom failed:', errorMessage);
+      throw new Error(`Failed to get delegators: ${errorMessage}`);
     }
 
     return response.data as IndexerDelegatedFromResponse;
@@ -526,9 +515,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create nonce: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] createNonce failed:', errorMessage);
+      throw new Error(`Failed to create nonce: ${errorMessage}`);
     }
 
     return response.data as IndexerNonceResponse;
@@ -550,9 +539,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get nonce: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getNonce failed:', errorMessage);
+      throw new Error(`Failed to get nonce: ${errorMessage}`);
     }
 
     return response.data as IndexerNonceResponse;
@@ -574,9 +563,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get entitlement: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getEntitlement failed:', errorMessage);
+      throw new Error(`Failed to get entitlement: ${errorMessage}`);
     }
 
     return response.data as IndexerEntitlementResponse;
@@ -598,9 +587,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get points balance: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getPointsBalance failed:', errorMessage);
+      throw new Error(`Failed to get points balance: ${errorMessage}`);
     }
 
     return response.data as IndexerPointsResponse;
@@ -614,12 +603,6 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<ReferralCodeResponse> {
-    console.log('[IndexerClient] getReferralCode called with:', {
-      walletAddress,
-      auth,
-      endpoint: `/wallets/${encodeURIComponent(walletAddress)}/referral`,
-    });
-
     const response = await this.post<ReferralCodeResponse>(
       `/wallets/${encodeURIComponent(walletAddress)}/referral`,
       {},
@@ -627,12 +610,6 @@ export class IndexerClient {
         headers: this.createAuthHeaders(auth),
       }
     );
-
-    console.log('[IndexerClient] getReferralCode response:', {
-      ok: response.ok,
-      status: response.status,
-      data: response.data,
-    });
 
     if (!response.ok) {
       const errorMessage =
@@ -658,9 +635,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get referral stats: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getReferralStats failed:', errorMessage);
+      throw new Error(`Failed to get referral stats: ${errorMessage}`);
     }
 
     return response.data as ReferralStatsResponse;
@@ -686,9 +663,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get wallet names: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getWalletNames failed:', errorMessage);
+      throw new Error(`Failed to get wallet names: ${errorMessage}`);
     }
 
     return response.data as IndexerNameServiceResponse;
@@ -706,9 +683,12 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to resolve name: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] resolveNameToAddress failed:',
+        errorMessage
       );
+      throw new Error(`Failed to resolve name: ${errorMessage}`);
     }
 
     return response.data as IndexerNameResolutionResponse;
@@ -736,9 +716,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create template: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] createMailTemplate failed:', errorMessage);
+      throw new Error(`Failed to create template: ${errorMessage}`);
     }
 
     return response.data as MailTemplateResponse;
@@ -772,9 +752,9 @@ export class IndexerClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get templates: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getMailTemplates failed:', errorMessage);
+      throw new Error(`Failed to get templates: ${errorMessage}`);
     }
 
     return response.data as MailTemplatesListResponse;
@@ -797,9 +777,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get template: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getMailTemplate failed:', errorMessage);
+      throw new Error(`Failed to get template: ${errorMessage}`);
     }
 
     return response.data as MailTemplateResponse;
@@ -824,9 +804,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to update template: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] updateMailTemplate failed:', errorMessage);
+      throw new Error(`Failed to update template: ${errorMessage}`);
     }
 
     return response.data as MailTemplateResponse;
@@ -849,9 +829,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to delete template: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] deleteMailTemplate failed:', errorMessage);
+      throw new Error(`Failed to delete template: ${errorMessage}`);
     }
 
     return response.data as MailTemplateDeleteResponse;
@@ -879,9 +859,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create webhook: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] createWebhook failed:', errorMessage);
+      throw new Error(`Failed to create webhook: ${errorMessage}`);
     }
 
     return response.data as WebhookResponse;
@@ -915,9 +895,9 @@ export class IndexerClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get webhooks: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getWebhooks failed:', errorMessage);
+      throw new Error(`Failed to get webhooks: ${errorMessage}`);
     }
 
     return response.data as WebhooksListResponse;
@@ -940,9 +920,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get webhook: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getWebhook failed:', errorMessage);
+      throw new Error(`Failed to get webhook: ${errorMessage}`);
     }
 
     return response.data as WebhookResponse;
@@ -965,9 +945,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to delete webhook: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] deleteWebhook failed:', errorMessage);
+      throw new Error(`Failed to delete webhook: ${errorMessage}`);
     }
 
     return response.data as WebhookDeleteResponse;
@@ -995,9 +975,12 @@ export class IndexerClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create auth challenge: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] createAuthChallenge failed:',
+        errorMessage
       );
+      throw new Error(`Failed to create auth challenge: ${errorMessage}`);
     }
 
     return response.data;
@@ -1021,9 +1004,12 @@ export class IndexerClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to verify signature: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] verifyAuthSignature failed:',
+        errorMessage
       );
+      throw new Error(`Failed to verify signature: ${errorMessage}`);
     }
 
     return response.data;
@@ -1069,9 +1055,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to authorize: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] authorizeOAuth failed:', errorMessage);
+      throw new Error(`Failed to authorize: ${errorMessage}`);
     }
 
     return response.data;
@@ -1104,9 +1090,9 @@ export class IndexerClient {
     const response = await this.post<any>('/oauth/token', body);
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to exchange token: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] exchangeOAuthToken failed:', errorMessage);
+      throw new Error(`Failed to exchange token: ${errorMessage}`);
     }
 
     return response.data;
@@ -1124,9 +1110,9 @@ export class IndexerClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get user info: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getOAuthUserInfo failed:', errorMessage);
+      throw new Error(`Failed to get user info: ${errorMessage}`);
     }
 
     return response.data;
@@ -1143,9 +1129,9 @@ export class IndexerClient {
     const response = await this.post<any>('/oauth/revoke', body);
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to revoke token: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] revokeOAuthToken failed:', errorMessage);
+      throw new Error(`Failed to revoke token: ${errorMessage}`);
     }
   }
 
@@ -1157,9 +1143,9 @@ export class IndexerClient {
     const response = await this.get<any>(`/oauth/clients/${clientId}`);
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get client info: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getOAuthClientInfo failed:', errorMessage);
+      throw new Error(`Failed to get client info: ${errorMessage}`);
     }
 
     return response.data;
@@ -1187,9 +1173,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to initiate KYC: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] initiateKYC failed:', errorMessage);
+      throw new Error(`Failed to initiate KYC: ${errorMessage}`);
     }
 
     return response.data;
@@ -1211,9 +1197,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get KYC status: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getKYCStatus failed:', errorMessage);
+      throw new Error(`Failed to get KYC status: ${errorMessage}`);
     }
 
     return response.data;
@@ -1239,9 +1225,9 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to check authentication status: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] checkAuthenticated failed:', errorMessage);
+      throw new Error(`Failed to check authentication status: ${errorMessage}`);
     }
 
     return response.data;
@@ -1255,9 +1241,9 @@ export class IndexerClient {
     const response = await this.get<any>('/blocks');
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get block status: ${(response.data as any)?.error || 'Unknown error'}`
-      );
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getBlockStatus failed:', errorMessage);
+      throw new Error(`Failed to get block status: ${errorMessage}`);
     }
 
     return response.data;
@@ -1282,9 +1268,12 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get contract permissions: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] getContractPermissions failed:',
+        errorMessage
       );
+      throw new Error(`Failed to get contract permissions: ${errorMessage}`);
     }
 
     return response.data;
@@ -1309,9 +1298,12 @@ export class IndexerClient {
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get wallet permissions: ${(response.data as any)?.error || 'Unknown error'}`
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error(
+        '[IndexerClient] getWalletPermissions failed:',
+        errorMessage
       );
+      throw new Error(`Failed to get wallet permissions: ${errorMessage}`);
     }
 
     return response.data;

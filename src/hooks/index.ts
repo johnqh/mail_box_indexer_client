@@ -27,7 +27,6 @@ export {
 
 // Referral hooks
 export * from './useIndexerReferralCode';
-export * from './useIndexerReferralConsumption';
 export * from './useIndexerReferralStats';
 
 // Mail template hooks

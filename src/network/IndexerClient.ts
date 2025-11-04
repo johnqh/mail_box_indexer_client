@@ -105,6 +105,42 @@ export interface ReferralStatsResponse {
 }
 
 /**
+ * Points info site stats
+ */
+export interface PointsInfoSiteStats {
+  totalPoints: string;
+  totalUsers: number;
+  lastUpdated: string;
+}
+
+/**
+ * Points info top user
+ */
+export interface PointsInfoTopUser {
+  walletAddress: string;
+  pointsEarned: string;
+  rank: number;
+}
+
+/**
+ * Points info data
+ */
+export interface PointsInfoData {
+  siteStats: PointsInfoSiteStats;
+  topUsers: PointsInfoTopUser[];
+}
+
+/**
+ * Points info response
+ */
+export interface PointsInfoResponse {
+  success: boolean;
+  data: PointsInfoData;
+  error: Optional<string>;
+  timestamp: string;
+}
+
+/**
  * Mail template data - re-export from @sudobility/types
  */
 export type MailTemplate = IndexerTemplateData;
@@ -361,6 +397,22 @@ export class IndexerClient {
     }
 
     return response.data as IndexerSignInMessageResponse;
+  }
+
+  /**
+   * Get general points system information (public endpoint)
+   * GET /points
+   */
+  async getPointsInfo(): Promise<PointsInfoResponse> {
+    const response = await this.get<PointsInfoResponse>('/points');
+
+    if (!response.ok) {
+      const errorMessage = (response.data as any)?.error || 'Unknown error';
+      console.error('[IndexerClient] getPointsInfo failed:', errorMessage);
+      throw new Error(`Failed to get points info: ${errorMessage}`);
+    }
+
+    return response.data as PointsInfoResponse;
   }
 
   /**

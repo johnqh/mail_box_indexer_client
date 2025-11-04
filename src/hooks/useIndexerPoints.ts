@@ -10,12 +10,58 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
+import {
+  IndexerClient,
+  type PointsInfoResponse,
+} from '../network/IndexerClient';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
   Optional,
 } from '@sudobility/types';
+
+/**
+ * React hook for fetching general points system information (public endpoint)
+ * GET /points
+ *
+ * @param endpointUrl - Base URL for the indexer API
+ * @param dev - Development mode flag
+ * @param options - Additional React Query options
+ * @returns Query result with points info data
+ *
+ * @example
+ * ```tsx
+ * const { data, isLoading, error, refetch } = useIndexerPointsInfo(
+ *   'https://indexer.0xmail.box',
+ *   false
+ * );
+ *
+ * if (data?.success) {
+ *   console.log('Total Users:', data.data.siteStats.totalUsers);
+ *   console.log('Total Points:', data.data.siteStats.totalPoints);
+ *   console.log('Top 5 Users:', data.data.topUsers);
+ * }
+ *
+ * // Force refresh the data
+ * await refetch();
+ * ```
+ */
+export function useIndexerPointsInfo(
+  endpointUrl: string,
+  dev: boolean,
+  options?: UseQueryOptions<PointsInfoResponse>
+): UseQueryResult<PointsInfoResponse> {
+  const client = new IndexerClient(endpointUrl, dev);
+
+  return useQuery({
+    queryKey: ['indexer', 'points-info'],
+    queryFn: async (): Promise<PointsInfoResponse> => {
+      return await client.getPointsInfo();
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes - general info changes frequently
+    ...options,
+  });
+}
 
 /**
  * React hook for fetching points leaderboard (public endpoint)
@@ -107,7 +153,7 @@ export function useIndexerPointsSiteStats(
 
 /**
  * Legacy combined hook with mutation-style API for backward compatibility
- * @deprecated Use useIndexerPointsLeaderboard and useIndexerPointsSiteStats instead
+ * @deprecated Use useIndexerPointsInfo, useIndexerPointsLeaderboard and useIndexerPointsSiteStats instead
  */
 export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
   const [error, setError] = useState<Optional<string>>(null);
@@ -120,6 +166,22 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
   const clearError = useCallback(() => {
     setError(null);
   }, []);
+
+  // Mutation for getting points info
+  const pointsInfoMutation = useMutation({
+    mutationFn: async (): Promise<PointsInfoResponse> => {
+      setError(null);
+      try {
+        const result = await indexerClient.getPointsInfo();
+        return result;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to get points info';
+        setError(errorMessage);
+        throw err;
+      }
+    },
+  });
 
   // Mutation for getting leaderboard
   const leaderboardMutation = useMutation({
@@ -155,6 +217,11 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
     },
   });
 
+  const getPointsInfo = useCallback(async (): Promise<PointsInfoResponse> => {
+    const result = await pointsInfoMutation.mutateAsync();
+    return result;
+  }, [pointsInfoMutation]);
+
   const getPointsLeaderboard = useCallback(
     async (count: number = 10): Promise<IndexerLeaderboardResponse> => {
       const result = await leaderboardMutation.mutateAsync(count);
@@ -170,11 +237,14 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
     }, [siteStatsMutation]);
 
   const isLoading =
-    leaderboardMutation.isPending || siteStatsMutation.isPending;
+    pointsInfoMutation.isPending ||
+    leaderboardMutation.isPending ||
+    siteStatsMutation.isPending;
 
   return useMemo(
     () => ({
       // Public API endpoints only
+      getPointsInfo,
       getPointsLeaderboard,
       getPointsSiteStats,
       // State
@@ -185,6 +255,13 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
       // Note: The following methods have been removed as they require signature verification:
       // - getPointsBalance (requires signature verification - not usable by client applications)
     }),
-    [getPointsLeaderboard, getPointsSiteStats, isLoading, error, clearError]
+    [
+      getPointsInfo,
+      getPointsLeaderboard,
+      getPointsSiteStats,
+      isLoading,
+      error,
+      clearError,
+    ]
   );
 }

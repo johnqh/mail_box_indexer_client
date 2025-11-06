@@ -73,5 +73,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/johnqh/mail_box_indexer_client.git"
+  },
+  "dependencies": {
+    "@sudobility/configs": "^0.0.17"
   }
 }

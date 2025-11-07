@@ -1,0 +1,94 @@
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from '@tanstack/react-query';
+import { IndexerClient } from '../network/IndexerClient';
+
+/**
+ * Wallet permissions response data structure
+ */
+export interface WalletPermissionsData {
+  walletAddress: string;
+  chainId: number;
+  permissions: string[];
+  timestamp: string;
+}
+
+/**
+ * Wallet permissions response
+ */
+export interface WalletPermissionsResponse {
+  success: boolean;
+  data: WalletPermissionsData;
+  error?: string;
+  timestamp: string;
+}
+
+/**
+ * React hook for fetching wallet permissions
+ * Uses React Query useQuery for automatic caching and refetching
+ *
+ * @param endpointUrl - Indexer API endpoint URL
+ * @param dev - Whether to use dev mode headers
+ * @param walletAddress - Wallet address to get permissions for
+ * @param chainId - Chain ID
+ * @param testNet - Whether this is a test network
+ * @param options - Additional React Query options
+ * @returns Query result with permissions data
+ *
+ * @example
+ * ```typescript
+ * const { data, isLoading, error, refetch } = useIndexerGetWalletPermissions(
+ *   'https://indexer.0xmail.box',
+ *   false,
+ *   walletAddress,
+ *   1,
+ *   false
+ * );
+ *
+ * if (data?.success) {
+ *   console.log('Permissions:', data.data.permissions);
+ * }
+ *
+ * // Force refresh the data
+ * await refetch();
+ * ```
+ */
+export const useIndexerGetWalletPermissions = (
+  endpointUrl: string,
+  dev: boolean,
+  walletAddress: string,
+  chainId: number,
+  testNet: boolean = false,
+  options?: Omit<
+    UseQueryOptions<WalletPermissionsResponse>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<WalletPermissionsResponse> => {
+  const client = new IndexerClient(endpointUrl, dev);
+
+  return useQuery({
+    queryKey: [
+      'indexer',
+      'wallet-permissions',
+      walletAddress,
+      chainId,
+      testNet,
+    ],
+    queryFn: async (): Promise<WalletPermissionsResponse> => {
+      return (await client.getWalletPermissions(
+        walletAddress,
+        chainId,
+        testNet
+      )) as WalletPermissionsResponse;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Default enabled check, but can be overridden by options
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled
+        : !!walletAddress && !!chainId,
+    ...options,
+  });
+};

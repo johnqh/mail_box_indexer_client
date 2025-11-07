@@ -18,6 +18,7 @@ export * from './useIndexerCreateNonce';
 export * from './useIndexerGetNonce';
 export * from './useIndexerGetEntitlement';
 export * from './useIndexerGetPointsBalance';
+export * from './useIndexerGetWalletPermissions';
 
 // Name service hooks
 export {

@@ -41,7 +41,10 @@ export const useIndexerGetDelegatedFrom = (
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
-  options?: UseQueryOptions<IndexerDelegatedFromResponse>
+  options?: Omit<
+    UseQueryOptions<IndexerDelegatedFromResponse>,
+    'queryKey' | 'queryFn'
+  >
 ): UseQueryResult<IndexerDelegatedFromResponse> => {
   const client = new IndexerClient(endpointUrl, dev);
 
@@ -51,7 +54,11 @@ export const useIndexerGetDelegatedFrom = (
       return await client.getDelegatedFrom(walletAddress, auth);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    // Default enabled check, but can be overridden by options
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled
+        : !!walletAddress && !!auth.signature && !!auth.message,
     ...options,
   });
 };

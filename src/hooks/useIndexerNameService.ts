@@ -6,9 +6,10 @@ import {
 import type {
   IndexerNameResolutionResponse,
   IndexerNameServiceResponse,
+  NetworkClient,
 } from '@sudobility/types';
-import { IndexerClient } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 // Query stale times (5 minutes for name service resolution)
 const STALE_TIMES = {
@@ -19,6 +20,7 @@ const STALE_TIMES = {
  * Hook to get all ENS/SNS names for a wallet address (signature-protected)
  * GET /wallets/:walletAddress/names
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @param walletAddress - Wallet address to query names for
@@ -29,6 +31,7 @@ const STALE_TIMES = {
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useWalletNames(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
@@ -44,13 +47,14 @@ const STALE_TIMES = {
  * ```
  */
 export const useWalletNames = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerNameServiceResponse>
 ): UseQueryResult<IndexerNameServiceResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'wallet-names', walletAddress],
@@ -67,6 +71,7 @@ export const useWalletNames = (
  * Hook to resolve ENS/SNS name to wallet address (public endpoint)
  * GET /wallets/named/:name
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @param name - ENS/SNS name to resolve
@@ -76,6 +81,7 @@ export const useWalletNames = (
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useResolveNameToAddress(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   'vitalik.eth'
@@ -91,12 +97,13 @@ export const useWalletNames = (
  * ```
  */
 export const useResolveNameToAddress = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   name: string,
   options?: UseQueryOptions<IndexerNameResolutionResponse>
 ): UseQueryResult<IndexerNameResolutionResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'resolve-name', name],

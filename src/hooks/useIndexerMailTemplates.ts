@@ -1,21 +1,22 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Optional } from '@sudobility/types';
-import {
-  IndexerClient,
-  type MailTemplate,
-  type MailTemplateCreateRequest,
-  type MailTemplateDeleteResponse,
-  type MailTemplateResponse,
-  type MailTemplatesListParams,
-  type MailTemplatesListResponse,
-  type MailTemplateUpdateRequest,
+import type { NetworkClient, Optional } from '@sudobility/types';
+import type {
+  MailTemplate,
+  MailTemplateCreateRequest,
+  MailTemplateDeleteResponse,
+  MailTemplateResponse,
+  MailTemplatesListParams,
+  MailTemplatesListResponse,
+  MailTemplateUpdateRequest,
 } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * Hook for managing mail templates
  * Provides CRUD operations for user email templates
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @returns Hook state and CRUD functions
@@ -32,7 +33,7 @@ import type { IndexerUserAuth } from '../types';
  *   getTemplate,
  *   updateTemplate,
  *   deleteTemplate
- * } = useIndexerMailTemplates('https://indexer.0xmail.box', false);
+ * } = useIndexerMailTemplates(networkClient, 'https://indexer.0xmail.box', false);
  *
  * // Create a new template
  * await createTemplate(walletAddress, auth, {
@@ -55,14 +56,17 @@ import type { IndexerUserAuth } from '../types';
  * await deleteTemplate(walletAddress, templateId, auth);
  * ```
  */
-export const useIndexerMailTemplates = (endpointUrl: string, dev: boolean) => {
+export const useIndexerMailTemplates = (
+  networkClient: NetworkClient,
+  endpointUrl: string,
+  dev: boolean
+) => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [templates, setTemplates] =
     useState<Optional<MailTemplatesListResponse>>(null);
   const [template, setTemplate] = useState<Optional<MailTemplate>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const client = new IndexerClient(endpointUrl, dev);
 
   /**
    * Create a new mail template

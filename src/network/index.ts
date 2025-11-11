@@ -3,9 +3,8 @@
  */
 
 export { IndexerClient } from './IndexerClient';
+export { FetchNetworkClient } from './FetchNetworkClient';
 export type {
-  NetworkRequestOptions,
-  NetworkResponse,
   ReferralCodeData,
   ReferralCodeResponse,
   ReferredWallet,

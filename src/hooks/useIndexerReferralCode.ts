@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Optional } from '@sudobility/types';
-import {
-  IndexerClient,
-  type ReferralCodeResponse,
-} from '../network/IndexerClient';
+import { type NetworkClient, type Optional } from '@sudobility/types';
+import type { ReferralCodeResponse } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * Hook for getting or creating referral code for a wallet
- * GET /wallets/:walletAddress/referral
+ * POST /wallets/:walletAddress/referral
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @returns Hook state and fetch function
@@ -17,22 +16,26 @@ import type { IndexerUserAuth } from '../types';
  * @example
  * ```typescript
  * const { referralCode, isLoading, error, fetchReferralCode } = useIndexerReferralCode(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false
  * );
  *
  * // Get or create referral code
- * await fetchReferralCode(walletAddress, { signature, message });
+ * await fetchReferralCode(walletAddress, { signature, message, signer: walletAddress });
  * console.log(referralCode?.referralCode); // "ABC123DEF"
  * ```
  */
-export const useIndexerReferralCode = (endpointUrl: string, dev: boolean) => {
+export const useIndexerReferralCode = (
+  networkClient: NetworkClient,
+  endpointUrl: string,
+  dev: boolean
+) => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [referralCode, setReferralCode] =
     useState<Optional<ReferralCodeResponse>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const client = new IndexerClient(endpointUrl, dev);
 
   const fetchReferralCode = useCallback(
     async (walletAddress: string, auth: IndexerUserAuth) => {

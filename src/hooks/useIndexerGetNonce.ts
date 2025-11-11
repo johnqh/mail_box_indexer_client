@@ -3,15 +3,19 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
-import { type IndexerNonceResponse } from '@sudobility/types';
+import {
+  type IndexerNonceResponse,
+  type NetworkClient,
+} from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * React hook for getting existing authentication nonce
  * Requires wallet signature for authentication
  * Uses React Query useQuery for automatic caching and refetching
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @param username - Email username (without @domain)
@@ -22,6 +26,7 @@ import type { IndexerUserAuth } from '../types';
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetNonce(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   'myuser',
@@ -37,13 +42,14 @@ import type { IndexerUserAuth } from '../types';
  * ```
  */
 export const useIndexerGetNonce = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   username: string,
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerNonceResponse>
 ): UseQueryResult<IndexerNonceResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'nonce', username, auth.signature],

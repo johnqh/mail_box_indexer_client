@@ -1,14 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Optional } from '@sudobility/types';
-import {
-  IndexerClient,
-  type ReferralStatsResponse,
-} from '../network/IndexerClient';
+import type { NetworkClient, Optional } from '@sudobility/types';
+import type { ReferralStatsResponse } from '../network/IndexerClient';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * Hook for getting referral statistics by referral code (public endpoint)
  * POST /referrals/:referralCode/stats
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @returns Hook state and fetch function
@@ -16,6 +15,7 @@ import {
  * @example
  * ```typescript
  * const { stats, isLoading, error, fetchStats } = useIndexerReferralStats(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -26,12 +26,15 @@ import {
  * console.log(stats?.data.referredWallets); // Array of referred wallets
  * ```
  */
-export const useIndexerReferralStats = (endpointUrl: string, dev: boolean) => {
+export const useIndexerReferralStats = (
+  networkClient: NetworkClient,
+  endpointUrl: string,
+  dev: boolean
+) => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [stats, setStats] = useState<Optional<ReferralStatsResponse>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const client = new IndexerClient(endpointUrl, dev);
 
   const fetchStats = useCallback(
     async (referralCode: string) => {

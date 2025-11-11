@@ -3,15 +3,19 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
-import { type IndexerPointsResponse } from '@sudobility/types';
+import {
+  type IndexerPointsResponse,
+  type NetworkClient,
+} from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * React hook for fetching user's points balance
  * Requires wallet signature for authentication
  * Uses React Query useQuery for automatic caching and refetching
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @param walletAddress - Wallet address to query
@@ -22,6 +26,7 @@ import type { IndexerUserAuth } from '../types';
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetPointsBalance(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
@@ -38,13 +43,14 @@ import type { IndexerUserAuth } from '../types';
  * ```
  */
 export const useIndexerGetPointsBalance = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerPointsResponse>
 ): UseQueryResult<IndexerPointsResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-balance', walletAddress, auth.signature],

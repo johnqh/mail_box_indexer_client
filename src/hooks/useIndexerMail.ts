@@ -1,20 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
-import {
-  type IndexerAddressValidationResponse,
-  type IndexerDelegatedFromResponse,
-  type IndexerDelegatedToResponse,
-  type IndexerEmailAccountsResponse,
-  type IndexerEntitlementResponse,
-  type IndexerLeaderboardResponse,
-  type IndexerNonceResponse,
-  type IndexerPointsResponse,
-  type IndexerSignInMessageResponse,
-  type IndexerSiteStatsResponse,
-  type Optional,
+import type {
+  IndexerAddressValidationResponse,
+  IndexerDelegatedFromResponse,
+  IndexerDelegatedToResponse,
+  IndexerEmailAccountsResponse,
+  IndexerEntitlementResponse,
+  IndexerLeaderboardResponse,
+  IndexerNonceResponse,
+  IndexerPointsResponse,
+  IndexerSignInMessageResponse,
+  IndexerSiteStatsResponse,
+  NetworkClient,
+  Optional,
 } from '@sudobility/types';
+import { IndexerClient } from '../network/IndexerClient';
 
 interface UseIndexerMailReturn {
   isLoading: boolean;
@@ -90,16 +91,12 @@ interface UseIndexerMailReturn {
  * and useMutation for POST endpoints, following React Query best practices.
  */
 const useIndexerMail = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerMailReturn => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [error, setError] = useState<Optional<string>>(null);
-
-  // Memoize indexerClient to prevent recreation on every render
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -112,7 +109,7 @@ const useIndexerMail = (
     ): Promise<Optional<IndexerAddressValidationResponse>> => {
       setError(null);
       try {
-        return await indexerClient.validateUsername(username);
+        return await client.validateUsername(username);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Validation failed';
@@ -137,12 +134,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerSignInMessageResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getMessage(
-          chainId,
-          walletAddress,
-          domain,
-          url
-        );
+        return await client.getMessage(chainId, walletAddress, domain, url);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';
@@ -159,7 +151,7 @@ const useIndexerMail = (
     ): Promise<Optional<IndexerLeaderboardResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsLeaderboard(count);
+        return await client.getPointsLeaderboard(count);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get leaderboard';
@@ -174,7 +166,7 @@ const useIndexerMail = (
     mutationFn: async (): Promise<Optional<IndexerSiteStatsResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsSiteStats();
+        return await client.getPointsSiteStats();
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get site stats';
@@ -197,7 +189,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerEmailAccountsResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getWalletAccounts(
+        return await client.getWalletAccounts(
           walletAddress,
           auth,
           referralCode
@@ -222,7 +214,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerDelegatedToResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getDelegatedTo(walletAddress, auth);
+        return await client.getDelegatedTo(walletAddress, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated to';
@@ -243,7 +235,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerDelegatedFromResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getDelegatedFrom(walletAddress, auth);
+        return await client.getDelegatedFrom(walletAddress, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated from';
@@ -264,7 +256,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerNonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.createNonce(username, auth);
+        return await client.createNonce(username, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to create nonce';
@@ -285,7 +277,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerNonceResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getNonce(username, auth);
+        return await client.getNonce(username, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get nonce';
@@ -306,7 +298,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerEntitlementResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getEntitlement(walletAddress, auth);
+        return await client.getEntitlement(walletAddress, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get entitlement';
@@ -327,7 +319,7 @@ const useIndexerMail = (
     }): Promise<Optional<IndexerPointsResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getPointsBalance(walletAddress, auth);
+        return await client.getPointsBalance(walletAddress, auth);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points balance';

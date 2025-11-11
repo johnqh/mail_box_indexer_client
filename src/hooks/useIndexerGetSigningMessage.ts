@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
 import {
   type IndexerSignInMessageResponse,
+  type NetworkClient,
   type Optional,
 } from '@sudobility/types';
+import { IndexerClient } from '../network/IndexerClient';
 
 interface UseIndexerGetSigningMessageReturn {
   getSigningMessage: (
@@ -23,6 +24,7 @@ interface UseIndexerGetSigningMessageReturn {
  * Public endpoint - no authentication required
  * Uses React Query useMutation to ensure fresh message each time (no caching)
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @returns Object with getSigningMessage function and state
@@ -32,15 +34,12 @@ interface UseIndexerGetSigningMessageReturn {
  * attempt gets a new signing message.
  */
 export const useIndexerGetSigningMessage = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerGetSigningMessageReturn => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -60,12 +59,7 @@ export const useIndexerGetSigningMessage = (
     }): Promise<Optional<IndexerSignInMessageResponse>> => {
       setError(null);
       try {
-        return await indexerClient.getMessage(
-          chainId,
-          walletAddress,
-          domain,
-          url
-        );
+        return await client.getMessage(chainId, walletAddress, domain, url);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';

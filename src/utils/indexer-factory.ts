@@ -1,10 +1,10 @@
 /**
  * Factory functions for creating indexer helper classes with automatic network client injection
- * These functions use the IndexerClient by default for easy integration
+ * These functions use FetchNetworkClient by default for easy integration
  */
 
 import type { AppConfig } from '@sudobility/types';
-import { IndexerClient } from '../network/IndexerClient';
+import { FetchNetworkClient } from '../network/FetchNetworkClient';
 import { createIndexerAdminHelper, IndexerAdminHelper } from './indexer-admin';
 import {
   createIndexerGraphQLHelper,
@@ -32,13 +32,10 @@ import {
  * ```
  */
 export const createIndexerAdmin = (config: AppConfig): IndexerAdminHelper => {
-  const networkClient = new IndexerClient(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    (config as any).devMode || false
-  );
+  const fetchClient = new FetchNetworkClient();
   return createIndexerAdminHelper(
     config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    networkClient
+    fetchClient
   );
 };
 
@@ -61,13 +58,10 @@ export const createIndexerAdmin = (config: AppConfig): IndexerAdminHelper => {
 export const createIndexerGraphQL = (
   config: AppConfig
 ): IndexerGraphQLHelper => {
-  const networkClient = new IndexerClient(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    (config as any).devMode || false
-  );
+  const fetchClient = new FetchNetworkClient();
   return createIndexerGraphQLHelper(
     config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    networkClient
+    fetchClient
   );
 };
 
@@ -94,13 +88,10 @@ export const createIndexerGraphQL = (
 export const createIndexerWebhook = (
   config: AppConfig
 ): IndexerWebhookHelper => {
-  const networkClient = new IndexerClient(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    (config as any).devMode || false
-  );
+  const fetchClient = new FetchNetworkClient();
   return createIndexerWebhookHelper(
     config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    networkClient
+    fetchClient
   );
 };
 

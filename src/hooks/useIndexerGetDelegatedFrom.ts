@@ -3,15 +3,19 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
-import { type IndexerDelegatedFromResponse } from '@sudobility/types';
+import {
+  type IndexerDelegatedFromResponse,
+  type NetworkClient,
+} from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * React hook for fetching reverse delegation info (who delegates to this wallet)
  * Requires wallet signature for authentication
  * Uses React Query useQuery for automatic caching and refetching
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @param walletAddress - Wallet address (delegate)
@@ -22,6 +26,7 @@ import type { IndexerUserAuth } from '../types';
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetDelegatedFrom(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
@@ -37,6 +42,7 @@ import type { IndexerUserAuth } from '../types';
  * ```
  */
 export const useIndexerGetDelegatedFrom = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
@@ -46,7 +52,7 @@ export const useIndexerGetDelegatedFrom = (
     'queryKey' | 'queryFn'
   >
 ): UseQueryResult<IndexerDelegatedFromResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'delegated-from', walletAddress, auth.signature],

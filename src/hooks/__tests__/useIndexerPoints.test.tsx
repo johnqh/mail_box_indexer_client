@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import { useIndexerPoints } from '../useIndexerPoints';
+import { FetchNetworkClient } from '../../network/FetchNetworkClient';
 
 // Mock IndexerClient
 const mockGetPointsLeaderboard = vi.fn();
@@ -19,6 +20,8 @@ vi.mock('../../network/IndexerClient', () => {
 
 
 describe('useIndexerPoints', () => {
+  const networkClient = new FetchNetworkClient();
+
   // Create a wrapper with QueryClient for testing
   const createWrapper = () => {
     const queryClient = new QueryClient({
@@ -63,7 +66,7 @@ describe('useIndexerPoints', () => {
   describe('getPointsLeaderboard', () => {
     it('should fetch leaderboard successfully', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -77,7 +80,7 @@ describe('useIndexerPoints', () => {
 
     it('should use default count of 10', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -92,7 +95,7 @@ describe('useIndexerPoints', () => {
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -107,7 +110,7 @@ describe('useIndexerPoints', () => {
 
     it('should set loading state', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -123,7 +126,7 @@ describe('useIndexerPoints', () => {
   describe('getPointsSiteStats', () => {
     it('should fetch site stats successfully', async () => {
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -142,7 +145,7 @@ describe('useIndexerPoints', () => {
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 
@@ -163,7 +166,7 @@ describe('useIndexerPoints', () => {
       );
 
       const { result } = renderHook(
-        () => useIndexerPoints('https://test-indexer.example.com', false),
+        () => useIndexerPoints(networkClient, 'https://test-indexer.example.com', false),
         { wrapper: createWrapper() }
       );
 

@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { IndexerClient } from '../network/IndexerClient';
 import {
   type IndexerAddressValidationResponse,
+  type NetworkClient,
   type Optional,
 } from '@sudobility/types';
+import { IndexerClient } from '../network/IndexerClient';
 
 interface UseIndexerValidateUsernameReturn {
   validateUsername: (
@@ -20,6 +21,7 @@ interface UseIndexerValidateUsernameReturn {
  * Public endpoint - no authentication required
  * Uses React Query useMutation for on-demand validation (no caching)
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @returns Object with validateUsername function and state
@@ -28,15 +30,12 @@ interface UseIndexerValidateUsernameReturn {
  * called on-demand (e.g., onBlur in a form) and should not be cached.
  */
 export const useIndexerValidateUsername = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerValidateUsernameReturn => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const indexerClient = useMemo(
-    () => new IndexerClient(endpointUrl, dev),
-    [endpointUrl, dev]
-  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -48,7 +47,7 @@ export const useIndexerValidateUsername = (
     ): Promise<Optional<IndexerAddressValidationResponse>> => {
       setError(null);
       try {
-        return await indexerClient.validateUsername(username);
+        return await client.validateUsername(username);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Validation failed';

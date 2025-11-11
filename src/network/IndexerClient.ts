@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type {
   ChainType,
   IndexerAddressValidationResponse,
@@ -24,32 +23,16 @@ import type {
   IndexerWebhookDeleteResponse,
   IndexerWebhookListResponse,
   IndexerWebhookResponse,
+  NetworkClient,
   Optional,
 } from '@sudobility/types';
 import type { IndexerUserAuth } from '../types';
-
-/**
- * Network request options
- */
-export interface NetworkRequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  headers?: Record<string, string>;
-  body?: any;
-  signal?: AbortSignal;
-}
-
-/**
- * Network response interface
- */
-export interface NetworkResponse<T> {
-  ok: boolean;
-  status: number;
-  statusText: string;
-  data: T;
-  headers: Record<string, string>;
-  success: boolean;
-  timestamp: string;
-}
+import {
+  buildUrl,
+  createAuthHeaders,
+  createHeaders,
+  handleApiError,
+} from '../utils/indexer-helpers';
 
 /**
  * Referral code data
@@ -216,134 +199,21 @@ export interface WebhooksListParams {
 /**
  * Indexer API client for public endpoints only
  * Only includes endpoints that client applications can actually use without server-side authentication
+ * Uses NetworkClient for all HTTP operations
  */
 export class IndexerClient {
   private readonly baseUrl: string;
-  private readonly timeout: number;
   private readonly dev: boolean;
+  private readonly networkClient: NetworkClient;
 
   constructor(
     endpointUrl: string,
-    dev: boolean = false,
-    timeout: number = 30000
+    networkClient: NetworkClient,
+    dev: boolean = false
   ) {
     this.baseUrl = endpointUrl;
+    this.networkClient = networkClient;
     this.dev = dev;
-    this.timeout = timeout;
-  }
-
-  async get<T>(
-    url: string,
-    options?: Omit<NetworkRequestOptions, 'method' | 'body'>
-  ): Promise<NetworkResponse<T>> {
-    return this.request<T>(url, { ...options, method: 'GET' });
-  }
-
-  async post<T>(
-    url: string,
-    body?: any,
-    options?: Omit<NetworkRequestOptions, 'method'>
-  ): Promise<NetworkResponse<T>> {
-    return this.request<T>(url, {
-      ...options,
-      method: 'POST',
-      body,
-    });
-  }
-
-  async put<T>(
-    url: string,
-    body?: any,
-    options?: Omit<NetworkRequestOptions, 'method'>
-  ): Promise<NetworkResponse<T>> {
-    return this.request<T>(url, {
-      ...options,
-      method: 'PUT',
-      body,
-    });
-  }
-
-  async delete<T>(
-    url: string,
-    options?: Omit<NetworkRequestOptions, 'method' | 'body'>
-  ): Promise<NetworkResponse<T>> {
-    return this.request<T>(url, { ...options, method: 'DELETE' });
-  }
-
-  async request<T>(
-    url: string,
-    options?: NetworkRequestOptions
-  ): Promise<NetworkResponse<T>> {
-    const fullUrl = `${this.baseUrl}${url}`;
-
-    const axiosConfig: any = {
-      method: options?.method || 'GET',
-      url: fullUrl,
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...(this.dev && { 'x-dev': 'true' }),
-        ...options?.headers,
-      },
-      timeout: this.timeout,
-      signal: options?.signal,
-      withCredentials: false, // Ensure CORS doesn't require credentials
-    };
-
-    if (options?.body) {
-      if (typeof options.body === 'string') {
-        try {
-          axiosConfig.data = JSON.parse(options.body);
-        } catch {
-          axiosConfig.data = options.body;
-        }
-      } else {
-        axiosConfig.data = options.body;
-      }
-    }
-
-    try {
-      const response = await axios(axiosConfig);
-
-      return {
-        ok: response.status >= 200 && response.status < 300,
-        status: response.status,
-        statusText: response.statusText,
-        data: response.data as T,
-        headers: response.headers as Record<string, string>,
-        success: response.status >= 200 && response.status < 300,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error: any) {
-      // Check if it's an axios error by checking for response property
-      if (error.response || error.request) {
-        // If we got a response, return it even if it's an error status
-        if (error.response) {
-          return {
-            ok: false,
-            status: error.response.status,
-            statusText: error.response.statusText,
-            data: error.response.data as T,
-            headers: error.response.headers as Record<string, string>,
-            success: false,
-            timestamp: new Date().toISOString(),
-          };
-        }
-
-        // Network or other error without a response
-        console.error('[IndexerClient] Network error details:', {
-          message: error.message,
-          code: error.code,
-          url: fullUrl,
-          method: axiosConfig.method,
-        });
-        throw new Error(`Indexer API request failed: ${error.message}`);
-      }
-
-      throw new Error(
-        `Indexer API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
   }
 
   // =============================================================================
@@ -357,17 +227,22 @@ export class IndexerClient {
   async validateUsername(
     username: string
   ): Promise<IndexerAddressValidationResponse> {
-    const response = await this.get<IndexerAddressValidationResponse>(
-      `/users/${encodeURIComponent(username)}/validate`
-    );
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] validateUsername failed:', errorMessage);
-      throw new Error(`Failed to validate username: ${errorMessage}`);
+    const response =
+      await this.networkClient.get<IndexerAddressValidationResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/users/${encodeURIComponent(username)}/validate`
+        ),
+        { headers }
+      );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'validate username');
     }
 
-    return response.data as IndexerAddressValidationResponse;
+    return response.data;
   }
 
   /**
@@ -380,23 +255,26 @@ export class IndexerClient {
     domain: string,
     url: string
   ): Promise<IndexerSignInMessageResponse> {
+    const headers = createHeaders(this.dev);
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       domain,
       url,
     });
 
-    const response = await this.get<IndexerSignInMessageResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/message?${queryParams.toString()}`
+    const response = await this.networkClient.get<IndexerSignInMessageResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/message?${queryParams.toString()}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getMessage failed:', errorMessage);
-      throw new Error(`Failed to get message: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get message');
     }
 
-    return response.data as IndexerSignInMessageResponse;
+    return response.data;
   }
 
   /**
@@ -404,15 +282,18 @@ export class IndexerClient {
    * GET /points
    */
   async getPointsInfo(): Promise<PointsInfoResponse> {
-    const response = await this.get<PointsInfoResponse>('/points');
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getPointsInfo failed:', errorMessage);
-      throw new Error(`Failed to get points info: ${errorMessage}`);
+    const response = await this.networkClient.get<PointsInfoResponse>(
+      buildUrl(this.baseUrl, '/points'),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get points info');
     }
 
-    return response.data as PointsInfoResponse;
+    return response.data;
   }
 
   /**
@@ -422,20 +303,18 @@ export class IndexerClient {
   async getPointsLeaderboard(
     count: number = 10
   ): Promise<IndexerLeaderboardResponse> {
-    const response = await this.get<IndexerLeaderboardResponse>(
-      `/points/leaderboard/${count}`
+    const headers = createHeaders(this.dev);
+
+    const response = await this.networkClient.get<IndexerLeaderboardResponse>(
+      buildUrl(this.baseUrl, `/points/leaderboard/${count}`),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] getPointsLeaderboard failed:',
-        errorMessage
-      );
-      throw new Error(`Failed to get points leaderboard: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get points leaderboard');
     }
 
-    return response.data as IndexerLeaderboardResponse;
+    return response.data;
   }
 
   /**
@@ -443,34 +322,23 @@ export class IndexerClient {
    * GET /points/site-stats
    */
   async getPointsSiteStats(): Promise<IndexerSiteStatsResponse> {
-    const response =
-      await this.get<IndexerSiteStatsResponse>('/points/site-stats');
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getPointsSiteStats failed:', errorMessage);
-      throw new Error(`Failed to get site stats: ${errorMessage}`);
+    const response = await this.networkClient.get<IndexerSiteStatsResponse>(
+      buildUrl(this.baseUrl, '/points/site-stats'),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get site stats');
     }
 
-    return response.data as IndexerSiteStatsResponse;
+    return response.data;
   }
 
   // =============================================================================
   // SIGNATURE-PROTECTED ENDPOINTS (Require wallet signature)
   // =============================================================================
-
-  /**
-   * Helper method to create authentication headers for signature-protected endpoints
-   * Encodes the message using encodeURIComponent for HTTP header transmission
-   * The indexer will decode it using decodeURIComponent
-   */
-  private createAuthHeaders(auth: IndexerUserAuth): Record<string, string> {
-    return {
-      'x-signature': auth.signature.replace(/[\r\n]/g, ''), // Remove any newlines from signature
-      'x-message': encodeURIComponent(auth.message), // Encode message for HTTP header
-      'x-signer': auth.signer, // Wallet address that signed the message
-    };
-  }
 
   /**
    * Get email addresses for a wallet (requires signature)
@@ -481,25 +349,24 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     referralCode?: string
   ): Promise<IndexerEmailAccountsResponse> {
-    const headers = this.createAuthHeaders(auth);
+    const additionalHeaders = referralCode
+      ? { 'x-referral': referralCode }
+      : undefined;
+    const headers = createAuthHeaders(auth, this.dev, additionalHeaders);
 
-    // Add referral code header if provided
-    if (referralCode) {
-      headers['x-referral'] = referralCode;
-    }
-
-    const response = await this.get<IndexerEmailAccountsResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/accounts`,
+    const response = await this.networkClient.get<IndexerEmailAccountsResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/accounts`
+      ),
       { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getWalletAccounts failed:', errorMessage);
-      throw new Error(`Failed to get wallet accounts: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get wallet accounts');
     }
 
-    return response.data as IndexerEmailAccountsResponse;
+    return response.data;
   }
 
   /**
@@ -510,20 +377,21 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<IndexerDelegatedToResponse> {
-    const response = await this.get<IndexerDelegatedToResponse>(
-      `/delegations/from/${encodeURIComponent(walletAddress)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerDelegatedToResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/delegations/from/${encodeURIComponent(walletAddress)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getDelegatedTo failed:', errorMessage);
-      throw new Error(`Failed to get delegation: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get delegation');
     }
 
-    return response.data as IndexerDelegatedToResponse;
+    return response.data;
   }
 
   /**
@@ -534,20 +402,21 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<IndexerDelegatedFromResponse> {
-    const response = await this.get<IndexerDelegatedFromResponse>(
-      `/delegations/to/${encodeURIComponent(walletAddress)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerDelegatedFromResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/delegations/to/${encodeURIComponent(walletAddress)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getDelegatedFrom failed:', errorMessage);
-      throw new Error(`Failed to get delegators: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get delegators');
     }
 
-    return response.data as IndexerDelegatedFromResponse;
+    return response.data;
   }
 
   /**
@@ -558,21 +427,19 @@ export class IndexerClient {
     username: string,
     auth: IndexerUserAuth
   ): Promise<IndexerNonceResponse> {
-    const response = await this.post<IndexerNonceResponse>(
-      `/users/${encodeURIComponent(username)}/nonce`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.post<IndexerNonceResponse>(
+      buildUrl(this.baseUrl, `/users/${encodeURIComponent(username)}/nonce`),
       {},
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] createNonce failed:', errorMessage);
-      throw new Error(`Failed to create nonce: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create nonce');
     }
 
-    return response.data as IndexerNonceResponse;
+    return response.data;
   }
 
   /**
@@ -583,20 +450,18 @@ export class IndexerClient {
     username: string,
     auth: IndexerUserAuth
   ): Promise<IndexerNonceResponse> {
-    const response = await this.get<IndexerNonceResponse>(
-      `/users/${encodeURIComponent(username)}/nonce`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerNonceResponse>(
+      buildUrl(this.baseUrl, `/users/${encodeURIComponent(username)}/nonce`),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getNonce failed:', errorMessage);
-      throw new Error(`Failed to get nonce: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get nonce');
     }
 
-    return response.data as IndexerNonceResponse;
+    return response.data;
   }
 
   /**
@@ -607,20 +472,21 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<IndexerEntitlementResponse> {
-    const response = await this.get<IndexerEntitlementResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/entitlements/`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerEntitlementResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/entitlements/`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getEntitlement failed:', errorMessage);
-      throw new Error(`Failed to get entitlement: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get entitlement');
     }
 
-    return response.data as IndexerEntitlementResponse;
+    return response.data;
   }
 
   /**
@@ -631,20 +497,21 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<IndexerPointsResponse> {
-    const response = await this.get<IndexerPointsResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/points`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerPointsResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/points`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getPointsBalance failed:', errorMessage);
-      throw new Error(`Failed to get points balance: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get points balance');
     }
 
-    return response.data as IndexerPointsResponse;
+    return response.data;
   }
 
   /**
@@ -655,25 +522,22 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<ReferralCodeResponse> {
-    const response = await this.post<ReferralCodeResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/referral`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.post<ReferralCodeResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/referral`
+      ),
       {},
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage =
-        (response.data as any)?.error ||
-        (response.data as any)?.message ||
-        JSON.stringify(response.data) ||
-        `HTTP ${response.status}`;
-      console.error('[IndexerClient] getReferralCode failed:', errorMessage);
-      throw new Error(`Failed to get referral code: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get referral code');
     }
 
-    return response.data as ReferralCodeResponse;
+    return response.data;
   }
 
   /**
@@ -681,18 +545,22 @@ export class IndexerClient {
    * POST /referrals/:referralCode/stats
    */
   async getReferralStats(referralCode: string): Promise<ReferralStatsResponse> {
-    const response = await this.post<ReferralStatsResponse>(
-      `/referrals/${encodeURIComponent(referralCode)}/stats`,
-      {}
+    const headers = createHeaders(this.dev);
+
+    const response = await this.networkClient.post<ReferralStatsResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/referrals/${encodeURIComponent(referralCode)}/stats`
+      ),
+      {},
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getReferralStats failed:', errorMessage);
-      throw new Error(`Failed to get referral stats: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get referral stats');
     }
 
-    return response.data as ReferralStatsResponse;
+    return response.data;
   }
 
   // =============================================================================
@@ -707,20 +575,21 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<IndexerNameServiceResponse> {
-    const response = await this.get<IndexerNameServiceResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/names`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerNameServiceResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/names`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getWalletNames failed:', errorMessage);
-      throw new Error(`Failed to get wallet names: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get wallet names');
     }
 
-    return response.data as IndexerNameServiceResponse;
+    return response.data;
   }
 
   /**
@@ -730,20 +599,19 @@ export class IndexerClient {
   async resolveNameToAddress(
     name: string
   ): Promise<IndexerNameResolutionResponse> {
-    const response = await this.get<IndexerNameResolutionResponse>(
-      `/wallets/named/${encodeURIComponent(name)}`
-    );
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] resolveNameToAddress failed:',
-        errorMessage
+    const response =
+      await this.networkClient.get<IndexerNameResolutionResponse>(
+        buildUrl(this.baseUrl, `/wallets/named/${encodeURIComponent(name)}`),
+        { headers }
       );
-      throw new Error(`Failed to resolve name: ${errorMessage}`);
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'resolve name');
     }
 
-    return response.data as IndexerNameResolutionResponse;
+    return response.data;
   }
 
   // =============================================================================
@@ -759,21 +627,22 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     template: MailTemplateCreateRequest
   ): Promise<MailTemplateResponse> {
-    const response = await this.post<MailTemplateResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/templates`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.post<MailTemplateResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/templates`
+      ),
       template,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] createMailTemplate failed:', errorMessage);
-      throw new Error(`Failed to create template: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create template');
     }
 
-    return response.data as MailTemplateResponse;
+    return response.data;
   }
 
   /**
@@ -785,7 +654,9 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     params?: MailTemplatesListParams
   ): Promise<MailTemplatesListResponse> {
+    const headers = createAuthHeaders(auth, this.dev);
     const queryParams = new URLSearchParams();
+
     if (params?.active !== undefined) {
       queryParams.append('active', params.active.toString());
     }
@@ -797,19 +668,18 @@ export class IndexerClient {
     }
 
     const queryString = queryParams.toString();
-    const url = `/wallets/${encodeURIComponent(walletAddress)}/templates${queryString ? `?${queryString}` : ''}`;
+    const path = `/wallets/${encodeURIComponent(walletAddress)}/templates${queryString ? `?${queryString}` : ''}`;
 
-    const response = await this.get<MailTemplatesListResponse>(url, {
-      headers: this.createAuthHeaders(auth),
-    });
+    const response = await this.networkClient.get<MailTemplatesListResponse>(
+      buildUrl(this.baseUrl, path),
+      { headers }
+    );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getMailTemplates failed:', errorMessage);
-      throw new Error(`Failed to get templates: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get templates');
     }
 
-    return response.data as MailTemplatesListResponse;
+    return response.data;
   }
 
   /**
@@ -821,20 +691,21 @@ export class IndexerClient {
     templateId: string,
     auth: IndexerUserAuth
   ): Promise<MailTemplateResponse> {
-    const response = await this.get<MailTemplateResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<MailTemplateResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getMailTemplate failed:', errorMessage);
-      throw new Error(`Failed to get template: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get template');
     }
 
-    return response.data as MailTemplateResponse;
+    return response.data;
   }
 
   /**
@@ -847,21 +718,22 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     updates: MailTemplateUpdateRequest
   ): Promise<MailTemplateResponse> {
-    const response = await this.put<MailTemplateResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.put<MailTemplateResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`
+      ),
       updates,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] updateMailTemplate failed:', errorMessage);
-      throw new Error(`Failed to update template: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update template');
     }
 
-    return response.data as MailTemplateResponse;
+    return response.data;
   }
 
   /**
@@ -873,20 +745,22 @@ export class IndexerClient {
     templateId: string,
     auth: IndexerUserAuth
   ): Promise<MailTemplateDeleteResponse> {
-    const response = await this.delete<MailTemplateDeleteResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
-    );
+    const headers = createAuthHeaders(auth, this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] deleteMailTemplate failed:', errorMessage);
-      throw new Error(`Failed to delete template: ${errorMessage}`);
+    const response =
+      await this.networkClient.delete<MailTemplateDeleteResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/wallets/${encodeURIComponent(walletAddress)}/templates/${encodeURIComponent(templateId)}`
+        ),
+        { headers }
+      );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'delete template');
     }
 
-    return response.data as MailTemplateDeleteResponse;
+    return response.data;
   }
 
   // =============================================================================
@@ -902,21 +776,22 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     webhook: WebhookCreateRequest
   ): Promise<WebhookResponse> {
-    const response = await this.post<WebhookResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/webhooks`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.post<WebhookResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/webhooks`
+      ),
       webhook,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] createWebhook failed:', errorMessage);
-      throw new Error(`Failed to create webhook: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create webhook');
     }
 
-    return response.data as WebhookResponse;
+    return response.data;
   }
 
   /**
@@ -928,7 +803,9 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     params?: WebhooksListParams
   ): Promise<WebhooksListResponse> {
+    const headers = createAuthHeaders(auth, this.dev);
     const queryParams = new URLSearchParams();
+
     if (params?.active !== undefined) {
       queryParams.append('active', params.active.toString());
     }
@@ -940,19 +817,18 @@ export class IndexerClient {
     }
 
     const queryString = queryParams.toString();
-    const url = `/wallets/${encodeURIComponent(walletAddress)}/webhooks${queryString ? `?${queryString}` : ''}`;
+    const path = `/wallets/${encodeURIComponent(walletAddress)}/webhooks${queryString ? `?${queryString}` : ''}`;
 
-    const response = await this.get<WebhooksListResponse>(url, {
-      headers: this.createAuthHeaders(auth),
-    });
+    const response = await this.networkClient.get<WebhooksListResponse>(
+      buildUrl(this.baseUrl, path),
+      { headers }
+    );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getWebhooks failed:', errorMessage);
-      throw new Error(`Failed to get webhooks: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get webhooks');
     }
 
-    return response.data as WebhooksListResponse;
+    return response.data;
   }
 
   /**
@@ -964,20 +840,21 @@ export class IndexerClient {
     webhookId: string,
     auth: IndexerUserAuth
   ): Promise<WebhookResponse> {
-    const response = await this.get<WebhookResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<WebhookResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getWebhook failed:', errorMessage);
-      throw new Error(`Failed to get webhook: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get webhook');
     }
 
-    return response.data as WebhookResponse;
+    return response.data;
   }
 
   /**
@@ -989,20 +866,21 @@ export class IndexerClient {
     webhookId: string,
     auth: IndexerUserAuth
   ): Promise<WebhookDeleteResponse> {
-    const response = await this.delete<WebhookDeleteResponse>(
-      `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.delete<WebhookDeleteResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/webhooks/${encodeURIComponent(webhookId)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] deleteWebhook failed:', errorMessage);
-      throw new Error(`Failed to delete webhook: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'delete webhook');
     }
 
-    return response.data as WebhookDeleteResponse;
+    return response.data;
   }
 
   // =============================================================================
@@ -1019,20 +897,21 @@ export class IndexerClient {
     redirectUri: string,
     deviceFingerprint?: string
   ): Promise<any> {
-    const response = await this.post<any>('/auth/challenge', {
-      wallet_identifier: walletIdentifier,
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      device_fingerprint: deviceFingerprint,
-    });
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] createAuthChallenge failed:',
-        errorMessage
-      );
-      throw new Error(`Failed to create auth challenge: ${errorMessage}`);
+    const response = await this.networkClient.post<any>(
+      buildUrl(this.baseUrl, '/auth/challenge'),
+      {
+        wallet_identifier: walletIdentifier,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        device_fingerprint: deviceFingerprint,
+      },
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create auth challenge');
     }
 
     return response.data;
@@ -1048,20 +927,21 @@ export class IndexerClient {
     chainType: 'evm' | 'solana',
     currentWallet: string
   ): Promise<any> {
-    const response = await this.post<any>('/auth/verify', {
-      session_id: sessionId,
-      signature,
-      chain_type: chainType,
-      current_wallet: currentWallet,
-    });
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] verifyAuthSignature failed:',
-        errorMessage
-      );
-      throw new Error(`Failed to verify signature: ${errorMessage}`);
+    const response = await this.networkClient.post<any>(
+      buildUrl(this.baseUrl, '/auth/verify'),
+      {
+        session_id: sessionId,
+        signature,
+        chain_type: chainType,
+        current_wallet: currentWallet,
+      },
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'verify signature');
     }
 
     return response.data;
@@ -1083,6 +963,7 @@ export class IndexerClient {
     nonce?: string,
     privacy?: string
   ): Promise<any> {
+    const headers = createHeaders(this.dev, { 'X-Session-Id': sessionId });
     const queryParams = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,
@@ -1097,19 +978,13 @@ export class IndexerClient {
     if (nonce) queryParams.append('nonce', nonce);
     if (privacy) queryParams.append('privacy', privacy);
 
-    const response = await this.get<any>(
-      `/oauth/authorize?${queryParams.toString()}`,
-      {
-        headers: {
-          'X-Session-Id': sessionId,
-        },
-      }
+    const response = await this.networkClient.get<any>(
+      buildUrl(this.baseUrl, `/oauth/authorize?${queryParams.toString()}`),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] authorizeOAuth failed:', errorMessage);
-      throw new Error(`Failed to authorize: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'authorize');
     }
 
     return response.data;
@@ -1128,6 +1003,7 @@ export class IndexerClient {
     codeVerifier?: string,
     refreshToken?: string
   ): Promise<any> {
+    const headers = createHeaders(this.dev);
     const body: any = {
       grant_type: grantType,
       client_id: clientId,
@@ -1139,12 +1015,14 @@ export class IndexerClient {
     if (codeVerifier) body.code_verifier = codeVerifier;
     if (refreshToken) body.refresh_token = refreshToken;
 
-    const response = await this.post<any>('/oauth/token', body);
+    const response = await this.networkClient.post<any>(
+      buildUrl(this.baseUrl, '/oauth/token'),
+      body,
+      { headers }
+    );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] exchangeOAuthToken failed:', errorMessage);
-      throw new Error(`Failed to exchange token: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'exchange token');
     }
 
     return response.data;
@@ -1155,16 +1033,17 @@ export class IndexerClient {
    * GET /oauth/userinfo
    */
   async getOAuthUserInfo(accessToken: string): Promise<any> {
-    const response = await this.get<any>('/oauth/userinfo', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+    const headers = createHeaders(this.dev, {
+      Authorization: `Bearer ${accessToken}`,
     });
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getOAuthUserInfo failed:', errorMessage);
-      throw new Error(`Failed to get user info: ${errorMessage}`);
+    const response = await this.networkClient.get<any>(
+      buildUrl(this.baseUrl, '/oauth/userinfo'),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get user info');
     }
 
     return response.data;
@@ -1175,15 +1054,18 @@ export class IndexerClient {
    * POST /oauth/revoke
    */
   async revokeOAuthToken(token: string, tokenTypeHint?: string): Promise<void> {
+    const headers = createHeaders(this.dev);
     const body: any = { token };
     if (tokenTypeHint) body.token_type_hint = tokenTypeHint;
 
-    const response = await this.post<any>('/oauth/revoke', body);
+    const response = await this.networkClient.post<any>(
+      buildUrl(this.baseUrl, '/oauth/revoke'),
+      body,
+      { headers }
+    );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] revokeOAuthToken failed:', errorMessage);
-      throw new Error(`Failed to revoke token: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'revoke token');
     }
   }
 
@@ -1192,12 +1074,15 @@ export class IndexerClient {
    * GET /oauth/clients/:clientId
    */
   async getOAuthClientInfo(clientId: string): Promise<any> {
-    const response = await this.get<any>(`/oauth/clients/${clientId}`);
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getOAuthClientInfo failed:', errorMessage);
-      throw new Error(`Failed to get client info: ${errorMessage}`);
+    const response = await this.networkClient.get<any>(
+      buildUrl(this.baseUrl, `/oauth/clients/${clientId}`),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get client info');
     }
 
     return response.data;
@@ -1216,18 +1101,19 @@ export class IndexerClient {
     auth: IndexerUserAuth,
     verificationLevel: 'basic' | 'enhanced' | 'accredited'
   ): Promise<any> {
-    const response = await this.post<any>(
-      `/kyc/initiate/${encodeURIComponent(walletAddress)}`,
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.post<any>(
+      buildUrl(
+        this.baseUrl,
+        `/kyc/initiate/${encodeURIComponent(walletAddress)}`
+      ),
       { verificationLevel },
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] initiateKYC failed:', errorMessage);
-      throw new Error(`Failed to initiate KYC: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'initiate KYC');
     }
 
     return response.data;
@@ -1241,17 +1127,18 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<any> {
-    const response = await this.get<any>(
-      `/kyc/status/${encodeURIComponent(walletAddress)}`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<any>(
+      buildUrl(
+        this.baseUrl,
+        `/kyc/status/${encodeURIComponent(walletAddress)}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getKYCStatus failed:', errorMessage);
-      throw new Error(`Failed to get KYC status: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get KYC status');
     }
 
     return response.data;
@@ -1269,17 +1156,18 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth
   ): Promise<any> {
-    const response = await this.get<any>(
-      `/wallets/${encodeURIComponent(walletAddress)}/authenticated`,
-      {
-        headers: this.createAuthHeaders(auth),
-      }
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<any>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/authenticated`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] checkAuthenticated failed:', errorMessage);
-      throw new Error(`Failed to check authentication status: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'check authentication status');
     }
 
     return response.data;
@@ -1290,12 +1178,15 @@ export class IndexerClient {
    * GET /blocks
    */
   async getBlockStatus(): Promise<any> {
-    const response = await this.get<any>('/blocks');
+    const headers = createHeaders(this.dev);
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error('[IndexerClient] getBlockStatus failed:', errorMessage);
-      throw new Error(`Failed to get block status: ${errorMessage}`);
+    const response = await this.networkClient.get<any>(
+      buildUrl(this.baseUrl, '/blocks'),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get block status');
     }
 
     return response.data;
@@ -1310,22 +1201,22 @@ export class IndexerClient {
     chainId: number,
     testNet: boolean = false
   ): Promise<any> {
+    const headers = createHeaders(this.dev);
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       testNet: testNet.toString(),
     });
 
-    const response = await this.get<any>(
-      `/permissions/contract/${encodeURIComponent(contractAddress)}?${queryParams.toString()}`
+    const response = await this.networkClient.get<any>(
+      buildUrl(
+        this.baseUrl,
+        `/permissions/contract/${encodeURIComponent(contractAddress)}?${queryParams.toString()}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] getContractPermissions failed:',
-        errorMessage
-      );
-      throw new Error(`Failed to get contract permissions: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get contract permissions');
     }
 
     return response.data;
@@ -1340,22 +1231,22 @@ export class IndexerClient {
     chainId: number,
     testNet: boolean = false
   ): Promise<any> {
+    const headers = createHeaders(this.dev);
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       testNet: testNet.toString(),
     });
 
-    const response = await this.get<any>(
-      `/permissions/wallet/${encodeURIComponent(walletAddress)}?${queryParams.toString()}`
+    const response = await this.networkClient.get<any>(
+      buildUrl(
+        this.baseUrl,
+        `/permissions/wallet/${encodeURIComponent(walletAddress)}?${queryParams.toString()}`
+      ),
+      { headers }
     );
 
-    if (!response.ok) {
-      const errorMessage = (response.data as any)?.error || 'Unknown error';
-      console.error(
-        '[IndexerClient] getWalletPermissions failed:',
-        errorMessage
-      );
-      throw new Error(`Failed to get wallet permissions: ${errorMessage}`);
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get wallet permissions');
     }
 
     return response.data;

@@ -1,20 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Optional } from '@sudobility/types';
-import {
-  IndexerClient,
-  type Webhook,
-  type WebhookCreateRequest,
-  type WebhookDeleteResponse,
-  type WebhookResponse,
-  type WebhooksListParams,
-  type WebhooksListResponse,
+import type { NetworkClient, Optional } from '@sudobility/types';
+import type {
+  Webhook,
+  WebhookCreateRequest,
+  WebhookDeleteResponse,
+  WebhookResponse,
+  WebhooksListParams,
+  WebhooksListResponse,
 } from '../network/IndexerClient';
 import type { IndexerUserAuth } from '../types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * Hook for managing mail webhooks
  * Provides CRUD operations for user webhooks
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer backend URL
  * @param dev - Development mode flag
  * @returns Hook state and CRUD functions
@@ -30,7 +31,7 @@ import type { IndexerUserAuth } from '../types';
  *   getWebhooks,
  *   getWebhook,
  *   deleteWebhook
- * } = useIndexerMailWebhooks('https://indexer.0xmail.box', false);
+ * } = useIndexerMailWebhooks(networkClient, 'https://indexer.0xmail.box', false);
  *
  * // Create a new webhook
  * await createWebhook(walletAddress, auth, {
@@ -47,14 +48,17 @@ import type { IndexerUserAuth } from '../types';
  * await deleteWebhook(walletAddress, webhookId, auth);
  * ```
  */
-export const useIndexerMailWebhooks = (endpointUrl: string, dev: boolean) => {
+export const useIndexerMailWebhooks = (
+  networkClient: NetworkClient,
+  endpointUrl: string,
+  dev: boolean
+) => {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [webhooks, setWebhooks] =
     useState<Optional<WebhooksListResponse>>(null);
   const [webhook, setWebhook] = useState<Optional<Webhook>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);
-
-  const client = new IndexerClient(endpointUrl, dev);
 
   /**
    * Create a new webhook

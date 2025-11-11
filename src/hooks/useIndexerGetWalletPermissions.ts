@@ -3,6 +3,7 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
+import { type NetworkClient } from '@sudobility/types';
 import { IndexerClient } from '../network/IndexerClient';
 
 /**
@@ -29,6 +30,7 @@ export interface WalletPermissionsResponse {
  * React hook for fetching wallet permissions
  * Uses React Query useQuery for automatic caching and refetching
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Indexer API endpoint URL
  * @param dev - Whether to use dev mode headers
  * @param walletAddress - Wallet address to get permissions for
@@ -40,6 +42,7 @@ export interface WalletPermissionsResponse {
  * @example
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetWalletPermissions(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   walletAddress,
@@ -56,6 +59,7 @@ export interface WalletPermissionsResponse {
  * ```
  */
 export const useIndexerGetWalletPermissions = (
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   walletAddress: string,
@@ -66,7 +70,7 @@ export const useIndexerGetWalletPermissions = (
     'queryKey' | 'queryFn'
   >
 ): UseQueryResult<WalletPermissionsResponse> => {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: [
@@ -77,11 +81,7 @@ export const useIndexerGetWalletPermissions = (
       testNet,
     ],
     queryFn: async (): Promise<WalletPermissionsResponse> => {
-      return (await client.getWalletPermissions(
-        walletAddress,
-        chainId,
-        testNet
-      )) as WalletPermissionsResponse;
+      return await client.getWalletPermissions(walletAddress, chainId, testNet);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     // Default enabled check, but can be overridden by options

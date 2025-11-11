@@ -8,5 +8,8 @@ export * from './indexer-admin';
 export * from './indexer-graphql';
 export * from './indexer-webhooks';
 
+// Helper utilities for hooks
+export * from './indexer-helpers';
+
 // Convenience functions with IndexerClient auto-injection
 export * from './indexer-factory';

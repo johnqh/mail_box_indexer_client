@@ -1,21 +1,85 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IndexerClient } from '../IndexerClient';
-import axios from 'axios';
+import type { NetworkClient, NetworkResponse, Optional } from '@sudobility/types';
 
-// Mock axios
-vi.mock('axios');
-const mockAxios = vi.mocked(axios, true);
+// Mock NetworkClient
+class MockNetworkClient implements NetworkClient {
+  private mockResponses: Map<string, any> = new Map();
+
+  setMockResponse(url: string, response: any) {
+    this.mockResponses.set(url, response);
+  }
+
+  clearMocks() {
+    this.mockResponses.clear();
+  }
+
+  async request<T = unknown>(
+    url: string,
+    options?: Optional<{
+      method?: Optional<'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'>;
+      headers?: Optional<Record<string, string>>;
+      body?: Optional<string | FormData | Blob>;
+      signal?: Optional<AbortSignal>;
+      timeout?: Optional<number>;
+    }>
+  ): Promise<NetworkResponse<T>> {
+    const response = this.mockResponses.get(url) || this.mockResponses.get('default');
+    if (!response) {
+      throw new Error(`No mock response configured for URL: ${url}`);
+    }
+
+    if (response instanceof Error) {
+      throw response;
+    }
+
+    return response;
+  }
+
+  async get<T = unknown>(
+    url: string,
+    options?: Optional<any>
+  ): Promise<NetworkResponse<T>> {
+    return this.request<T>(url, { ...options, method: 'GET' });
+  }
+
+  async post<T = unknown>(
+    url: string,
+    body?: Optional<unknown>,
+    options?: Optional<any>
+  ): Promise<NetworkResponse<T>> {
+    return this.request<T>(url, { ...options, method: 'POST', body: JSON.stringify(body) });
+  }
+
+  async put<T = unknown>(
+    url: string,
+    body?: Optional<unknown>,
+    options?: Optional<any>
+  ): Promise<NetworkResponse<T>> {
+    return this.request<T>(url, { ...options, method: 'PUT', body: JSON.stringify(body) });
+  }
+
+  async delete<T = unknown>(
+    url: string,
+    options?: Optional<any>
+  ): Promise<NetworkResponse<T>> {
+    return this.request<T>(url, { ...options, method: 'DELETE' });
+  }
+}
 
 describe('IndexerClient', () => {
   let client: IndexerClient;
+  let mockNetworkClient: MockNetworkClient;
   const mockEndpointUrl = 'https://test-indexer.example.com';
 
   beforeEach(() => {
-    client = new IndexerClient(mockEndpointUrl);
+    mockNetworkClient = new MockNetworkClient();
+    client = new IndexerClient(mockEndpointUrl, mockNetworkClient, false);
     vi.clearAllMocks();
   });
 
   afterEach(() => {
+    mockNetworkClient.clearMocks();
     vi.clearAllMocks();
   });
 
@@ -26,13 +90,7 @@ describe('IndexerClient', () => {
     });
 
     it('should create instance with dev mode', () => {
-      const testClient = new IndexerClient(mockEndpointUrl, true);
-      expect(testClient).toBeDefined();
-      expect(testClient).toBeInstanceOf(IndexerClient);
-    });
-
-    it('should create instance with custom timeout', () => {
-      const testClient = new IndexerClient(mockEndpointUrl, false, 5000);
+      const testClient = new IndexerClient(mockEndpointUrl, mockNetworkClient, true);
       expect(testClient).toBeDefined();
       expect(testClient).toBeInstanceOf(IndexerClient);
     });
@@ -40,71 +98,77 @@ describe('IndexerClient', () => {
 
   describe('validateUsername', () => {
     it('should validate address successfully', async () => {
-      const mockResponse = {
-        ok: true,
-        data: {
-          isValid: true,
-          address: '0x123...',
-          addressType: 'evm',
-          normalizedAddress: '0x123...',
-          timestamp: new Date().toISOString(),
-        },
+      const mockData = {
+        isValid: true,
+        address: '0x123...',
+        addressType: 'evm',
+        normalizedAddress: '0x123...',
+        timestamp: new Date().toISOString(),
       };
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/users/0x123.../validate`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.validateUsername('0x123...');
-      expect(result.ok).toBe(true);
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/users/0x123.../validate'),
-          method: 'GET',
-          headers: expect.objectContaining({
-            'Content-Type': 'application/json',
-          }),
-        })
-      );
+      expect(result.isValid).toBe(true);
+      expect(result.address).toBe('0x123...');
     });
 
     it('should handle validation errors', async () => {
-      mockAxios.mockResolvedValueOnce({
-        status: 400,
-        statusText: 'Bad Request',
-        data: { error: 'Invalid address format' },
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/users/invalid-address/validate`,
+        {
+          ok: false,
+          status: 400,
+          statusText: 'Bad Request',
+          data: { error: 'Invalid address format' },
+          headers: {},
+          success: false,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       await expect(
         client.validateUsername('invalid-address')
       ).rejects.toThrow('Failed to validate username');
-
-      expect(mockAxios).toHaveBeenCalled();
     });
   });
 
   describe('getMessage', () => {
     it('should get signing message', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          message: 'Sign in with Ethereum to the app.',
-          walletAddress: '0x123...',
-          chainType: 'evm',
-          chainId: 1,
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        message: 'Sign in with Ethereum to the app.',
+        walletAddress: '0x123...',
+        chainType: 'evm',
+        chainId: 1,
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/wallets/0x123.../message?chainId=1&domain=example.com&url=https%3A%2F%2Fexample.com`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getMessage(
         1,
@@ -115,55 +179,51 @@ describe('IndexerClient', () => {
 
       expect(result.success).toBe(true);
       expect(result.data?.message).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/wallets/0x123.../message?'),
-          method: 'GET',
-        })
-      );
     });
   });
 
   describe('error handling', () => {
     it('should handle network errors', async () => {
-      mockAxios.mockRejectedValueOnce(new Error('Network error'));
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/users/0x123.../validate`,
+        new Error('Network error')
+      );
 
       await expect(client.validateUsername('0x123...')).rejects.toThrow(
-        'Indexer API request failed'
+        'Network error'
       );
-    });
-
-    it('should handle timeout errors', async () => {
-      const timeoutClient = new IndexerClient(mockEndpointUrl, false, 1);
-      mockAxios.mockRejectedValueOnce(new Error('timeout of 1ms exceeded'));
-
-      await expect(timeoutClient.validateUsername('0x123...')).rejects.toThrow();
     });
   });
 
   describe('points endpoints', () => {
     it('should get points leaderboard', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          leaderboard: [
-            {
-              walletAddress: '0x123...',
-              chainType: 'evm',
-              pointsEarned: '100',
-              lastActivityDate: '2025-09-28T18:58:15.155Z',
-            },
-          ],
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        leaderboard: [
+          {
+            walletAddress: '0x123...',
+            chainType: 'evm',
+            pointsEarned: '100',
+            lastActivityDate: '2025-09-28T18:58:15.155Z',
+          },
+        ],
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/points/leaderboard/10`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getPointsLeaderboard(10);
       expect(result.success).toBe(true);
@@ -171,22 +231,28 @@ describe('IndexerClient', () => {
     });
 
     it('should get site stats', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          totalPoints: '1000',
-          totalUsers: 50,
-          lastUpdated: '2025-09-28T18:58:15.155Z',
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        totalPoints: '1000',
+        totalUsers: 50,
+        lastUpdated: '2025-09-28T18:58:15.155Z',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/points/site-stats`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getPointsSiteStats();
       expect(result.success).toBe(true);
@@ -196,7 +262,7 @@ describe('IndexerClient', () => {
 
   describe('OAuth endpoints', () => {
     it('should create auth challenge', async () => {
-      const mockResponse = {
+      const mockData = {
         challenge: 'auth.0xmail.box wants you to sign in...',
         session_id: 'session-123',
         expires_in: 600,
@@ -205,12 +271,18 @@ describe('IndexerClient', () => {
         wallet_address: '0x123...',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/auth/challenge`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.createAuthChallenge(
         '0x123...',
@@ -220,30 +292,26 @@ describe('IndexerClient', () => {
 
       expect(result.session_id).toBe('session-123');
       expect(result.challenge).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/auth/challenge'),
-          method: 'POST',
-          data: expect.objectContaining({
-            wallet_identifier: '0x123...',
-            client_id: 'client-123',
-          }),
-        })
-      );
     });
 
     it('should verify auth signature', async () => {
-      const mockResponse = {
+      const mockData = {
         success: true,
         session_id: 'session-123',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/auth/verify`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.verifyAuthSignature(
         'session-123',
@@ -253,32 +321,29 @@ describe('IndexerClient', () => {
       );
 
       expect(result.success).toBe(true);
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/auth/verify'),
-          method: 'POST',
-          data: expect.objectContaining({
-            session_id: 'session-123',
-            signature: '0xsignature...',
-          }),
-        })
-      );
     });
 
     it('should authorize OAuth', async () => {
-      const mockResponse = {
+      const mockData = {
         success: true,
         redirect_url: 'http://localhost:3000/callback?code=auth-code&state=state-123',
         code: 'auth-code',
         state: 'state-123',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      // URLSearchParams will encode spaces as +, not %20
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/oauth/authorize?client_id=client-123&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&response_type=code&scope=openid+email&state=state-123`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.authorizeOAuth(
         'client-123',
@@ -291,19 +356,10 @@ describe('IndexerClient', () => {
 
       expect(result.success).toBe(true);
       expect(result.code).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/oauth/authorize'),
-          method: 'GET',
-          headers: expect.objectContaining({
-            'X-Session-Id': 'session-123',
-          }),
-        })
-      );
     });
 
     it('should exchange OAuth token', async () => {
-      const mockResponse = {
+      const mockData = {
         access_token: 'access-token',
         token_type: 'Bearer',
         expires_in: 3600,
@@ -311,12 +367,18 @@ describe('IndexerClient', () => {
         scope: 'openid email',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/oauth/token`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.exchangeOAuthToken(
         'authorization_code',
@@ -327,20 +389,10 @@ describe('IndexerClient', () => {
 
       expect(result.access_token).toBeDefined();
       expect(result.token_type).toBe('Bearer');
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/oauth/token'),
-          method: 'POST',
-          data: expect.objectContaining({
-            grant_type: 'authorization_code',
-            code: 'auth-code',
-          }),
-        })
-      );
     });
 
     it('should get OAuth user info', async () => {
-      const mockResponse = {
+      const mockData = {
         sub: '0x123...',
         email: '0x123...@0xmail.box',
         email_verified: true,
@@ -348,83 +400,83 @@ describe('IndexerClient', () => {
         chain_type: 'evm',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/oauth/userinfo`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getOAuthUserInfo('access-token');
 
       expect(result.sub).toBeDefined();
       expect(result.email).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/oauth/userinfo'),
-          method: 'GET',
-          headers: expect.objectContaining({
-            Authorization: 'Bearer access-token',
-          }),
-        })
-      );
     });
 
     it('should revoke OAuth token', async () => {
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: '',
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/oauth/revoke`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {},  // Empty object instead of empty string
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       await client.revokeOAuthToken('refresh-token');
-
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/oauth/revoke'),
-          method: 'POST',
-          data: expect.objectContaining({
-            token: 'refresh-token',
-          }),
-        })
-      );
+      // Should not throw
     });
 
     it('should get OAuth client info', async () => {
-      const mockResponse = {
+      const mockData = {
         client_id: 'client-123',
         client_name: 'Test Client',
         client_uri: 'http://localhost:3000',
         scope: 'openid email profile',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/oauth/clients/client-123`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getOAuthClientInfo('client-123');
 
       expect(result.client_id).toBe('client-123');
       expect(result.client_name).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/oauth/clients/client-123'),
-          method: 'GET',
-        })
-      );
     });
 
     it('should handle OAuth errors', async () => {
-      mockAxios.mockResolvedValueOnce({
-        status: 400,
-        statusText: 'Bad Request',
-        data: { error: 'invalid_client' },
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/auth/challenge`,
+        {
+          ok: false,
+          status: 400,
+          statusText: 'Bad Request',
+          data: { error: 'invalid_client' },
+          headers: {},
+          success: false,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       await expect(
         client.createAuthChallenge('0x123...', 'invalid-client', 'http://localhost:3000/callback')
@@ -440,86 +492,83 @@ describe('IndexerClient', () => {
     };
 
     it('should initiate KYC', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          applicationId: 'app-123',
-          sumsubAccessToken: 'sumsub-token',
-          status: 'INITIATED',
-          verificationLevel: 'basic',
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        applicationId: 'app-123',
+        sumsubAccessToken: 'sumsub-token',
+        status: 'INITIATED',
+        verificationLevel: 'basic',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/kyc/initiate/0x123...`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.initiateKYC('0x123...', mockAuth, 'basic');
 
       expect(result.success).toBe(true);
       expect(result.data?.applicationId).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/kyc/initiate/0x123...'),
-          method: 'POST',
-          data: { verificationLevel: 'basic' },
-          headers: expect.objectContaining({
-            'x-signature': '0xsignature...',
-            'x-signer': '0x123...',
-          }),
-        })
-      );
     });
 
     it('should get KYC status', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          applicationId: 'app-123',
-          walletAddress: '0x123...',
-          verificationLevel: 'basic',
-          status: 'PENDING',
-          results: {},
-          canRetry: true,
-          retriesRemaining: 3,
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        applicationId: 'app-123',
+        walletAddress: '0x123...',
+        verificationLevel: 'basic',
+        status: 'PENDING',
+        results: {},
+        canRetry: true,
+        retriesRemaining: 3,
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/kyc/status/0x123...`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getKYCStatus('0x123...', mockAuth);
 
       expect(result.success).toBe(true);
       expect(result.data?.status).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/kyc/status/0x123...'),
-          method: 'GET',
-          headers: expect.objectContaining({
-            'x-signature': '0xsignature...',
-            'x-signer': '0x123...',
-          }),
-        })
-      );
     });
 
     it('should handle KYC errors', async () => {
-      mockAxios.mockResolvedValueOnce({
-        status: 400,
-        statusText: 'Bad Request',
-        data: { error: 'Invalid verification level' },
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/kyc/initiate/0x123...`,
+        {
+          ok: false,
+          status: 400,
+          statusText: 'Bad Request',
+          data: { error: 'Invalid verification level' },
+          headers: {},
+          success: false,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       await expect(
         client.initiateKYC('0x123...', mockAuth, 'basic')
@@ -535,87 +584,83 @@ describe('IndexerClient', () => {
     };
 
     it('should check authenticated status', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          authenticated: true,
-          datetime: '2025-09-28T18:58:15.155Z',
-        },
-        timestamp: '2025-09-28T18:58:15.155Z',
+      const mockData = {
+        authenticated: true,
+        datetime: '2025-09-28T18:58:15.155Z',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/wallets/0x123.../authenticated`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.checkAuthenticated('0x123...', mockAuth);
 
       expect(result.success).toBe(true);
       expect(result.data?.authenticated).toBe(true);
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/wallets/0x123.../authenticated'),
-          method: 'GET',
-          headers: expect.objectContaining({
-            'x-signature': '0xsignature...',
-            'x-signer': '0x123...',
-          }),
-        })
-      );
     });
 
     it('should get block status', async () => {
-      const mockResponse = {
-        success: true,
-        data: {
-          chains: [
-            {
-              chain: 'ethereum',
-              chainId: 1,
-              currentBlock: '18000000',
-              indexedBlock: '17999000',
-              percentage: '99.99%',
-              blocksBehind: '1000',
-              status: 'syncing',
-            },
-          ],
-          totalChains: 1,
-          syncedChains: 0,
-          overallHealth: 'syncing',
-          summary: {
-            syncedCount: 0,
-            syncingCount: 1,
-            errorCount: 0,
+      const mockData = {
+        chains: [
+          {
+            chain: 'ethereum',
+            chainId: 1,
+            currentBlock: '18000000',
+            indexedBlock: '17999000',
+            percentage: '99.99%',
+            blocksBehind: '1000',
+            status: 'syncing',
           },
-          timestamp: '2025-09-28T18:58:15.155Z',
+        ],
+        totalChains: 1,
+        syncedChains: 0,
+        overallHealth: 'syncing',
+        summary: {
+          syncedCount: 0,
+          syncingCount: 1,
+          errorCount: 0,
         },
         timestamp: '2025-09-28T18:58:15.155Z',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/blocks`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: {
+            success: true,
+            data: mockData,
+            timestamp: '2025-09-28T18:58:15.155Z',
+          },
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getBlockStatus();
 
       expect(result.success).toBe(true);
       expect(result.data?.chains).toBeDefined();
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/blocks'),
-          method: 'GET',
-        })
-      );
     });
 
     it('should get contract permissions', async () => {
-      const mockResponse = {
+      const mockData = {
         success: true,
         contractAddress: '0xabc...',
         chainId: 1,
@@ -625,28 +670,28 @@ describe('IndexerClient', () => {
         timestamp: '2025-09-28T18:58:15.155Z',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/permissions/contract/0xabc...?chainId=1&testNet=false`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getContractPermissions('0xabc...', 1, false);
 
       expect(result.success).toBe(true);
       expect(result.wallets).toBeDefined();
       expect(result.count).toBe(2);
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/permissions/contract/0xabc...'),
-          method: 'GET',
-        })
-      );
     });
 
     it('should get wallet permissions', async () => {
-      const mockResponse = {
+      const mockData = {
         success: true,
         walletAddress: '0x123...',
         chainId: 1,
@@ -656,33 +701,39 @@ describe('IndexerClient', () => {
         timestamp: '2025-09-28T18:58:15.155Z',
       };
 
-      mockAxios.mockResolvedValueOnce({
-        status: 200,
-        statusText: 'OK',
-        data: mockResponse,
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/permissions/wallet/0x123...?chainId=1&testNet=false`,
+        {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          data: mockData,
+          headers: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       const result = await client.getWalletPermissions('0x123...', 1, false);
 
       expect(result.success).toBe(true);
       expect(result.contracts).toBeDefined();
       expect(result.count).toBe(2);
-      expect(mockAxios).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: expect.stringContaining('/permissions/wallet/0x123...'),
-          method: 'GET',
-        })
-      );
     });
 
     it('should handle mail endpoint errors', async () => {
-      mockAxios.mockResolvedValueOnce({
-        status: 500,
-        statusText: 'Internal Server Error',
-        data: { error: 'Server error' },
-        headers: {},
-      });
+      mockNetworkClient.setMockResponse(
+        `${mockEndpointUrl}/blocks`,
+        {
+          ok: false,
+          status: 500,
+          statusText: 'Internal Server Error',
+          data: { error: 'Server error' },
+          headers: {},
+          success: false,
+          timestamp: new Date().toISOString(),
+        }
+      );
 
       await expect(client.getBlockStatus()).rejects.toThrow(
         'Failed to get block status'

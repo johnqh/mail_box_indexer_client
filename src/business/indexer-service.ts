@@ -6,6 +6,7 @@
  */
 
 import { IndexerClient } from '../network/IndexerClient';
+import { FetchNetworkClient } from '../network/FetchNetworkClient';
 import type { AppConfig } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
@@ -35,8 +36,10 @@ class IndexerService {
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(config: AppConfig) {
+    const fetchClient = new FetchNetworkClient();
     this.indexerClient = new IndexerClient(
       config.indexerBackendUrl || 'https://indexer.0xmail.box',
+      fetchClient,
       (config as any).devMode || false
     );
   }

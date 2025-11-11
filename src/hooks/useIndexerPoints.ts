@@ -10,20 +10,20 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import {
-  IndexerClient,
-  type PointsInfoResponse,
-} from '../network/IndexerClient';
+import type { PointsInfoResponse } from '../network/IndexerClient';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
+  NetworkClient,
   Optional,
 } from '@sudobility/types';
+import { IndexerClient } from '../network/IndexerClient';
 
 /**
  * React hook for fetching general points system information (public endpoint)
  * GET /points
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Base URL for the indexer API
  * @param dev - Development mode flag
  * @param options - Additional React Query options
@@ -32,6 +32,7 @@ import type {
  * @example
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsInfo(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -47,11 +48,12 @@ import type {
  * ```
  */
 export function useIndexerPointsInfo(
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   options?: UseQueryOptions<PointsInfoResponse>
 ): UseQueryResult<PointsInfoResponse> {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-info'],
@@ -67,6 +69,7 @@ export function useIndexerPointsInfo(
  * React hook for fetching points leaderboard (public endpoint)
  * GET /points/leaderboard/:count
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Base URL for the indexer API
  * @param dev - Development mode flag
  * @param count - Number of top users to fetch (default: 10)
@@ -76,6 +79,7 @@ export function useIndexerPointsInfo(
  * @example
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsLeaderboard(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false,
  *   10
@@ -92,12 +96,13 @@ export function useIndexerPointsInfo(
  * ```
  */
 export function useIndexerPointsLeaderboard(
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   count: number = 10,
   options?: UseQueryOptions<IndexerLeaderboardResponse>
 ): UseQueryResult<IndexerLeaderboardResponse> {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-leaderboard', count],
@@ -113,6 +118,7 @@ export function useIndexerPointsLeaderboard(
  * React hook for fetching site-wide statistics (public endpoint)
  * GET /points/site-stats
  *
+ * @param networkClient - Network client for making HTTP requests
  * @param endpointUrl - Base URL for the indexer API
  * @param dev - Development mode flag
  * @param options - Additional React Query options
@@ -121,6 +127,7 @@ export function useIndexerPointsLeaderboard(
  * @example
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsSiteStats(
+ *   networkClient,
  *   'https://indexer.0xmail.box',
  *   false
  * );
@@ -135,11 +142,12 @@ export function useIndexerPointsLeaderboard(
  * ```
  */
 export function useIndexerPointsSiteStats(
+  networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
   options?: UseQueryOptions<IndexerSiteStatsResponse>
 ): UseQueryResult<IndexerSiteStatsResponse> {
-  const client = new IndexerClient(endpointUrl, dev);
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
 
   return useQuery({
     queryKey: ['indexer', 'points-site-stats'],
@@ -155,13 +163,13 @@ export function useIndexerPointsSiteStats(
  * Legacy combined hook with mutation-style API for backward compatibility
  * @deprecated Use useIndexerPointsInfo, useIndexerPointsLeaderboard and useIndexerPointsSiteStats instead
  */
-export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
+export function useIndexerPoints(
+  networkClient: NetworkClient,
+  endpointUrl: string,
+  dev: boolean = false
+) {
+  const client = new IndexerClient(endpointUrl, networkClient, dev);
   const [error, setError] = useState<Optional<string>>(null);
-
-  // Create stable client instance to prevent unnecessary re-renders
-  const indexerClient = useMemo(() => {
-    return new IndexerClient(endpointUrl, dev);
-  }, [endpointUrl, dev]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -172,8 +180,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
     mutationFn: async (): Promise<PointsInfoResponse> => {
       setError(null);
       try {
-        const result = await indexerClient.getPointsInfo();
-        return result;
+        return await client.getPointsInfo();
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points info';
@@ -190,8 +197,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
     ): Promise<IndexerLeaderboardResponse> => {
       setError(null);
       try {
-        const result = await indexerClient.getPointsLeaderboard(count);
-        return result;
+        return await client.getPointsLeaderboard(count);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get leaderboard';
@@ -206,8 +212,7 @@ export function useIndexerPoints(endpointUrl: string, dev: boolean = false) {
     mutationFn: async (): Promise<IndexerSiteStatsResponse> => {
       setError(null);
       try {
-        const result = await indexerClient.getPointsSiteStats();
-        return result;
+        return await client.getPointsSiteStats();
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get site stats';

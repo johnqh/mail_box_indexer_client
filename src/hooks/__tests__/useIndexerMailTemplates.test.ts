@@ -134,16 +134,17 @@ describe('useIndexerMailTemplates', () => {
         body: 'Test body',
       };
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.createTemplate(
-            mockWalletAddress,
-            mockAuth,
-            templateData
-          )
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.createTemplate(
+          mockWalletAddress,
+          mockAuth,
+          templateData
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
       expect(result.current.template).toBeNull();
     });
@@ -223,12 +224,14 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getTemplates(mockWalletAddress, mockAuth)
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.getTemplates(mockWalletAddress, mockAuth);
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
+      expect(response.data.templates).toEqual([]);
       expect(result.current.error).toBe(errorMessage);
       expect(result.current.templates).toBeNull();
     });
@@ -326,16 +329,17 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getTemplate(
-            mockWalletAddress,
-            mockTemplateId,
-            mockAuth
-          )
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.getTemplate(
+          mockWalletAddress,
+          mockTemplateId,
+          mockAuth
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
     });
   });
@@ -402,17 +406,18 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.updateTemplate(
-            mockWalletAddress,
-            mockTemplateId,
-            mockAuth,
-            { name: 'Updated' }
-          )
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.updateTemplate(
+          mockWalletAddress,
+          mockTemplateId,
+          mockAuth,
+          { name: 'Updated' }
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
     });
   });
@@ -461,16 +466,17 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.deleteTemplate(
-            mockWalletAddress,
-            mockTemplateId,
-            mockAuth
-          )
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.deleteTemplate(
+          mockWalletAddress,
+          mockTemplateId,
+          mockAuth
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
     });
   });
@@ -485,9 +491,7 @@ describe('useIndexerMailTemplates', () => {
 
       // Trigger an error
       await act(async () => {
-        await expect(
-          result.current.getTemplates(mockWalletAddress, mockAuth)
-        ).rejects.toThrow('Test error');
+        await result.current.getTemplates(mockWalletAddress, mockAuth);
       });
 
       expect(result.current.error).toBe('Test error');
@@ -595,16 +599,21 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.createTemplate(mockWalletAddress, mockAuth, {
+        response = await result.current.createTemplate(
+          mockWalletAddress,
+          mockAuth,
+          {
             name: 'Test',
             subject: 'Test',
             body: 'Test',
-          })
-        ).rejects.toBe('String error');
+          }
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Failed to create template');
       expect(result.current.error).toBe('Failed to create template');
     });
 
@@ -617,12 +626,13 @@ describe('useIndexerMailTemplates', () => {
         useIndexerMailTemplates(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getTemplates(mockWalletAddress, mockAuth)
-        ).rejects.toThrow('Network error');
+        response = await result.current.getTemplates(mockWalletAddress, mockAuth);
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Network error: Connection refused');
       expect(result.current.error).toBe('Network error: Connection refused');
     });
   });

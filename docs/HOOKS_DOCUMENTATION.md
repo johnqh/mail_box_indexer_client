@@ -14,6 +14,7 @@ import type { PointsResponse } from '@sudobility/indexer_client';
 ```
 
 **Dependencies:**
+
 - `@sudobility/types` v1.8.29
 - `@sudobility/di` v1.4.7
 
@@ -65,9 +66,11 @@ All hooks follow these conventions:
 The indexer API uses two authentication models:
 
 ### 1. Public Endpoints
+
 No authentication required. These endpoints are accessible to anyone.
 
 ### 2. Signature-Protected Endpoints
+
 Require wallet signature verification using the `IndexerUserAuth` type:
 
 ```typescript
@@ -78,11 +81,13 @@ interface IndexerUserAuth {
 ```
 
 **Authentication Flow:**
+
 1. Get the signing message using `useIndexerGetSigningMessage`
 2. Have user sign the message with their wallet
 3. Pass the `{ message, signature }` to signature-protected endpoints
 
 **Example:**
+
 ```typescript
 // Step 1: Get message to sign
 const { getSigningMessage } = useIndexerGetSigningMessage(
@@ -129,7 +134,7 @@ Validates username format according to 0xMail rules.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `endpointUrl` | string | Yes | - | Base URL of the indexer API (e.g., 'https://indexer.0xmail.box') |
+| `endpointUrl` | string | Yes | - | Base URL of the indexer API (e.g., <https://indexer.0xmail.box>) |
 | `dev` | boolean | No | false | If true, sends 'x-dev: true' header for backend development mode |
 
 #### Returns
@@ -650,6 +655,7 @@ Gets email accounts associated with a wallet address. This is the primary endpoi
 **API Endpoint:** `GET /wallets/:walletAddress/accounts`
 
 **Headers:**
+
 - `x-signature`: Wallet signature
 - `x-message`: Signed message (URL encoded)
 - `x-referral`: Referral code (optional)
@@ -788,6 +794,7 @@ function WalletAccountsViewer({
 ```
 
 **Important Notes:**
+
 - If a `referralCode` is provided and this is the user's first registration, the referral will be recorded and the referrer will earn points
 - The referral code is only consumed on first wallet registration, subsequent calls with the same code have no effect
 - Use `useIndexerReferralConsumption` hook to automatically detect and manage referral codes from URL parameters
@@ -907,6 +914,7 @@ function UserPointsDisplay({
 ```
 
 **Points System:**
+
 - **Send (5 points)**: Earned when sending an email
 - **ReadBy (25 points)**: Earned when a recipient reads your email
 - **Referral (50 points)**: Earned when someone signs up with your referral code
@@ -1802,12 +1810,14 @@ function App() {
 User A shares: `https://app.0xmail.box?referral=ABC123`
 
 User B visits the link:
+
 1. `useIndexerReferralConsumption` detects `?referral=ABC123`
 2. Saves to localStorage
 3. Cleans URL to `https://app.0xmail.box`
 4. Shows banner: "You have a referral code!"
 
 User B connects wallet:
+
 1. App calls `consumeReferralCode()` → returns "ABC123"
 2. Passes to `getWalletAccounts(address, auth, "ABC123")`
 3. Backend records the referral
@@ -1823,11 +1833,13 @@ User B connects wallet:
 **⚠️ DEPRECATED**: This is a legacy monolithic hook that provides all endpoint functions in one hook. It's recommended to use individual endpoint hooks instead for better tree-shaking and clarity.
 
 **Why deprecated:**
+
 - Large bundle size (includes all endpoints even if you only need one)
 - Less clear which endpoints you're actually using
 - Harder to test and maintain
 
 **Migration guide:**
+
 ```typescript
 // OLD (deprecated)
 const { getWalletAccounts, validateUsername } = useIndexerMail(url, dev);
@@ -2157,6 +2169,7 @@ try {
 ```
 
 Common error scenarios:
+
 - **Network errors**: "Indexer API request failed: Network Error"
 - **Authentication errors**: "Failed to get wallet accounts: Invalid signature"
 - **Not found errors**: "Failed to get nonce: Nonce not found"

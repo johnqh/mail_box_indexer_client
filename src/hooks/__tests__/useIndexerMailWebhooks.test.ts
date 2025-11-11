@@ -125,12 +125,17 @@ describe('useIndexerMailWebhooks', () => {
         webhookUrl: 'https://example.com/webhook',
       };
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.createWebhook(mockWalletAddress, mockAuth, webhookData)
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.createWebhook(
+          mockWalletAddress,
+          mockAuth,
+          webhookData
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
       expect(result.current.webhook).toBeNull();
     });
@@ -206,12 +211,14 @@ describe('useIndexerMailWebhooks', () => {
         useIndexerMailWebhooks(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getWebhooks(mockWalletAddress, mockAuth)
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.getWebhooks(mockWalletAddress, mockAuth);
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
+      expect(response.data.webhooks).toEqual([]);
       expect(result.current.error).toBe(errorMessage);
       expect(result.current.webhooks).toBeNull();
     });
@@ -307,12 +314,17 @@ describe('useIndexerMailWebhooks', () => {
         useIndexerMailWebhooks(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getWebhook(mockWalletAddress, mockWebhookId, mockAuth)
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.getWebhook(
+          mockWalletAddress,
+          mockWebhookId,
+          mockAuth
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
     });
   });
@@ -423,16 +435,17 @@ describe('useIndexerMailWebhooks', () => {
         useIndexerMailWebhooks(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.deleteWebhook(
-            mockWalletAddress,
-            mockWebhookId,
-            mockAuth
-          )
-        ).rejects.toThrow(errorMessage);
+        response = await result.current.deleteWebhook(
+          mockWalletAddress,
+          mockWebhookId,
+          mockAuth
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe(errorMessage);
       expect(result.current.error).toBe(errorMessage);
     });
   });
@@ -447,9 +460,7 @@ describe('useIndexerMailWebhooks', () => {
 
       // Trigger an error
       await act(async () => {
-        await expect(
-          result.current.getWebhooks(mockWalletAddress, mockAuth)
-        ).rejects.toThrow('Test error');
+        await result.current.getWebhooks(mockWalletAddress, mockAuth);
       });
 
       expect(result.current.error).toBe('Test error');
@@ -555,14 +566,19 @@ describe('useIndexerMailWebhooks', () => {
         useIndexerMailWebhooks(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.createWebhook(mockWalletAddress, mockAuth, {
+        response = await result.current.createWebhook(
+          mockWalletAddress,
+          mockAuth,
+          {
             webhookUrl: 'https://example.com/webhook',
-          })
-        ).rejects.toBe('String error');
+          }
+        );
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Failed to create webhook');
       expect(result.current.error).toBe('Failed to create webhook');
     });
 
@@ -575,12 +591,13 @@ describe('useIndexerMailWebhooks', () => {
         useIndexerMailWebhooks(mockEndpointUrl, false)
       );
 
+      let response;
       await act(async () => {
-        await expect(
-          result.current.getWebhooks(mockWalletAddress, mockAuth)
-        ).rejects.toThrow('Network error');
+        response = await result.current.getWebhooks(mockWalletAddress, mockAuth);
       });
 
+      expect(response.success).toBe(false);
+      expect(response.error).toBe('Network error: Connection refused');
       expect(result.current.error).toBe('Network error: Connection refused');
     });
   });

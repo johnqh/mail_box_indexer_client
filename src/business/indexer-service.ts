@@ -100,8 +100,7 @@ class IndexerService {
 
       this.setCache(cacheKey, result);
       return result;
-    } catch (error) {
-      console.error('Failed to get leaderboard:', error);
+    } catch {
       return { success: false, message: 'Failed to get leaderboard' };
     }
   }
@@ -125,8 +124,7 @@ class IndexerService {
 
       this.setCache(cacheKey, result);
       return result;
-    } catch (error) {
-      console.error('Failed to get public stats:', error);
+    } catch {
       return { success: false, message: 'Failed to get public stats' };
     }
   }

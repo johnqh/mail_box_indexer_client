@@ -48,6 +48,5 @@ export function buildUrl(endpoint: string, path: string): string {
 export function handleApiError(response: any, operation: string): Error {
   const errorMessage =
     response?.data?.error || response?.data?.message || 'Unknown error';
-  console.error(`[IndexerAPI] ${operation} failed:`, errorMessage);
   return new Error(`Failed to ${operation}: ${errorMessage}`);
 }

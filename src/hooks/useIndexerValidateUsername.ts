@@ -55,7 +55,8 @@ export const useIndexerValidateUsername = (
         const errorMessage =
           err instanceof Error ? err.message : 'Validation failed';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerValidateUsername]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,

@@ -67,7 +67,8 @@ export const useIndexerGetSigningMessage = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerGetSigningMessage]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,

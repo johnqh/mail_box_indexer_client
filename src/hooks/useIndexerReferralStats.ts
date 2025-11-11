@@ -52,7 +52,8 @@ export const useIndexerReferralStats = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get referral stats';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerReferralStats]', errorMessage, err);
+        return undefined;
       } finally {
         setIsLoading(false);
       }

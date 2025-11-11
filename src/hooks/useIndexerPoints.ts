@@ -193,7 +193,7 @@ export function useIndexerPoints(
 
   // Mutation for getting points info
   const pointsInfoMutation = useMutation({
-    mutationFn: async (): Promise<PointsInfoResponse> => {
+    mutationFn: async (): Promise<PointsInfoResponse | undefined> => {
       setError(null);
       try {
         return await client.getPointsInfo();
@@ -201,7 +201,8 @@ export function useIndexerPoints(
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points info';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerPoints]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -211,7 +212,7 @@ export function useIndexerPoints(
   const leaderboardMutation = useMutation({
     mutationFn: async (
       count: number = 10
-    ): Promise<IndexerLeaderboardResponse> => {
+    ): Promise<IndexerLeaderboardResponse | undefined> => {
       setError(null);
       try {
         return await client.getPointsLeaderboard(count);
@@ -219,7 +220,8 @@ export function useIndexerPoints(
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get leaderboard';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerPoints]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -227,7 +229,7 @@ export function useIndexerPoints(
 
   // Mutation for getting site stats
   const siteStatsMutation = useMutation({
-    mutationFn: async (): Promise<IndexerSiteStatsResponse> => {
+    mutationFn: async (): Promise<IndexerSiteStatsResponse | undefined> => {
       setError(null);
       try {
         return await client.getPointsSiteStats();
@@ -235,30 +237,36 @@ export function useIndexerPoints(
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get site stats';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerPoints]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
   });
 
-  const getPointsInfo = useCallback(async (): Promise<PointsInfoResponse> => {
+  const getPointsInfo = useCallback(async (): Promise<
+    PointsInfoResponse | undefined
+  > => {
     const result = await pointsInfoMutation.mutateAsync();
     return result;
   }, [pointsInfoMutation]);
 
   const getPointsLeaderboard = useCallback(
-    async (count: number = 10): Promise<IndexerLeaderboardResponse> => {
+    async (
+      count: number = 10
+    ): Promise<IndexerLeaderboardResponse | undefined> => {
       const result = await leaderboardMutation.mutateAsync(count);
       return result;
     },
     [leaderboardMutation]
   );
 
-  const getPointsSiteStats =
-    useCallback(async (): Promise<IndexerSiteStatsResponse> => {
-      const result = await siteStatsMutation.mutateAsync();
-      return result;
-    }, [siteStatsMutation]);
+  const getPointsSiteStats = useCallback(async (): Promise<
+    IndexerSiteStatsResponse | undefined
+  > => {
+    const result = await siteStatsMutation.mutateAsync();
+    return result;
+  }, [siteStatsMutation]);
 
   const isLoading =
     pointsInfoMutation.isPending ||

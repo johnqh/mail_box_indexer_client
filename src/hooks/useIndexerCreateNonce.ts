@@ -58,7 +58,8 @@ export const useIndexerCreateNonce = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to create nonce';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerCreateNonce]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,

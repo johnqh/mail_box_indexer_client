@@ -98,7 +98,11 @@ export const useIndexerMailTemplates = (
           err instanceof Error ? err.message : 'Failed to create template';
         setError(errorMessage);
         console.error('[useIndexerMailTemplates]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -131,7 +135,12 @@ export const useIndexerMailTemplates = (
           err instanceof Error ? err.message : 'Failed to get templates';
         setError(errorMessage);
         console.error('[useIndexerMailTemplates]', errorMessage, err);
-        return { data: { templates: [], total: 0, hasMore: false, verified: false }, success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          data: { templates: [], total: 0, hasMore: false, verified: false },
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -166,7 +175,11 @@ export const useIndexerMailTemplates = (
           err instanceof Error ? err.message : 'Failed to get template';
         setError(errorMessage);
         console.error('[useIndexerMailTemplates]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -203,7 +216,11 @@ export const useIndexerMailTemplates = (
           err instanceof Error ? err.message : 'Failed to update template';
         setError(errorMessage);
         console.error('[useIndexerMailTemplates]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -239,7 +256,11 @@ export const useIndexerMailTemplates = (
           err instanceof Error ? err.message : 'Failed to delete template';
         setError(errorMessage);
         console.error('[useIndexerMailTemplates]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }

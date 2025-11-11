@@ -90,7 +90,11 @@ export const useIndexerMailWebhooks = (
           err instanceof Error ? err.message : 'Failed to create webhook';
         setError(errorMessage);
         console.error('[useIndexerMailWebhooks]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -119,7 +123,12 @@ export const useIndexerMailWebhooks = (
           err instanceof Error ? err.message : 'Failed to get webhooks';
         setError(errorMessage);
         console.error('[useIndexerMailWebhooks]', errorMessage, err);
-        return { data: { webhooks: [], total: 0, hasMore: false, verified: false }, success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          data: { webhooks: [], total: 0, hasMore: false, verified: false },
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -154,7 +163,11 @@ export const useIndexerMailWebhooks = (
           err instanceof Error ? err.message : 'Failed to get webhook';
         setError(errorMessage);
         console.error('[useIndexerMailWebhooks]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }
@@ -190,7 +203,11 @@ export const useIndexerMailWebhooks = (
           err instanceof Error ? err.message : 'Failed to delete webhook';
         setError(errorMessage);
         console.error('[useIndexerMailWebhooks]', errorMessage, err);
-        return { success: false, error: errorMessage, timestamp: new Date().toISOString() };
+        return {
+          success: false,
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         setIsLoading(false);
       }

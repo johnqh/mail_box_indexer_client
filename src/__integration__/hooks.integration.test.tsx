@@ -36,8 +36,8 @@ describe('Hooks Integration Tests', () => {
 
       // Should have successful response
       expect(leaderboard).toBeDefined();
-      expect(leaderboard.success).toBe(true);
-      expect(leaderboard.data?.leaderboard).toBeDefined();
+      expect(leaderboard?.success).toBe(true);
+      expect(leaderboard?.data?.leaderboard).toBeDefined();
 
       // Loading state should be updated
       await waitFor(() => {
@@ -53,9 +53,9 @@ describe('Hooks Integration Tests', () => {
       const stats = await result.current.getPointsSiteStats();
 
       expect(stats).toBeDefined();
-      expect(stats.success).toBe(true);
-      expect(stats.data?.totalPoints).toBeDefined();
-      expect(stats.data?.totalUsers).toBeDefined();
+      expect(stats?.success).toBe(true);
+      expect(stats?.data?.totalPoints).toBeDefined();
+      expect(stats?.data?.totalUsers).toBeDefined();
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -69,13 +69,13 @@ describe('Hooks Integration Tests', () => {
 
       // Make multiple requests in sequence
       const leaderboard1 = await result.current.getPointsLeaderboard(5);
-      expect(leaderboard1.success).toBe(true);
+      expect(leaderboard1?.success).toBe(true);
 
       const stats = await result.current.getPointsSiteStats();
-      expect(stats.success).toBe(true);
+      expect(stats?.success).toBe(true);
 
       const leaderboard2 = await result.current.getPointsLeaderboard(10);
-      expect(leaderboard2.success).toBe(true);
+      expect(leaderboard2?.success).toBe(true);
 
       // Should maintain stable state
       await waitFor(() => {
@@ -118,8 +118,8 @@ describe('Hooks Integration Tests', () => {
 
       // Should get data from API
       expect(leaderboard).toBeDefined();
-      expect(leaderboard.success).toBe(true);
-      expect(leaderboard.data?.leaderboard).toBeDefined();
+      expect(leaderboard?.success).toBe(true);
+      expect(leaderboard?.data?.leaderboard).toBeDefined();
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -144,7 +144,7 @@ describe('Hooks Integration Tests', () => {
 
       // All requests should succeed
       results.forEach((response) => {
-        expect(response.success).toBe(true);
+        expect(response?.success).toBe(true);
       });
     }, 20000);
 
@@ -157,13 +157,13 @@ describe('Hooks Integration Tests', () => {
       );
 
       const stats1 = await result.current.getPointsSiteStats();
-      expect(stats1.success).toBe(true);
+      expect(stats1?.success).toBe(true);
 
       // Rerender with same URL - should reuse client
       rerender({ url: indexerUrl! });
 
       const stats2 = await result.current.getPointsSiteStats();
-      expect(stats2.success).toBe(true);
+      expect(stats2?.success).toBe(true);
     }, 15000);
 
     it('should handle different counts for leaderboard', async () => {
@@ -181,7 +181,7 @@ describe('Hooks Integration Tests', () => {
 
       // All should succeed
       results.forEach((result) => {
-        expect(result.success).toBe(true);
+        expect(result?.success).toBe(true);
       });
 
       // Loading should be false after all complete
@@ -199,12 +199,12 @@ describe('Hooks Integration Tests', () => {
 
       const leaderboard = await result.current.getPointsLeaderboard(10);
 
-      expect(leaderboard.success).toBe(true);
-      expect(leaderboard.timestamp).toBeDefined();
-      expect(leaderboard.data).toBeDefined();
+      expect(leaderboard?.success).toBe(true);
+      expect(leaderboard?.timestamp).toBeDefined();
+      expect(leaderboard?.data).toBeDefined();
 
       // Validate leaderboard structure
-      if (leaderboard.data?.leaderboard && leaderboard.data.leaderboard.length > 0) {
+      if (leaderboard?.data?.leaderboard && leaderboard.data.leaderboard.length > 0) {
         const entry = leaderboard.data.leaderboard[0];
         if (entry) {
           expect(entry).toHaveProperty('walletAddress');
@@ -224,11 +224,11 @@ describe('Hooks Integration Tests', () => {
 
       const stats = await result.current.getPointsSiteStats();
 
-      expect(stats.success).toBe(true);
-      expect(stats.timestamp).toBeDefined();
-      expect(stats.data).toBeDefined();
+      expect(stats?.success).toBe(true);
+      expect(stats?.timestamp).toBeDefined();
+      expect(stats?.data).toBeDefined();
 
-      if (stats.data) {
+      if (stats?.data) {
         expect(stats.data).toHaveProperty('totalPoints');
         expect(stats.data).toHaveProperty('totalUsers');
         expect(typeof stats.data.totalPoints).toBe('string');

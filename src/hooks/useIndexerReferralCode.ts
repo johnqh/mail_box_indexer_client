@@ -53,7 +53,8 @@ export const useIndexerReferralCode = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get referral code';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerReferralCode]', errorMessage, err);
+        return undefined;
       } finally {
         setIsLoading(false);
       }

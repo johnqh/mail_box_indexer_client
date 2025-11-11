@@ -117,7 +117,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Validation failed';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -143,7 +144,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get signing message';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -161,7 +163,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get leaderboard';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -177,7 +180,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get site stats';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -205,7 +209,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get wallet accounts';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -227,7 +232,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated to';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -249,7 +255,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get delegated from';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -271,7 +278,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to create nonce';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -293,7 +301,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get nonce';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -315,7 +324,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get entitlement';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,
@@ -337,7 +347,8 @@ const useIndexerMail = (
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to get points balance';
         setError(errorMessage);
-        throw err;
+        console.error('[useIndexerMail]', errorMessage, err);
+        return undefined;
       }
     },
     retry: false,

@@ -73,8 +73,8 @@ describe('useIndexerPoints', () => {
       const leaderboard = await result.current.getPointsLeaderboard(10);
 
       expect(leaderboard).toBeDefined();
-      expect(leaderboard.success).toBe(true);
-      expect(leaderboard.data?.leaderboard).toHaveLength(1);
+      expect(leaderboard?.success).toBe(true);
+      expect(leaderboard?.data?.leaderboard).toHaveLength(1);
       expect(mockGetPointsLeaderboard).toHaveBeenCalledWith(10);
     });
 
@@ -99,10 +99,9 @@ describe('useIndexerPoints', () => {
         { wrapper: createWrapper() }
       );
 
-      await expect(result.current.getPointsLeaderboard()).rejects.toThrow(
-        'Network error'
-      );
+      const leaderboard = await result.current.getPointsLeaderboard();
 
+      expect(leaderboard).toBeUndefined();
       await waitFor(() => {
         expect(result.current.error).toBe('Network error');
       });
@@ -133,9 +132,9 @@ describe('useIndexerPoints', () => {
       const stats = await result.current.getPointsSiteStats();
 
       expect(stats).toBeDefined();
-      expect(stats.success).toBe(true);
-      expect(stats.data?.totalPoints).toBe('1000000');
-      expect(stats.data?.totalUsers).toBe(5000);
+      expect(stats?.success).toBe(true);
+      expect(stats?.data?.totalPoints).toBe('1000000');
+      expect(stats?.data?.totalUsers).toBe(5000);
       expect(mockGetPointsSiteStats).toHaveBeenCalled();
     });
 
@@ -149,10 +148,9 @@ describe('useIndexerPoints', () => {
         { wrapper: createWrapper() }
       );
 
-      await expect(result.current.getPointsSiteStats()).rejects.toThrow(
-        'Service unavailable'
-      );
+      const stats = await result.current.getPointsSiteStats();
 
+      expect(stats).toBeUndefined();
       await waitFor(() => {
         expect(result.current.error).toBe('Service unavailable');
       });
@@ -170,11 +168,7 @@ describe('useIndexerPoints', () => {
         { wrapper: createWrapper() }
       );
 
-      try {
-        await result.current.getPointsLeaderboard();
-      } catch (error) {
-        // Expected to throw
-      }
+      await result.current.getPointsLeaderboard();
 
       await waitFor(() => {
         expect(result.current.error).not.toBeNull();

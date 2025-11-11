@@ -55,6 +55,7 @@ export const useIndexerValidateUsername = (
         throw err;
       }
     },
+    retry: false,
   });
 
   const validateUsername = useCallback(

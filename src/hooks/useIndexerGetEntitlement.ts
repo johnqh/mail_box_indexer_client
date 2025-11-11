@@ -58,6 +58,7 @@ export const useIndexerGetEntitlement = (
     },
     staleTime: 10 * 60 * 1000, // 10 minutes - entitlements don't change often
     enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    retry: false,
     ...options,
   });
 };

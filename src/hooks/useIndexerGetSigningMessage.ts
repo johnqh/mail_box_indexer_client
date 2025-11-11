@@ -67,6 +67,7 @@ export const useIndexerGetSigningMessage = (
         throw err;
       }
     },
+    retry: false,
   });
 
   const getSigningMessage = useCallback(

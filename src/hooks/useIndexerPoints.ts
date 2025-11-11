@@ -61,6 +61,7 @@ export function useIndexerPointsInfo(
       return await client.getPointsInfo();
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - general info changes frequently
+    retry: false,
     ...options,
   });
 }
@@ -110,6 +111,7 @@ export function useIndexerPointsLeaderboard(
       return await client.getPointsLeaderboard(count);
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - leaderboard changes frequently
+    retry: false,
     ...options,
   });
 }
@@ -155,6 +157,7 @@ export function useIndexerPointsSiteStats(
       return await client.getPointsSiteStats();
     },
     staleTime: 5 * 60 * 1000, // 5 minutes - site stats don't change as frequently
+    retry: false,
     ...options,
   });
 }
@@ -188,6 +191,7 @@ export function useIndexerPoints(
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getting leaderboard
@@ -205,6 +209,7 @@ export function useIndexerPoints(
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getting site stats
@@ -220,6 +225,7 @@ export function useIndexerPoints(
         throw err;
       }
     },
+    retry: false,
   });
 
   const getPointsInfo = useCallback(async (): Promise<PointsInfoResponse> => {

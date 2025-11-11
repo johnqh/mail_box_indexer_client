@@ -63,6 +63,7 @@ export const useWalletNames = (
     },
     staleTime: STALE_TIMES.NAME_SERVICE_RESOLUTION,
     enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    retry: false,
     ...options,
   });
 };
@@ -112,6 +113,7 @@ export const useResolveNameToAddress = (
     },
     staleTime: STALE_TIMES.NAME_SERVICE_RESOLUTION,
     enabled: !!name,
+    retry: false,
     ...options,
   });
 };

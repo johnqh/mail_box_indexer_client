@@ -117,6 +117,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getSigningMessage
@@ -142,6 +143,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getPointsLeaderboard
@@ -159,6 +161,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getPointsSiteStats
@@ -174,6 +177,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getWalletAccounts
@@ -201,6 +205,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getDelegatedTo
@@ -222,6 +227,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getDelegatedFrom
@@ -243,6 +249,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for createNonce
@@ -264,6 +271,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getNonce
@@ -285,6 +293,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getEntitlement
@@ -306,6 +315,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Mutation for getPointsBalance
@@ -327,6 +337,7 @@ const useIndexerMail = (
         throw err;
       }
     },
+    retry: false,
   });
 
   // Wrapper functions

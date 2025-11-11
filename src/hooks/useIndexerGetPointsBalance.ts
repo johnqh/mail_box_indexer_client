@@ -59,6 +59,7 @@ export const useIndexerGetPointsBalance = (
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - points change frequently
     enabled: !!walletAddress && !!auth.signature && !!auth.message,
+    retry: false,
     ...options,
   });
 };

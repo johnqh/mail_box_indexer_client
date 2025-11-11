@@ -89,6 +89,7 @@ export const useIndexerGetWalletPermissions = (
       options?.enabled !== undefined
         ? options.enabled
         : !!walletAddress && !!chainId,
+    retry: false,
     ...options,
   });
 };

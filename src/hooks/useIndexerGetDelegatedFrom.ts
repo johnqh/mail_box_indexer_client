@@ -65,6 +65,7 @@ export const useIndexerGetDelegatedFrom = (
       options?.enabled !== undefined
         ? options.enabled
         : !!walletAddress && !!auth.signature && !!auth.message,
+    retry: false,
     ...options,
   });
 };

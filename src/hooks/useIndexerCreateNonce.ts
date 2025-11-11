@@ -58,6 +58,7 @@ export const useIndexerCreateNonce = (
         throw err;
       }
     },
+    retry: false,
   });
 
   const createNonce = useCallback(

@@ -58,6 +58,7 @@ export const useIndexerGetNonce = (
     },
     staleTime: 1 * 60 * 1000, // 1 minute - nonces are short-lived
     enabled: !!username && !!auth.signature && !!auth.message,
+    retry: false,
     ...options,
   });
 };

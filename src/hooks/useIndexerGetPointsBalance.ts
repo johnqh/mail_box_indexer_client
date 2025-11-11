@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   useQuery,
   UseQueryOptions,
@@ -50,7 +51,10 @@ export const useIndexerGetPointsBalance = (
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerPointsResponse>
 ): UseQueryResult<IndexerPointsResponse> => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'points-balance', walletAddress, auth.signature],

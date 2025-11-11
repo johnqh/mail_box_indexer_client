@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   useQuery,
   UseQueryOptions,
@@ -49,7 +50,10 @@ export const useIndexerGetNonce = (
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerNonceResponse>
 ): UseQueryResult<IndexerNonceResponse> => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'nonce', username, auth.signature],

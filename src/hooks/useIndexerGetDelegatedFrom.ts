@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   useQuery,
   UseQueryOptions,
@@ -52,7 +53,10 @@ export const useIndexerGetDelegatedFrom = (
     'queryKey' | 'queryFn'
   >
 ): UseQueryResult<IndexerDelegatedFromResponse> => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'delegated-from', walletAddress, auth.signature],

@@ -31,7 +31,10 @@ export const useIndexerReferralStats = (
   endpointUrl: string,
   dev: boolean
 ) => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
   const [stats, setStats] = useState<Optional<ReferralStatsResponse>>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Optional<string>>(null);

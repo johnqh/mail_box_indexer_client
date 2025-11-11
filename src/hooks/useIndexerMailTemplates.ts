@@ -61,7 +61,10 @@ export const useIndexerMailTemplates = (
   endpointUrl: string,
   dev: boolean
 ) => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
   const [templates, setTemplates] =
     useState<Optional<MailTemplatesListResponse>>(null);
   const [template, setTemplate] = useState<Optional<MailTemplate>>(null);

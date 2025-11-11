@@ -95,7 +95,10 @@ const useIndexerMail = (
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerMailReturn => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
   const [error, setError] = useState<Optional<string>>(null);
 
   const clearError = useCallback(() => {

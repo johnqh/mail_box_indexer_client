@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   useQuery,
   UseQueryOptions,
@@ -54,7 +55,10 @@ export const useWalletNames = (
   auth: IndexerUserAuth,
   options?: UseQueryOptions<IndexerNameServiceResponse>
 ): UseQueryResult<IndexerNameServiceResponse> => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'wallet-names', walletAddress],
@@ -104,7 +108,10 @@ export const useResolveNameToAddress = (
   name: string,
   options?: UseQueryOptions<IndexerNameResolutionResponse>
 ): UseQueryResult<IndexerNameResolutionResponse> => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'resolve-name', name],

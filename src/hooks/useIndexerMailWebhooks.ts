@@ -53,7 +53,10 @@ export const useIndexerMailWebhooks = (
   endpointUrl: string,
   dev: boolean
 ) => {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
   const [webhooks, setWebhooks] =
     useState<Optional<WebhooksListResponse>>(null);
   const [webhook, setWebhook] = useState<Optional<Webhook>>(null);

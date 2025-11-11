@@ -53,7 +53,10 @@ export function useIndexerPointsInfo(
   dev: boolean,
   options?: UseQueryOptions<PointsInfoResponse>
 ): UseQueryResult<PointsInfoResponse> {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'points-info'],
@@ -103,7 +106,10 @@ export function useIndexerPointsLeaderboard(
   count: number = 10,
   options?: UseQueryOptions<IndexerLeaderboardResponse>
 ): UseQueryResult<IndexerLeaderboardResponse> {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'points-leaderboard', count],
@@ -149,7 +155,10 @@ export function useIndexerPointsSiteStats(
   dev: boolean,
   options?: UseQueryOptions<IndexerSiteStatsResponse>
 ): UseQueryResult<IndexerSiteStatsResponse> {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
 
   return useQuery({
     queryKey: ['indexer', 'points-site-stats'],
@@ -171,7 +180,10 @@ export function useIndexerPoints(
   endpointUrl: string,
   dev: boolean = false
 ) {
-  const client = new IndexerClient(endpointUrl, networkClient, dev);
+  const client = useMemo(
+    () => new IndexerClient(endpointUrl, networkClient, dev),
+    [endpointUrl, networkClient, dev]
+  );
   const [error, setError] = useState<Optional<string>>(null);
 
   const clearError = useCallback(() => {

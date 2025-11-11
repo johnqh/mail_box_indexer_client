@@ -35,7 +35,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Nonce:', data.data.nonce);
+ *   // Access data.data.nonce
  * }
  *
  * // Force refresh the data

@@ -35,8 +35,8 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Total Points:', data.data.totalPoints);
- *   console.log('Breakdown:', data.data.breakdown);
+ *   // Access data.data.totalPoints
+ *   // Access data.data.breakdown
  * }
  *
  * // Force refresh the data

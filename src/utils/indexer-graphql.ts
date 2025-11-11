@@ -196,9 +196,9 @@ const getIndexerGraphQLUrl = (config: IndexerGraphQLConfig): string => {
  *   });
  * } catch (error) {
  *   if (error.message.includes('GraphQL error')) {
- *     console.error('Server-side GraphQL error:', error);
+ *     // Handle server-side GraphQL error
  *   } else if (error.message.includes('HTTP error')) {
- *     console.error('Network error:', error);
+ *     // Handle network error
  *   }
  * }
  * ```

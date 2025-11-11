@@ -35,7 +35,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success && data.data.hasDelegation) {
- *   console.log('Delegated to:', data.data.delegatedTo.address);
+ *   // Access data.data.delegatedTo.address
  * }
  *
  * // Force refresh the data

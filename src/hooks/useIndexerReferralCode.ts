@@ -23,7 +23,7 @@ import { IndexerClient } from '../network/IndexerClient';
  *
  * // Get or create referral code
  * await fetchReferralCode(walletAddress, { signature, message, signer: walletAddress });
- * console.log(referralCode?.referralCode); // "ABC123DEF"
+ * // Access referralCode?.referralCode - e.g., "ABC123DEF"
  * ```
  */
 export const useIndexerReferralCode = (

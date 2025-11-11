@@ -52,7 +52,7 @@ export interface WalletPermissionsResponse {
  * );
  *
  * if (data?.success) {
- *   console.log('Permissions:', data.data.permissions);
+ *   // Access data.data.permissions
  * }
  *
  * // Force refresh the data

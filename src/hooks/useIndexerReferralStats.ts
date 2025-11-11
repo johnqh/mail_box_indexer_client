@@ -22,8 +22,8 @@ import { IndexerClient } from '../network/IndexerClient';
  *
  * // Get referral statistics by code
  * await fetchStats('ABC123DEF');
- * console.log(stats?.data.totalReferred); // Number of referrals
- * console.log(stats?.data.referredWallets); // Array of referred wallets
+ * // Access stats?.data.totalReferred - number of referrals
+ * // Access stats?.data.referredWallets - array of referred wallets
  * ```
  */
 export const useIndexerReferralStats = (

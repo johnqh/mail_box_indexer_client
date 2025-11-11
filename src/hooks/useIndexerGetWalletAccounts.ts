@@ -37,7 +37,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Accounts:', data.data.accounts);
+ *   // Access data.data.accounts
  * }
  *
  * // Force refresh the data

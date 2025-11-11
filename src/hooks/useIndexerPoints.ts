@@ -38,9 +38,9 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Total Users:', data.data.siteStats.totalUsers);
- *   console.log('Total Points:', data.data.siteStats.totalPoints);
- *   console.log('Top 5 Users:', data.data.topUsers);
+ *   // Access data.data.siteStats.totalUsers
+ *   // Access data.data.siteStats.totalPoints
+ *   // Access data.data.topUsers
  * }
  *
  * // Force refresh the data
@@ -90,8 +90,9 @@ export function useIndexerPointsInfo(
  * );
  *
  * if (data?.success) {
+ *   // Access leaderboard data
  *   data.data.leaderboard.forEach(user => {
- *     console.log(`${user.rank}. ${user.walletAddress}: ${user.totalPoints} points`);
+ *     // user.rank, user.walletAddress, user.totalPoints
  *   });
  * }
  *
@@ -141,8 +142,8 @@ export function useIndexerPointsLeaderboard(
  * );
  *
  * if (data?.success) {
- *   console.log('Total Users:', data.data.totalUsers);
- *   console.log('Total Points:', data.data.totalPoints);
+ *   // Access data.data.totalUsers
+ *   // Access data.data.totalPoints
  * }
  *
  * // Force refresh the data

@@ -40,7 +40,7 @@ const STALE_TIMES = {
  * );
  *
  * if (data?.success) {
- *   console.log('Names:', data.data.names); // ['vitalik.eth', 'example.eth']
+ *   // Access data.data.names - array of names like ['vitalik.eth', 'example.eth']
  * }
  *
  * // Force refresh the data
@@ -93,8 +93,8 @@ export const useWalletNames = (
  * );
  *
  * if (data?.success) {
- *   console.log('Wallet:', data.data.address);
- *   console.log('Chain:', data.data.chainType);
+ *   // Access data.data.address
+ *   // Access data.data.chainType
  * }
  *
  * // Force refresh the data

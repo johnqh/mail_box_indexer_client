@@ -35,7 +35,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Has Entitlement:', data.data.hasEntitlement);
+ *   // Access data.data.hasEntitlement
  * }
  *
  * // Force refresh the data

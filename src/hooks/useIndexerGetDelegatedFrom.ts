@@ -35,7 +35,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * );
  *
  * if (data?.success) {
- *   console.log('Delegators:', data.data.delegations);
+ *   // Access data.data.delegations
  * }
  *
  * // Force refresh the data

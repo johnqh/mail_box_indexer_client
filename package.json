@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/indexer_client",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "description": "React and React Native compatible client library for 0xMail indexer API with TypeScript support",
   "type": "module",
   "main": "dist/index.js",
@@ -47,8 +47,8 @@
     "react": "^19.2.0"
   },
   "devDependencies": {
-    "@sudobility/di": "^1.4.16",
-    "@sudobility/types": "^1.9.10",
+    "@sudobility/di": "^1.4.17",
+    "@sudobility/types": "^1.9.11",
     "@tanstack/react-query": "^5.90.5",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.9.1",
@@ -73,6 +73,6 @@
     "url": "https://github.com/johnqh/mail_box_indexer_client.git"
   },
   "dependencies": {
-    "@sudobility/configs": "^0.0.23"
+    "@sudobility/configs": "^0.0.24"
   }
 }

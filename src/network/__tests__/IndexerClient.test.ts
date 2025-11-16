@@ -263,7 +263,7 @@ describe('IndexerClient', () => {
   describe('OAuth endpoints', () => {
     it('should create auth challenge', async () => {
       const mockData = {
-        challenge: 'auth.0xmail.box wants you to sign in...',
+        challenge: 'auth.example.com wants you to sign in...',
         session_id: 'session-123',
         expires_in: 600,
         display_name: '0x123...',
@@ -394,7 +394,7 @@ describe('IndexerClient', () => {
     it('should get OAuth user info', async () => {
       const mockData = {
         sub: '0x123...',
-        email: '0x123...@0xmail.box',
+        email: '0x123...@example.com',
         email_verified: true,
         wallet_address: '0x123...',
         chain_type: 'evm',

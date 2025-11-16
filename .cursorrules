@@ -1,7 +1,7 @@
 # Cursor AI Rules for @sudobility/indexer_client
 
 ## Project Context
-This is a TypeScript client library for the 0xMail Indexer API, compatible with React and React Native.
+This is a TypeScript client library for the blockchain mail Indexer API, compatible with React and React Native.
 Backend is located at ../mail_box_indexer (Ponder-based blockchain indexer).
 
 ## Code Style & Conventions

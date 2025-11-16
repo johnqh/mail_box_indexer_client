@@ -33,7 +33,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsInfo(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false
  * );
  *
@@ -84,7 +84,7 @@ export function useIndexerPointsInfo(
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsLeaderboard(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false,
  *   10
  * );
@@ -137,7 +137,7 @@ export function useIndexerPointsLeaderboard(
  * ```tsx
  * const { data, isLoading, error, refetch } = useIndexerPointsSiteStats(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false
  * );
  *

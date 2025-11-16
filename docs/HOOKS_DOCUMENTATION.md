@@ -1,6 +1,6 @@
-# 0xMail Indexer Client - Hooks Documentation
+# blockchain mail Indexer Client - Hooks Documentation
 
-This document provides comprehensive documentation for all React hooks in the `@sudobility/indexer_client` package. The hooks provide a React-friendly interface to interact with the 0xMail indexer API.
+This document provides comprehensive documentation for all React hooks in the `@sudobility/indexer_client` package. The hooks provide a React-friendly interface to interact with the blockchain mail indexer API.
 
 **Important Type Import Change:** As of version 0.0.26, this library no longer re-exports types from `@sudobility/types`. All type imports must come directly from `@sudobility/types`:
 
@@ -91,15 +91,15 @@ interface IndexerUserAuth {
 ```typescript
 // Step 1: Get message to sign
 const { getSigningMessage } = useIndexerGetSigningMessage(
-  'https://indexer.0xmail.box',
+  'https://indexer.example.com',
   false
 );
 
 const messageData = await getSigningMessage(
   walletAddress,
   1,  // chainId (1 for Ethereum mainnet, -1 for Solana mainnet)
-  'app.0xmail.box',
-  'https://app.0xmail.box'
+  'app.example.com',
+  'https://app.example.com'
 );
 
 // Step 2: Sign message with wallet
@@ -113,7 +113,7 @@ const auth: IndexerUserAuth = {
 
 // Step 4: Use auth with protected endpoints
 const { getWalletAccounts } = useIndexerGetWalletAccounts(
-  'https://indexer.0xmail.box',
+  'https://indexer.example.com',
   false
 );
 
@@ -126,7 +126,7 @@ const accounts = await getWalletAccounts(walletAddress, auth);
 
 ### useIndexerValidateUsername
 
-Validates username format according to 0xMail rules.
+Validates username format according to blockchain mail rules.
 
 **API Endpoint:** `GET /users/:username/validate`
 
@@ -134,7 +134,7 @@ Validates username format according to 0xMail rules.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `endpointUrl` | string | Yes | - | Base URL of the indexer API (e.g., <https://indexer.0xmail.box>) |
+| `endpointUrl` | string | Yes | - | Base URL of the indexer API (e.g., <https://indexer.example.com>) |
 | `dev` | boolean | No | false | If true, sends 'x-dev: true' header for backend development mode |
 
 #### Returns
@@ -168,7 +168,7 @@ import { useIndexerValidateUsername } from '@sudobility/indexer_client';
 
 function ValidateUsernameForm() {
   const { validateUsername, isLoading, error, clearError } =
-    useIndexerValidateUsername('https://indexer.0xmail.box', false);
+    useIndexerValidateUsername('https://indexer.example.com', false);
 
   const [username, setUsername] = useState('');
   const [isValid, setIsValid] = useState<boolean | null>(null);
@@ -231,8 +231,8 @@ The `getSigningMessage` function accepts:
 |-----------|------|----------|-------------|
 | `walletAddress` | string | Yes | Wallet address requesting authentication |
 | `chainId` | number | Yes | Chain ID: positive for EVM chains (1=Ethereum, 8453=Base), negative for Solana (-1=mainnet, -2=devnet) |
-| `domain` | string | Yes | Domain of the application (e.g., 'app.0xmail.box') |
-| `url` | string | Yes | Full URL of the application (e.g., 'https://app.0xmail.box') |
+| `domain` | string | Yes | Domain of the application (e.g., 'app.example.com') |
+| `url` | string | Yes | Full URL of the application (e.g., 'https://app.example.com') |
 
 #### Returns
 
@@ -276,7 +276,7 @@ import type { IndexerUserAuth } from '@sudobility/types';
 
 function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, chainId: number }) {
   const { getSigningMessage, isLoading, error } =
-    useIndexerGetSigningMessage('https://indexer.0xmail.box', false);
+    useIndexerGetSigningMessage('https://indexer.example.com', false);
 
   const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
 
@@ -286,8 +286,8 @@ function WalletAuthButton({ walletAddress, chainId }: { walletAddress: string, c
       const messageData = await getSigningMessage(
         walletAddress,
         chainId,
-        'app.0xmail.box',
-        'https://app.0xmail.box'
+        'app.example.com',
+        'https://app.example.com'
       );
 
       if (!messageData?.success) {
@@ -409,7 +409,7 @@ import { useIndexerPoints } from '@sudobility/indexer_client';
 
 function PointsLeaderboard() {
   const { getPointsLeaderboard, getPointsSiteStats, isLoading, error } =
-    useIndexerPoints('https://indexer.0xmail.box', false);
+    useIndexerPoints('https://indexer.example.com', false);
 
   const [leaderboard, setLeaderboard] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
@@ -520,7 +520,7 @@ function NameResolver() {
   const [name, setName] = useState('vitalik.eth');
 
   const { data, isLoading, error } = useResolveNameToAddress(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false,
     name,
     {
@@ -608,7 +608,7 @@ import { useIndexerReferralStats } from '@sudobility/indexer_client';
 
 function ReferralStatsDisplay({ referralCode }: { referralCode: string }) {
   const { stats, isLoading, error, fetchStats } =
-    useIndexerReferralStats('https://indexer.0xmail.box', false);
+    useIndexerReferralStats('https://indexer.example.com', false);
 
   useEffect(() => {
     if (referralCode) {
@@ -698,7 +698,7 @@ interface EmailAccountsResponse {
   success: boolean;
   data: {
     accounts: Array<{
-      address: string;        // Email address (e.g., "user@0xmail.box")
+      address: string;        // Email address (e.g., "user@example.com")
       name?: string;          // Display name
       created: string;        // ISO timestamp
       quota: {
@@ -728,7 +728,7 @@ function WalletAccountsViewer({
   auth: IndexerUserAuth;
 }) {
   const { getWalletAccounts, isLoading, error } =
-    useIndexerGetWalletAccounts('https://indexer.0xmail.box', false);
+    useIndexerGetWalletAccounts('https://indexer.example.com', false);
 
   // Handle referral code if present in URL
   const { consumeReferralCode, clearReferralCode, hasPendingCode } =
@@ -869,7 +869,7 @@ function UserPointsDisplay({
   auth: IndexerUserAuth;
 }) {
   const { getPointsBalance, isLoading, error } =
-    useIndexerGetPointsBalance('https://indexer.0xmail.box', false);
+    useIndexerGetPointsBalance('https://indexer.example.com', false);
 
   const [points, setPoints] = useState<any>(null);
 
@@ -987,7 +987,7 @@ function PremiumFeatureGate({
   children: React.ReactNode;
 }) {
   const { getEntitlement, isLoading, error } =
-    useIndexerGetEntitlement('https://indexer.0xmail.box', false);
+    useIndexerGetEntitlement('https://indexer.example.com', false);
 
   const [hasAccess, setHasAccess] = useState(false);
 
@@ -1094,7 +1094,7 @@ function DelegationStatus({
   auth: IndexerUserAuth;
 }) {
   const { getDelegatedTo, isLoading, error } =
-    useIndexerGetDelegatedTo('https://indexer.0xmail.box', false);
+    useIndexerGetDelegatedTo('https://indexer.example.com', false);
 
   const [delegation, setDelegation] = useState<any>(null);
 
@@ -1204,7 +1204,7 @@ function DelegatedAccountsList({
   auth: IndexerUserAuth;
 }) {
   const { getDelegatedFrom, isLoading, error } =
-    useIndexerGetDelegatedFrom('https://indexer.0xmail.box', false);
+    useIndexerGetDelegatedFrom('https://indexer.example.com', false);
 
   const [delegators, setDelegators] = useState<any[]>([]);
 
@@ -1316,7 +1316,7 @@ function EmailAuthFlow({
   auth: IndexerUserAuth;
 }) {
   const { createNonce, isLoading, error } =
-    useIndexerCreateNonce('https://indexer.0xmail.box', false);
+    useIndexerCreateNonce('https://indexer.example.com', false);
 
   const [nonce, setNonce] = useState<string | null>(null);
 
@@ -1400,7 +1400,7 @@ function CheckExistingNonce({
   auth: IndexerUserAuth;
 }) {
   const { getNonce, isLoading, error } =
-    useIndexerGetNonce('https://indexer.0xmail.box', false);
+    useIndexerGetNonce('https://indexer.example.com', false);
 
   const [nonce, setNonce] = useState<any>(null);
 
@@ -1494,7 +1494,7 @@ function WalletNamesDisplay({
   auth: IndexerUserAuth;
 }) {
   const { data, isLoading, error, refetch } = useWalletNames(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false,
     walletAddress,
     auth,
@@ -1586,7 +1586,7 @@ function ReferralCodeManager({
   auth: IndexerUserAuth;
 }) {
   const { referralCode, isLoading, error, fetchReferralCode } =
-    useIndexerReferralCode('https://indexer.0xmail.box', false);
+    useIndexerReferralCode('https://indexer.example.com', false);
 
   useEffect(() => {
     if (walletAddress && auth) {
@@ -1669,19 +1669,19 @@ function ShareReferralButton({
   auth: IndexerUserAuth;
 }) {
   const { getShareUrl, isLoading, error } =
-    useIndexerReferralShare('https://indexer.0xmail.box', false);
+    useIndexerReferralShare('https://indexer.example.com', false);
 
   const handleShare = async () => {
     try {
       // Generate share URL with referral code
       const shareUrl = await getShareUrl(
-        'https://app.0xmail.box',
+        'https://app.example.com',
         walletAddress,
         auth
       );
 
       // shareUrl will be something like:
-      // "https://app.0xmail.box?referral=ABC123DEF"
+      // "https://app.example.com?referral=ABC123DEF"
 
       // Copy to clipboard
       navigator.clipboard.writeText(shareUrl);
@@ -1690,8 +1690,8 @@ function ShareReferralButton({
       // Or use Web Share API
       if (navigator.share) {
         await navigator.share({
-          title: 'Join 0xMail',
-          text: 'Sign up for 0xMail using my referral link!',
+          title: 'Join blockchain mail',
+          text: 'Sign up for blockchain mail using my referral link!',
           url: shareUrl
         });
       }
@@ -1757,7 +1757,7 @@ function App() {
   } = useIndexerReferralConsumption();
 
   const { getWalletAccounts } = useIndexerGetWalletAccounts(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false
   );
 
@@ -1807,13 +1807,13 @@ function App() {
 
 **Complete Referral Flow Example:**
 
-User A shares: `https://app.0xmail.box?referral=ABC123`
+User A shares: `https://app.example.com?referral=ABC123`
 
 User B visits the link:
 
 1. `useIndexerReferralConsumption` detects `?referral=ABC123`
 2. Saves to localStorage
-3. Cleans URL to `https://app.0xmail.box`
+3. Cleans URL to `https://app.example.com`
 4. Shows banner: "You have a referral code!"
 
 User B connects wallet:
@@ -1919,7 +1919,7 @@ function LegacyComponent() {
     getWalletAccounts,
     isLoading,
     error
-  } = useIndexerMail('https://indexer.0xmail.box', false);
+  } = useIndexerMail('https://indexer.example.com', false);
 
   // Use the functions...
 }
@@ -1936,10 +1936,10 @@ import {
 // This is the recommended approach
 function ModernComponent() {
   const { validateUsername, isLoading: validating, error: validationError } =
-    useIndexerValidateUsername('https://indexer.0xmail.box', false);
+    useIndexerValidateUsername('https://indexer.example.com', false);
 
   const { getWalletAccounts, isLoading: loading, error: accountError } =
-    useIndexerGetWalletAccounts('https://indexer.0xmail.box', false);
+    useIndexerGetWalletAccounts('https://indexer.example.com', false);
 
   // Use the functions with independent loading states...
 }
@@ -1962,12 +1962,12 @@ function AuthenticatedApp({ walletAddress, chainId }: Props) {
   const [auth, setAuth] = useState<IndexerUserAuth | null>(null);
 
   const { getSigningMessage } = useIndexerGetSigningMessage(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false
   );
 
   const { getWalletAccounts } = useIndexerGetWalletAccounts(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false
   );
 
@@ -1976,8 +1976,8 @@ function AuthenticatedApp({ walletAddress, chainId }: Props) {
     const messageData = await getSigningMessage(
       walletAddress,
       chainId,
-      'app.0xmail.box',
-      'https://app.0xmail.box'
+      'app.example.com',
+      'https://app.example.com'
     );
 
     const signature = await walletProvider.signMessage(messageData.data.message);
@@ -2027,15 +2027,15 @@ function ReferralSystem({ walletAddress, auth }: Props) {
 
   // Get user's referral code
   const { referralCode, fetchReferralCode } =
-    useIndexerReferralCode('https://indexer.0xmail.box', false);
+    useIndexerReferralCode('https://indexer.example.com', false);
 
   // Generate share links
   const { getShareUrl } =
-    useIndexerReferralShare('https://indexer.0xmail.box', false);
+    useIndexerReferralShare('https://indexer.example.com', false);
 
   // View stats
   const { stats, fetchStats } =
-    useIndexerReferralStats('https://indexer.0xmail.box', false);
+    useIndexerReferralStats('https://indexer.example.com', false);
 
   useEffect(() => {
     if (walletAddress && auth) {
@@ -2053,7 +2053,7 @@ function ReferralSystem({ walletAddress, auth }: Props) {
 
   const handleShare = async () => {
     const url = await getShareUrl(
-      'https://app.0xmail.box',
+      'https://app.example.com',
       walletAddress,
       auth
     );
@@ -2091,12 +2091,12 @@ import {
 
 function PointsDashboard({ walletAddress, auth }: Props) {
   const { getPointsBalance } = useIndexerGetPointsBalance(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false
   );
 
   const { getPointsLeaderboard, getPointsSiteStats } = useIndexerPoints(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false
   );
 
@@ -2216,10 +2216,10 @@ The `dev` parameter (boolean) controls whether the `x-dev: true` header is sent 
 
 ```typescript
 // Production
-const hook = useIndexerHook('https://indexer.0xmail.box', false);
+const hook = useIndexerHook('https://indexer.example.com', false);
 
 // Development
-const hook = useIndexerHook('https://dev-indexer.0xmail.box', true);
+const hook = useIndexerHook('https://dev-indexer.example.com', true);
 ```
 
 **Note:** The `dev` parameter does NOT enable mock data - all hooks make real API calls.

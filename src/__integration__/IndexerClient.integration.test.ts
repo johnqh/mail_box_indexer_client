@@ -3,7 +3,7 @@
  * These tests run against a real indexer endpoint
  *
  * Set INTEGRATION_TEST_INDEXER_URL in .env.test to configure the endpoint
- * Example: INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box
+ * Example: INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com
  */
 
 import { describe, it, expect, beforeAll } from 'vitest';

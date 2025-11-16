@@ -1,6 +1,6 @@
 /**
  * @johnqh/indexer_client
- * React and React Native compatible client library for 0xMail indexer API
+ * React and React Native compatible client library for blockchain mail indexer API
  */
 
 // Network client

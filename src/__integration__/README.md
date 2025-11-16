@@ -15,7 +15,7 @@ This directory contains integration tests that run against a real indexer API en
 
    Edit `.env.test` and set your indexer endpoint:
    ```bash
-   INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box
+   INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com
    ```
 
    Or for local development:
@@ -110,7 +110,7 @@ The integration tests cover the following areas:
 
 Make sure you have created `.env.test` with the required environment variable:
 ```bash
-echo "INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box" > .env.test
+echo "INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com" > .env.test
 ```
 
 ### Network timeouts

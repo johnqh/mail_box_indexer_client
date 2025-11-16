@@ -24,7 +24,7 @@ import {
  * ```typescript
  * import { createIndexerAdmin } from '@johnqh/lib';
  *
- * const config = { indexerBackendUrl: 'https://indexer-api.0xmail.box' };
+ * const config = { indexerBackendUrl: 'https://indexer-api.example.com' };
  * const admin = createIndexerAdmin(config);
  *
  * // Use the admin helper
@@ -32,11 +32,11 @@ import {
  * ```
  */
 export const createIndexerAdmin = (config: AppConfig): IndexerAdminHelper => {
+  if (!config.indexerBackendUrl) {
+    throw new Error('indexerBackendUrl is required in AppConfig');
+  }
   const fetchClient = new FetchNetworkClient();
-  return createIndexerAdminHelper(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    fetchClient
-  );
+  return createIndexerAdminHelper(config.indexerBackendUrl, fetchClient);
 };
 
 /**
@@ -48,7 +48,7 @@ export const createIndexerAdmin = (config: AppConfig): IndexerAdminHelper => {
  * ```typescript
  * import { createIndexerGraphQL } from '@johnqh/lib';
  *
- * const config = { indexerBackendUrl: 'https://indexer-api.0xmail.box' };
+ * const config = { indexerBackendUrl: 'https://indexer-api.example.com' };
  * const graphql = createIndexerGraphQL(config);
  *
  * // Query blockchain mail data
@@ -58,11 +58,11 @@ export const createIndexerAdmin = (config: AppConfig): IndexerAdminHelper => {
 export const createIndexerGraphQL = (
   config: AppConfig
 ): IndexerGraphQLHelper => {
+  if (!config.indexerBackendUrl) {
+    throw new Error('indexerBackendUrl is required in AppConfig');
+  }
   const fetchClient = new FetchNetworkClient();
-  return createIndexerGraphQLHelper(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    fetchClient
-  );
+  return createIndexerGraphQLHelper(config.indexerBackendUrl, fetchClient);
 };
 
 /**
@@ -74,7 +74,7 @@ export const createIndexerGraphQL = (
  * ```typescript
  * import { createIndexerWebhook } from '@johnqh/lib';
  *
- * const config = { indexerBackendUrl: 'https://indexer-api.0xmail.box' };
+ * const config = { indexerBackendUrl: 'https://indexer-api.example.com' };
  * const webhook = createIndexerWebhook(config);
  *
  * // Process webhook events
@@ -88,11 +88,11 @@ export const createIndexerGraphQL = (
 export const createIndexerWebhook = (
   config: AppConfig
 ): IndexerWebhookHelper => {
+  if (!config.indexerBackendUrl) {
+    throw new Error('indexerBackendUrl is required in AppConfig');
+  }
   const fetchClient = new FetchNetworkClient();
-  return createIndexerWebhookHelper(
-    config.indexerBackendUrl || 'https://indexer.0xmail.box',
-    fetchClient
-  );
+  return createIndexerWebhookHelper(config.indexerBackendUrl, fetchClient);
 };
 
 /**
@@ -104,7 +104,7 @@ export const createIndexerWebhook = (
  * ```typescript
  * import { createIndexerHelpers } from '@johnqh/lib';
  *
- * const config = { indexerBackendUrl: 'https://indexer-api.0xmail.box' };
+ * const config = { indexerBackendUrl: 'https://indexer-api.example.com' };
  * const { admin, graphql, webhook } = createIndexerHelpers(config);
  *
  * // Use any helper as needed

@@ -48,7 +48,7 @@
  * - Base (chainId: 8453)
  *
  * @description GraphQL Endpoint:
- * - Production: https://indexer-api.0xmail.box/graphql
+ * - Production: Configured via `indexerBackendUrl` in AppConfig
  * - Development: http://localhost:3001/graphql
  * - Configured via `VITE_INDEXER_BACKEND_URL` environment variable
  */

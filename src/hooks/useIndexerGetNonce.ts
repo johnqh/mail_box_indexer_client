@@ -28,7 +28,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetNonce(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false,
  *   'myuser',
  *   { signature, message, signer: walletAddress }

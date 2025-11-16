@@ -44,7 +44,7 @@ export interface WalletPermissionsResponse {
  * ```typescript
  * const { data, isLoading, error, refetch } = useIndexerGetWalletPermissions(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false,
  *   walletAddress,
  *   1,

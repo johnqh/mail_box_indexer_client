@@ -1,6 +1,6 @@
 # Code Examples
 
-Complete examples for common use cases with the 0xMail Indexer Client.
+Complete examples for common use cases with the blockchain mail Indexer Client.
 
 **Important:** As of version 0.0.26, all types must be imported from `@sudobility/types`, not from `@sudobility/indexer_client`. This library no longer re-exports types.
 
@@ -41,7 +41,7 @@ npm install @sudobility/indexer_client @sudobility/types@^1.8.29 @sudobility/di@
 import { IndexerClient } from '@sudobility/indexer_client';
 
 const client = new IndexerClient(
-  'https://indexer.0xmail.box',  // Endpoint URL
+  'https://indexer.example.com',  // Endpoint URL
   false                           // Dev mode (false for production)
 );
 ```
@@ -77,7 +77,7 @@ function App() {
 ```typescript
 import { IndexerClient } from '@sudobility/indexer_client';
 
-const client = new IndexerClient('https://indexer.0xmail.box', false);
+const client = new IndexerClient('https://indexer.example.com', false);
 
 async function validateWallet(address: string) {
   try {
@@ -107,8 +107,8 @@ const walletData = await validateWallet('0x742d35Cc6285C9D3C0ef5BAdF3a70b1E95c1e
 async function getSigningMessage(
   walletAddress: string,
   chainId: number,
-  domain: string = '0xmail.box',
-  url: string = 'https://0xmail.box'
+  domain: string = 'example.com',
+  url: string = 'https://example.com'
 ) {
   const result = await client.getMessage(walletAddress, chainId, domain, url);
 
@@ -123,8 +123,8 @@ async function getSigningMessage(
 const message = await getSigningMessage(
   '0x742d35Cc6285C9D3C0ef5BAdF3a70b1E95c1e6Bb',
   1,  // Ethereum mainnet
-  '0xmail.box',
-  'https://0xmail.box'
+  'example.com',
+  'https://example.com'
 );
 
 console.log('Sign this message:', message);
@@ -570,7 +570,7 @@ import { useIndexerPoints } from '@sudobility/indexer_client';
 
 function PointsDisplay({ wallet, signature, message }) {
   const { data, isLoading, error } = useIndexerPoints(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false,  // dev mode
     wallet,
     signature,
@@ -600,7 +600,7 @@ import { useIndexerMail } from '@sudobility/indexer_client';
 
 function EmailAccounts({ wallet, signature, message }) {
   const { data, isLoading, refetch } = useIndexerMail(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false,
     wallet,
     signature,
@@ -650,7 +650,7 @@ import { useIndexerReferralCode } from '@sudobility/indexer_client';
 
 function ReferralCodeDisplay({ wallet, signature, message }) {
   const { data, isLoading } = useIndexerReferralCode(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false,
     wallet,
     signature,
@@ -661,7 +661,7 @@ function ReferralCodeDisplay({ wallet, signature, message }) {
   if (!data?.success) return null;
 
   const { referralCode, totalRedemptions } = data.data;
-  const referralUrl = `https://0xmail.box?ref=${referralCode}`;
+  const referralUrl = `https://example.com?ref=${referralCode}`;
 
   return (
     <div className="referral-card">
@@ -810,7 +810,7 @@ import { IndexerClient, useIndexerMail, useIndexerPoints } from '@sudobility/ind
 import { ethers } from 'ethers';
 
 const queryClient = new QueryClient();
-const client = new IndexerClient('https://indexer.0xmail.box', false);
+const client = new IndexerClient('https://indexer.example.com', false);
 
 function IndexerApp() {
   const [wallet, setWallet] = useState<string>('');
@@ -825,7 +825,7 @@ function IndexerApp() {
     setWallet(address);
 
     // Generate and sign message
-    const msgResult = await client.getMessage(address, 1, '0xmail.box', 'https://0xmail.box');
+    const msgResult = await client.getMessage(address, 1, 'example.com', 'https://example.com');
     if (msgResult.success && msgResult.data) {
       const msg = msgResult.data.message;
       const sig = await signer.signMessage(msg);
@@ -839,7 +839,7 @@ function IndexerApp() {
   if (!isAuthenticated) {
     return (
       <div>
-        <h1>0xMail Indexer Client</h1>
+        <h1>blockchain mail Indexer Client</h1>
         <button onClick={connectWallet}>Connect Wallet</button>
       </div>
     );
@@ -854,8 +854,8 @@ function IndexerApp() {
 }
 
 function Dashboard({ wallet, signature, message }) {
-  const mailQuery = useIndexerMail('https://indexer.0xmail.box', false, wallet, signature, message);
-  const pointsQuery = useIndexerPoints('https://indexer.0xmail.box', false, wallet, signature, message);
+  const mailQuery = useIndexerMail('https://indexer.example.com', false, wallet, signature, message);
+  const pointsQuery = useIndexerPoints('https://indexer.example.com', false, wallet, signature, message);
 
   return (
     <div className="dashboard">

@@ -31,7 +31,7 @@ import { IndexerClient } from '../network/IndexerClient';
  *   getWebhooks,
  *   getWebhook,
  *   deleteWebhook
- * } = useIndexerMailWebhooks(networkClient, 'https://indexer.0xmail.box', false);
+ * } = useIndexerMailWebhooks(networkClient, 'https://indexer.example.com', false);
  *
  * // Create a new webhook
  * await createWebhook(walletAddress, auth, {

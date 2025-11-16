@@ -33,7 +33,7 @@ const STALE_TIMES = {
  * ```typescript
  * const { data, isLoading, error, refetch } = useWalletNames(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false,
  *   '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
  *   { signature, message, signer: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb' }
@@ -87,7 +87,7 @@ export const useWalletNames = (
  * ```typescript
  * const { data, isLoading, error, refetch } = useResolveNameToAddress(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false,
  *   'vitalik.eth'
  * );

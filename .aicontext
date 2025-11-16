@@ -10,7 +10,7 @@ This file helps AI assistants quickly understand the project structure.
 
 ## Project Summary
 - **Name**: @sudobility/indexer_client
-- **Type**: TypeScript client library for 0xMail Indexer API
+- **Type**: TypeScript client library for blockchain mail Indexer API
 - **Version**: 0.0.18
 - **Compatibility**: React and React Native
 - **Backend**: ../mail_box_indexer (Ponder-based blockchain indexer)

@@ -1,6 +1,6 @@
 # Contributing to @sudobility/indexer_client
 
-Thank you for your interest in contributing to the 0xMail Indexer Client! This document provides guidelines and best practices for contributing.
+Thank you for your interest in contributing to the blockchain mail Indexer Client! This document provides guidelines and best practices for contributing.
 
 **Current Package Versions:**
 - `@sudobility/indexer_client` v0.0.28

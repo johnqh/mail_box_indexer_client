@@ -1,6 +1,6 @@
 # Mail Box Indexer API Documentation
 
-This document provides comprehensive documentation for the 0xMail Indexer API endpoints and their implementation status in this client library.
+This document provides comprehensive documentation for the blockchain mail Indexer API endpoints and their implementation status in this client library.
 
 **Type Imports:** All response types referenced in this document are available in `@sudobility/types@^1.8.29`. As of v0.0.26, this client library no longer re-exports types - you must import them directly from `@sudobility/types`.
 
@@ -107,8 +107,8 @@ Generate deterministic signing message for wallet authentication.
 
 **Query Parameters:**
 - `chainId`: Blockchain chain ID (e.g., 1 for Ethereum mainnet)
-- `domain`: Domain name (e.g., "0xmail.box")
-- `url`: Full URL (e.g., "https://0xmail.box")
+- `domain`: Domain name (e.g., "example.com")
+- `url`: Full URL (e.g., "https://example.com")
 
 **Response:** `SignInMessageResponse`
 ```typescript
@@ -192,10 +192,10 @@ Get all email accounts for a wallet (primary, delegated, ENS/SNS domains).
         walletAddress: "0x742d35Cc...",
         chainType: "evm",
         isPrimary: true,
-        primaryAccount: "0x742d35cc6285c9d3c0ef5badf3a70b1e95c1e6bb@0xmail.box",
+        primaryAccount: "0x742d35cc6285c9d3c0ef5badf3a70b1e95c1e6bb@example.com",
         domainAccounts: [
           {
-            account: "vitalik.eth@0xmail.box",
+            account: "vitalik.eth@example.com",
             type: "ens",
             domain: { name: "vitalik.eth", ... },
             verified: true,

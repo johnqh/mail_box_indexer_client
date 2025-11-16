@@ -1,6 +1,6 @@
 # @sudobility/indexer_client
 
-TypeScript client library for the 0xMail Indexer API. Compatible with React and React Native applications.
+TypeScript client library for the blockchain mail Indexer API. Compatible with React and React Native applications.
 
 ## Features
 
@@ -61,7 +61,7 @@ import { useIndexerPoints } from '@sudobility/indexer_client';
 
 function PointsDisplay({ wallet, signature, message }) {
   const { data, isLoading } = useIndexerPoints(
-    'https://indexer.0xmail.box',
+    'https://indexer.example.com',
     false, // dev mode
     wallet,
     signature,
@@ -106,7 +106,7 @@ Low-level HTTP client for direct API access:
 ```typescript
 import { IndexerClient } from '@sudobility/indexer_client';
 
-const client = new IndexerClient('https://indexer.0xmail.box', false);
+const client = new IndexerClient('https://indexer.example.com', false);
 
 // Validate wallet address
 const result = await client.validateUsername('0x742d35Cc...');
@@ -115,8 +115,8 @@ const result = await client.validateUsername('0x742d35Cc...');
 const msgResult = await client.getMessage(
   '0x742d35Cc...',
   1, // chainId
-  '0xmail.box',
-  'https://0xmail.box'
+  'example.com',
+  'https://example.com'
 );
 
 // Get points balance (requires signature)
@@ -207,7 +207,7 @@ Caching wrapper for public endpoints:
 import { IndexerService } from '@sudobility/indexer_client';
 
 const config = {
-  indexerBackendUrl: 'https://indexer.0xmail.box'
+  indexerBackendUrl: 'https://indexer.example.com'
 };
 
 const service = IndexerService.getInstance(config);
@@ -232,7 +232,7 @@ import {
 } from '@sudobility/indexer_client';
 
 const config = {
-  indexerBackendUrl: 'https://indexer.0xmail.box'
+  indexerBackendUrl: 'https://indexer.example.com'
 };
 
 // Create individual helpers
@@ -366,7 +366,7 @@ if (resolved.success) {
 Enable development mode to use mock data:
 
 ```typescript
-const client = new IndexerClient('https://indexer.0xmail.box', true); // dev = true
+const client = new IndexerClient('https://indexer.example.com', true); // dev = true
 ```
 
 Mock data is defined in `src/hooks/mocks.ts`.

@@ -17,7 +17,7 @@ import { IndexerClient } from '../network/IndexerClient';
  * ```typescript
  * const { referralCode, isLoading, error, fetchReferralCode } = useIndexerReferralCode(
  *   networkClient,
- *   'https://indexer.0xmail.box',
+ *   'https://indexer.example.com',
  *   false
  * );
  *

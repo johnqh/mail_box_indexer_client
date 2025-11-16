@@ -33,7 +33,7 @@ import { IndexerClient } from '../network/IndexerClient';
  *   getTemplate,
  *   updateTemplate,
  *   deleteTemplate
- * } = useIndexerMailTemplates(networkClient, 'https://indexer.0xmail.box', false);
+ * } = useIndexerMailTemplates(networkClient, 'https://indexer.example.com', false);
  *
  * // Create a new template
  * await createTemplate(walletAddress, auth, {

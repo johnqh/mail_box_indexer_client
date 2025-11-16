@@ -17,7 +17,7 @@ Added comprehensive integration test suite to verify the client library works co
 
 **Configuration:**
 ```bash
-INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box
+INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com
 ```
 
 ### 2. Integration Test Suite

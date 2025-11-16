@@ -36,9 +36,12 @@ class IndexerService {
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(config: AppConfig) {
+    if (!config.indexerBackendUrl) {
+      throw new Error('indexerBackendUrl is required in AppConfig');
+    }
     const fetchClient = new FetchNetworkClient();
     this.indexerClient = new IndexerClient(
-      config.indexerBackendUrl || 'https://indexer.0xmail.box',
+      config.indexerBackendUrl,
       fetchClient,
       (config as any).devMode || false
     );

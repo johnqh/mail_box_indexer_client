@@ -99,7 +99,8 @@ export class IndexerMockData {
   }
 
   static getWalletAccounts(
-    walletAddress: string
+    walletAddress: string,
+    emailDomain: string = 'example.com'
   ): IndexerEmailAccountsResponse {
     return {
       success: true,
@@ -108,7 +109,7 @@ export class IndexerMockData {
           {
             walletAddress,
             chainType: 'ethereum' as ChainType,
-            names: [{ name: 'user@0xmail.box', entitled: true }],
+            names: [{ name: `user@${emailDomain}`, entitled: true }],
           },
         ],
       },

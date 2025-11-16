@@ -21,7 +21,7 @@ Integration tests verify that the client library works correctly with a real ind
 2. **Configure endpoint:**
    ```bash
    # Edit .env.test
-   INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box
+   INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com
    ```
 
 3. **Run tests:**
@@ -103,7 +103,7 @@ Tests React hooks with real API integration:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `INTEGRATION_TEST_INDEXER_URL` | Indexer API base URL | `https://indexer.0xmail.box` |
+| `INTEGRATION_TEST_INDEXER_URL` | Indexer API base URL | `https://indexer.example.com` |
 
 ### Test Timeouts
 
@@ -232,7 +232,7 @@ Error: INTEGRATION_TEST_INDEXER_URL environment variable is not set.
 
 **Solution:**
 ```bash
-echo "INTEGRATION_TEST_INDEXER_URL=https://indexer.0xmail.box" > .env.test
+echo "INTEGRATION_TEST_INDEXER_URL=https://indexer.example.com" > .env.test
 ```
 
 #### 2. Network Timeouts

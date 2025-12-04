@@ -3,10 +3,10 @@ import { describe, it, expect } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import { useIndexerMail } from '../useIndexerMail';
-import { FetchNetworkClient } from '../../network/FetchNetworkClient';
+import { MockNetworkClient } from '@sudobility/di/mocks';
 
 describe('useIndexerMail', () => {
-  const networkClient = new FetchNetworkClient();
+  const networkClient = new MockNetworkClient();
 
   // Create a wrapper with QueryClient for testing
   const createWrapper = () => {

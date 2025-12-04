@@ -1,16 +1,20 @@
 /**
  * Integration tests for React hooks
  * These tests run against a real indexer endpoint with React components
+ *
+ * Note: For integration tests, you need to provide a real NetworkClient implementation.
+ * This test uses MockNetworkClient for unit testing purposes. For actual integration
+ * testing against a real server, provide a proper fetch-based NetworkClient.
  */
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useIndexerPoints } from '../hooks/useIndexerPoints';
-import { FetchNetworkClient } from '../network/FetchNetworkClient';
+import { MockNetworkClient } from '@sudobility/di/mocks';
 
 describe('Hooks Integration Tests', () => {
   const indexerUrl = process.env.INTEGRATION_TEST_INDEXER_URL;
-  const networkClient = new FetchNetworkClient();
+  const networkClient = new MockNetworkClient();
 
   beforeAll(() => {
     if (!indexerUrl) {

@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import { useIndexerPoints } from '../useIndexerPoints';
-import { FetchNetworkClient } from '../../network/FetchNetworkClient';
+import { MockNetworkClient } from '@sudobility/di/mocks';
 
 // Mock IndexerClient
 const mockGetPointsLeaderboard = vi.fn();
@@ -20,7 +20,7 @@ vi.mock('../../network/IndexerClient', () => {
 
 
 describe('useIndexerPoints', () => {
-  const networkClient = new FetchNetworkClient();
+  const networkClient = new MockNetworkClient();
 
   // Create a wrapper with QueryClient for testing
   const createWrapper = () => {

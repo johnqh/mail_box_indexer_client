@@ -2,12 +2,14 @@
  * Business service for indexer operations (public endpoints only)
  * Provides high-level methods for interacting with public mail_box_indexer API endpoints
  *
+ * Note: This package is React Native compatible. You must provide a NetworkClient
+ * implementation from your DI container (e.g., @sudobility/di).
+ *
  * Note: Signature-protected and IP-restricted endpoints have been removed as they're not usable by client applications
  */
 
 import { IndexerClient } from '../network/IndexerClient';
-import { FetchNetworkClient } from '../network/FetchNetworkClient';
-import type { AppConfig } from '@sudobility/types';
+import type { AppConfig, NetworkClient } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
@@ -31,25 +33,32 @@ interface IndexerPublicStatsResponse {
  */
 class IndexerService {
   private static instance: IndexerService;
+  private static instanceNetworkClient: NetworkClient;
   private indexerClient: IndexerClient;
   private cache = new Map<string, { data: any; expires: number }>();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  constructor(config: AppConfig) {
+  constructor(config: AppConfig, networkClient: NetworkClient) {
     if (!config.indexerBackendUrl) {
       throw new Error('indexerBackendUrl is required in AppConfig');
     }
-    const fetchClient = new FetchNetworkClient();
     this.indexerClient = new IndexerClient(
       config.indexerBackendUrl,
-      fetchClient,
+      networkClient,
       (config as any).devMode || false
     );
   }
 
-  public static getInstance(config: AppConfig): IndexerService {
-    if (!IndexerService.instance) {
-      IndexerService.instance = new IndexerService(config);
+  public static getInstance(
+    config: AppConfig,
+    networkClient: NetworkClient
+  ): IndexerService {
+    if (
+      !IndexerService.instance ||
+      IndexerService.instanceNetworkClient !== networkClient
+    ) {
+      IndexerService.instance = new IndexerService(config, networkClient);
+      IndexerService.instanceNetworkClient = networkClient;
     }
     return IndexerService.instance;
   }

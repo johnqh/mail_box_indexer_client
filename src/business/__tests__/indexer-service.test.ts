@@ -1,17 +1,20 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IndexerService } from '../indexer-service';
+import { MockNetworkClient } from '@sudobility/di/mocks';
 import type { AppConfig } from '@sudobility/types';
 
 describe('IndexerService', () => {
   let service: IndexerService;
   let mockConfig: AppConfig;
+  let mockNetworkClient: MockNetworkClient;
 
   beforeEach(() => {
     mockConfig = {
       indexerBackendUrl: 'https://test-indexer.example.com',
       devMode: false,
     } as AppConfig;
-    service = new IndexerService(mockConfig);
+    mockNetworkClient = new MockNetworkClient();
+    service = new IndexerService(mockConfig, mockNetworkClient);
   });
 
   afterEach(() => {
@@ -25,8 +28,8 @@ describe('IndexerService', () => {
     });
 
     it('should create singleton instance', () => {
-      const instance1 = IndexerService.getInstance(mockConfig);
-      const instance2 = IndexerService.getInstance(mockConfig);
+      const instance1 = IndexerService.getInstance(mockConfig, mockNetworkClient);
+      const instance2 = IndexerService.getInstance(mockConfig, mockNetworkClient);
       expect(instance1).toBe(instance2);
     });
   });

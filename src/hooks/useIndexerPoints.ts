@@ -11,12 +11,11 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import type { PointsInfoResponse } from '../network/IndexerClient';
+import type { NetworkClient, Optional } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
-  NetworkClient,
-  Optional,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 import { IndexerClient } from '../network/IndexerClient';
 
 /**

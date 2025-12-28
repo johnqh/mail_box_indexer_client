@@ -3,8 +3,8 @@
  * Includes both public and signature-protected endpoints (excludes IP-restricted endpoints)
  */
 
+import type { ChainType } from '@sudobility/types';
 import type {
-  ChainType,
   IndexerAddressValidationResponse,
   IndexerDelegatedFromResponse,
   IndexerDelegatedToResponse,
@@ -15,7 +15,7 @@ import type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 
 export class IndexerMockData {
   static getLeaderboard(count: number = 10): IndexerLeaderboardResponse {

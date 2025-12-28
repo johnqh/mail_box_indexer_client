@@ -1,5 +1,5 @@
+import type { ChainType, NetworkClient, Optional } from '@sudobility/types';
 import type {
-  ChainType,
   IndexerAddressValidationResponse,
   IndexerDelegatedFromResponse,
   IndexerDelegatedToResponse,
@@ -23,9 +23,7 @@ import type {
   IndexerWebhookDeleteResponse,
   IndexerWebhookListResponse,
   IndexerWebhookResponse,
-  NetworkClient,
-  Optional,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 import type { IndexerUserAuth } from '../types';
 import {
   buildUrl,

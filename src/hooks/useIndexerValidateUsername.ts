@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import {
-  type IndexerAddressValidationResponse,
-  type NetworkClient,
-  type Optional,
-} from '@sudobility/types';
+import { type NetworkClient, type Optional } from '@sudobility/types';
+import type { IndexerAddressValidationResponse } from '@sudobility/mail_box_types';
 import { IndexerClient } from '../network/IndexerClient';
 
 interface UseIndexerValidateUsernameReturn {

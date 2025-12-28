@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import {
-  type IndexerNonceResponse,
-  type NetworkClient,
-  type Optional,
-} from '@sudobility/types';
+import { type NetworkClient, type Optional } from '@sudobility/types';
+import type { IndexerNonceResponse } from '@sudobility/mail_box_types';
 import type { IndexerUserAuth } from '../types';
 import { IndexerClient } from '../network/IndexerClient';
 

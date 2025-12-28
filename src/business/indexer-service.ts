@@ -13,7 +13,7 @@ import type { AppConfig, NetworkClient } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
   IndexerSiteStatsResponse,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 
 // Legacy response types for backward compatibility
 interface IndexerIndexerLeaderboardResponse {

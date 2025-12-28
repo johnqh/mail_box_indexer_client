@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import type { IndexerUserAuth } from '../types';
+import type { NetworkClient, Optional } from '@sudobility/types';
 import type {
   IndexerAddressValidationResponse,
   IndexerDelegatedFromResponse,
@@ -12,9 +13,7 @@ import type {
   IndexerPointsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
-  NetworkClient,
-  Optional,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 import { IndexerClient } from '../network/IndexerClient';
 
 interface UseIndexerMailReturn {

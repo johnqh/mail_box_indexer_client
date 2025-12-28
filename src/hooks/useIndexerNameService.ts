@@ -4,11 +4,11 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
+import type { NetworkClient } from '@sudobility/types';
 import type {
   IndexerNameResolutionResponse,
   IndexerNameServiceResponse,
-  NetworkClient,
-} from '@sudobility/types';
+} from '@sudobility/mail_box_types';
 import type { IndexerUserAuth } from '../types';
 import { IndexerClient } from '../network/IndexerClient';
 

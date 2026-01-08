@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/indexer_client",
-  "version": "0.0.80",
+  "version": "0.0.81",
   "description": "React and React Native compatible client library for blockchain mail indexer API with TypeScript support",
   "type": "module",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepublishOnly": "bun run clean && bun run build",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -28,7 +28,7 @@
     "format:check": "prettier --check src/**/*.ts",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch",
-    "check-all": "npm run lint && npm run typecheck && npm run test:run"
+    "check-all": "bun run lint && bun run typecheck && bun run test:run"
   },
   "keywords": [
     "indexer",
@@ -43,14 +43,14 @@
   "peerDependencies": {
     "@sudobility/di": "^1.5.8",
     "@sudobility/mail_box_types": "^1.0.2",
-    "@sudobility/types": "^1.9.40",
+    "@sudobility/types": "^1.9.41",
     "@tanstack/react-query": ">=5.0.0",
     "react": ">=18.0.0"
   },
   "devDependencies": {
     "@sudobility/di": "^1.5.8",
     "@sudobility/mail_box_types": "^1.0.2",
-    "@sudobility/types": "^1.9.40",
+    "@sudobility/types": "^1.9.41",
     "@tanstack/react-query": "^5.90.5",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
@@ -78,6 +78,6 @@
     "url": "https://github.com/johnqh/mail_box_indexer_client.git"
   },
   "dependencies": {
-    "@sudobility/configs": "^0.0.49"
+    "@sudobility/configs": "^0.0.50"
   }
 }

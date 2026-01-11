@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/indexer_client",
-  "version": "0.0.89",
+  "version": "0.0.90",
   "description": "React and React Native compatible client library for blockchain mail indexer API with TypeScript support",
   "type": "module",
   "main": "dist/index.js",
@@ -43,14 +43,14 @@
   "peerDependencies": {
     "@sudobility/di": "^1.5.17",
     "@sudobility/mail_box_types": "^1.0.2",
-    "@sudobility/types": "^1.9.43",
+    "@sudobility/types": "^1.9.44",
     "@tanstack/react-query": ">=5.0.0",
     "react": ">=18.0.0"
   },
   "devDependencies": {
     "@sudobility/di": "^1.5.17",
     "@sudobility/mail_box_types": "^1.0.2",
-    "@sudobility/types": "^1.9.43",
+    "@sudobility/types": "^1.9.44",
     "@tanstack/react-query": "^5.90.5",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",

@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/indexer_client",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "React and React Native compatible client library for blockchain mail indexer API with TypeScript support",
   "type": "module",
   "main": "dist/index.js",
@@ -39,18 +39,20 @@
     "blockchain-mail"
   ],
   "author": "John Huang",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "peerDependencies": {
-    "@sudobility/di": "^1.5.33",
-    "@sudobility/mail_box_types": "^1.0.8",
-    "@sudobility/types": "^1.9.49",
+    "@sudobility/di": "^1.5.34",
+    "@sudobility/mail_box_types": "^1.0.9",
+    "@sudobility/types": "^1.9.50",
     "@tanstack/react-query": ">=5.0.0",
-    "react": ">=18.0.0"
+    "react": ">=18.0.0",
+    "@sudobility/configs": "^0.0.62"
   },
   "devDependencies": {
-    "@sudobility/di": "^1.5.33",
-    "@sudobility/mail_box_types": "^1.0.8",
-    "@sudobility/types": "^1.9.49",
+    "@sudobility/configs": "^0.0.62",
+    "@sudobility/di": "^1.5.34",
+    "@sudobility/mail_box_types": "^1.0.9",
+    "@sudobility/types": "^1.9.50",
     "@tanstack/react-query": "^5.90.5",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
@@ -76,8 +78,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/johnqh/mail_box_indexer_client.git"
-  },
-  "dependencies": {
-    "@sudobility/configs": "^0.0.61"
   }
 }

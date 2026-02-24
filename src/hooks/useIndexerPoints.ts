@@ -171,15 +171,34 @@ export function useIndexerPointsSiteStats(
   });
 }
 
+/** Tracks whether the deprecation warning has been emitted to avoid log spam. */
+let _useIndexerPointsDeprecationWarned = false;
+
 /**
- * Legacy combined hook with mutation-style API for backward compatibility
- * @deprecated Use useIndexerPointsInfo, useIndexerPointsLeaderboard and useIndexerPointsSiteStats instead
+ * Legacy combined hook with mutation-style API for backward compatibility.
+ *
+ * @deprecated **Removal target: next major version.** Use the individual hooks instead:
+ *
+ * | Legacy method | Replacement hook |
+ * |---|---|
+ * | `getPointsInfo` | `useIndexerPointsInfo` |
+ * | `getPointsLeaderboard` | `useIndexerPointsLeaderboard` |
+ * | `getPointsSiteStats` | `useIndexerPointsSiteStats` |
  */
 export function useIndexerPoints(
   networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ) {
+  // Emit a one-time runtime deprecation warning
+  if (!_useIndexerPointsDeprecationWarned) {
+    _useIndexerPointsDeprecationWarned = true;
+    console.warn(
+      '[useIndexerPoints] DEPRECATED: useIndexerPoints is deprecated and will be removed in the next major version. ' +
+        'Migrate to useIndexerPointsInfo, useIndexerPointsLeaderboard, and useIndexerPointsSiteStats.'
+    );
+  }
+
   const client = useMemo(
     () => new IndexerClient(endpointUrl, networkClient, dev),
     [endpointUrl, networkClient, dev]

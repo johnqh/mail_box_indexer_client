@@ -66,34 +66,50 @@ interface UseIndexerMailReturn {
   clearError: () => void;
 }
 
+/** Tracks whether the deprecation warning has been emitted to avoid log spam. */
+let _useIndexerMailDeprecationWarned = false;
+
 /**
- * React hook for Indexer Mail API operations
- * Includes both public endpoints and signature-protected endpoints
- * Uses React Query for better state management, caching, and error handling
- * Note: IP-restricted endpoints (using IPHelper) are not included as they're only accessible from WildDuck server
+ * React hook for Indexer Mail API operations.
+ * Includes both public endpoints and signature-protected endpoints.
+ * Uses React Query for better state management, caching, and error handling.
  *
- * @deprecated This legacy monolithic hook is kept for backward compatibility only.
- * For new code, use the individual hooks instead:
- * - useIndexerValidateUsername (GET)
- * - useIndexerGetSigningMessage (GET)
- * - useIndexerPointsLeaderboard (GET)
- * - useIndexerPointsSiteStats (GET)
- * - useIndexerGetWalletAccounts (GET)
- * - useIndexerGetDelegatedTo (GET)
- * - useIndexerGetDelegatedFrom (GET)
- * - useIndexerCreateNonce (POST)
- * - useIndexerGetNonce (GET)
- * - useIndexerGetEntitlement (GET)
- * - useIndexerGetPointsBalance (GET)
+ * Note: IP-restricted endpoints (using IPHelper) are not included as they are only
+ * accessible from the WildDuck server.
  *
- * The individual hooks use React Query's useQuery for GET endpoints (with automatic caching)
- * and useMutation for POST endpoints, following React Query best practices.
+ * @deprecated **Removal target: next major version.** This legacy monolithic hook is kept
+ * for backward compatibility only. Migrate to the individual hooks listed below, which use
+ * React Query's `useQuery` for GET endpoints (automatic caching) and `useMutation` for POST
+ * endpoints:
+ *
+ * | Legacy method | Replacement hook |
+ * |---|---|
+ * | `validateUsername` | `useIndexerValidateUsername` |
+ * | `getSigningMessage` | `useIndexerGetSigningMessage` |
+ * | `getPointsLeaderboard` | `useIndexerPointsLeaderboard` |
+ * | `getPointsSiteStats` | `useIndexerPointsSiteStats` |
+ * | `getWalletAccounts` | `useIndexerGetWalletAccounts` |
+ * | `getDelegatedTo` | `useIndexerGetDelegatedTo` |
+ * | `getDelegatedFrom` | `useIndexerGetDelegatedFrom` |
+ * | `createNonce` | `useIndexerCreateNonce` |
+ * | `getNonce` | `useIndexerGetNonce` |
+ * | `getEntitlement` | `useIndexerGetEntitlement` |
+ * | `getPointsBalance` | `useIndexerGetPointsBalance` |
  */
 const useIndexerMail = (
   networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerMailReturn => {
+  // Emit a one-time runtime deprecation warning
+  if (!_useIndexerMailDeprecationWarned) {
+    _useIndexerMailDeprecationWarned = true;
+    console.warn(
+      '[useIndexerMail] DEPRECATED: useIndexerMail is deprecated and will be removed in the next major version. ' +
+        'Migrate to individual hooks (useIndexerValidateUsername, useIndexerGetSigningMessage, etc.).'
+    );
+  }
+
   const client = useMemo(
     () => new IndexerClient(endpointUrl, networkClient, dev),
     [endpointUrl, networkClient, dev]

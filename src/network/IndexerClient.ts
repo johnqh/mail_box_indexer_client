@@ -195,15 +195,39 @@ export interface WebhooksListParams {
 }
 
 /**
- * Indexer API client for public endpoints only
- * Only includes endpoints that client applications can actually use without server-side authentication
- * Uses NetworkClient for all HTTP operations
+ * Indexer API client for the blockchain mail indexer REST API.
+ *
+ * Provides methods for all client-accessible endpoints -- both public and
+ * signature-protected. Server-side/IP-restricted endpoints are excluded.
+ *
+ * All HTTP operations are delegated to an injected {@link NetworkClient} interface,
+ * making this class cross-platform compatible (React Native, web, Node).
+ *
+ * @example
+ * ```typescript
+ * import { IndexerClient } from '@sudobility/indexer_client';
+ *
+ * const client = new IndexerClient('https://indexer.example.com', networkClient, false);
+ *
+ * // Public endpoint
+ * const leaderboard = await client.getPointsLeaderboard(10);
+ *
+ * // Signature-protected endpoint
+ * const accounts = await client.getWalletAccounts(walletAddress, auth);
+ * ```
  */
 export class IndexerClient {
   private readonly baseUrl: string;
   private readonly dev: boolean;
   private readonly networkClient: NetworkClient;
 
+  /**
+   * Creates a new IndexerClient instance.
+   *
+   * @param endpointUrl - Base URL of the indexer API (e.g., `https://indexer.example.com`)
+   * @param networkClient - Platform-specific HTTP client implementing the `NetworkClient` interface
+   * @param dev - When `true`, adds `x-dev: true` header to all requests to bypass server-side checks
+   */
   constructor(
     endpointUrl: string,
     networkClient: NetworkClient,
@@ -219,8 +243,16 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Validate username format (public endpoint)
-   * GET /users/:username/validate
+   * Validate a username/address format against the indexer.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /users/:username/validate`
+   *
+   * @param username - The username or wallet address to validate
+   * @returns Validation response indicating if the address is valid and its type
+   * @throws {IndexerValidationError} When the username format is invalid (400)
+   * @throws {IndexerError} On other API errors
    */
   async validateUsername(
     username: string
@@ -244,8 +276,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get deterministic message for signing (public endpoint)
-   * GET /wallets/:walletAddress/message?chainId=...&domain=...&url=...
+   * Get a deterministic SIWE (Sign-In with Ethereum) message for wallet authentication.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /wallets/:walletAddress/message?chainId=...&domain=...&url=...`
+   *
+   * @param chainId - The blockchain chain ID (e.g., 1 for Ethereum mainnet)
+   * @param walletAddress - The wallet address requesting the sign-in message
+   * @param domain - The domain requesting authentication (e.g., `'mail.example.com'`)
+   * @param url - The full URL of the application requesting authentication
+   * @returns Sign-in message response containing the message string to be signed
+   * @throws {IndexerError} On API errors
    */
   async getMessage(
     chainId: number,
@@ -276,8 +318,14 @@ export class IndexerClient {
   }
 
   /**
-   * Get general points system information (public endpoint)
-   * GET /points
+   * Get general points system information including site-wide stats and top users.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /points`
+   *
+   * @returns Points info response with site stats and top users list
+   * @throws {IndexerError} On API errors
    */
   async getPointsInfo(): Promise<PointsInfoResponse> {
     const headers = createHeaders(this.dev);
@@ -295,8 +343,15 @@ export class IndexerClient {
   }
 
   /**
-   * Get points leaderboard (public endpoint)
-   * GET /points/leaderboard/:count
+   * Get the points leaderboard showing top-ranked wallets.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /points/leaderboard/:count`
+   *
+   * @param count - Number of top users to include in the leaderboard (default: 10)
+   * @returns Leaderboard response with ranked wallet entries
+   * @throws {IndexerError} On API errors
    */
   async getPointsLeaderboard(
     count: number = 10
@@ -316,8 +371,14 @@ export class IndexerClient {
   }
 
   /**
-   * Get site-wide statistics (public endpoint)
-   * GET /points/site-stats
+   * Get site-wide statistics including total users, total points, and last update timestamp.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /points/site-stats`
+   *
+   * @returns Site stats response with aggregate counters
+   * @throws {IndexerError} On API errors
    */
   async getPointsSiteStats(): Promise<IndexerSiteStatsResponse> {
     const headers = createHeaders(this.dev);
@@ -339,8 +400,18 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Get email addresses for a wallet (requires signature)
-   * GET /wallets/:walletAddress/accounts
+   * Get email accounts associated with a wallet address.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/accounts`
+   *
+   * @param walletAddress - The wallet address to query
+   * @param auth - Wallet-signed authentication credentials (`message`, `signature`, `signer`)
+   * @param referralCode - Optional referral code to associate with account creation
+   * @returns Email accounts response listing the wallet's associated email addresses
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getWalletAccounts(
     walletAddress: string,
@@ -368,8 +439,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get latest delegated address for a wallet (requires signature)
-   * GET /delegations/from/:walletAddress
+   * Get the address that this wallet has delegated to (latest active delegation).
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /delegations/from/:walletAddress`
+   *
+   * @param walletAddress - The delegator's wallet address
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Delegation response showing the current delegate, if any
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getDelegatedTo(
     walletAddress: string,
@@ -393,8 +473,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get all addresses that have delegated TO a wallet (requires signature)
-   * GET /delegations/to/:walletAddress
+   * Get all wallet addresses that have delegated TO the given wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /delegations/to/:walletAddress`
+   *
+   * @param walletAddress - The delegate's wallet address
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Response listing all wallets that have delegated to this address
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getDelegatedFrom(
     walletAddress: string,
@@ -418,8 +507,17 @@ export class IndexerClient {
   }
 
   /**
-   * Create new nonce for username (requires signature)
-   * POST /users/:username/nonce
+   * Create a new authentication nonce for an email username.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /users/:username/nonce`
+   *
+   * @param username - Email username (without the @domain part)
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Nonce response containing the newly created nonce string
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async createNonce(
     username: string,
@@ -441,8 +539,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get nonce for username (requires signature)
-   * GET /users/:username/nonce
+   * Get the current authentication nonce for an email username.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /users/:username/nonce`
+   *
+   * @param username - Email username (without the @domain part)
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Nonce response containing the current nonce string
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getNonce(
     username: string,
@@ -463,8 +570,17 @@ export class IndexerClient {
   }
 
   /**
-   * Check entitlement for a wallet (requires signature)
-   * GET /wallets/:walletAddress/entitlements/
+   * Check whether a wallet has an active entitlement (e.g., premium name service).
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/entitlements/`
+   *
+   * @param walletAddress - The wallet address to check
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Entitlement response indicating the entitlement status and type
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getEntitlement(
     walletAddress: string,
@@ -488,8 +604,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get user points balance (requires signature)
-   * GET /wallets/:walletAddress/points
+   * Get the points balance and activity summary for a specific wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/points`
+   *
+   * @param walletAddress - The wallet address to query
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Points response with earned points, activity count, and leaderboard rank
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getPointsBalance(
     walletAddress: string,
@@ -513,8 +638,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get or create referral code for a wallet (requires signature)
-   * POST /wallets/:walletAddress/referral
+   * Get or create a referral code for a wallet. If a code already exists, it is returned;
+   * otherwise a new one is generated.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /wallets/:walletAddress/referral`
+   *
+   * @param walletAddress - The wallet address to get/create a referral code for
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Referral code response with the code string and usage statistics
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getReferralCode(
     walletAddress: string,
@@ -539,8 +674,15 @@ export class IndexerClient {
   }
 
   /**
-   * Get referral statistics by referral code (public endpoint)
-   * POST /referrals/:referralCode/stats
+   * Get usage statistics for a referral code.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `POST /referrals/:referralCode/stats`
+   *
+   * @param referralCode - The referral code to look up (e.g., `'ABC123DEF'`)
+   * @returns Referral stats response with total referred count and wallet list
+   * @throws {IndexerError} On API errors
    */
   async getReferralStats(referralCode: string): Promise<ReferralStatsResponse> {
     const headers = createHeaders(this.dev);
@@ -566,8 +708,17 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Get all ENS/SNS names for a wallet address (requires signature)
-   * GET /wallets/:walletAddress/names
+   * Get all ENS/SNS names registered to a wallet address.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/names`
+   *
+   * @param walletAddress - The wallet address to query
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Name service response with an array of associated name records
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getWalletNames(
     walletAddress: string,
@@ -591,8 +742,15 @@ export class IndexerClient {
   }
 
   /**
-   * Resolve ENS/SNS name to wallet address (public endpoint)
-   * GET /wallets/named/:name
+   * Resolve an ENS or SNS name to its associated wallet address.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /wallets/named/:name`
+   *
+   * @param name - The ENS or SNS name to resolve (e.g., `'vitalik.eth'`)
+   * @returns Name resolution response with the resolved wallet address and chain type
+   * @throws {IndexerError} On API errors (e.g., name not found)
    */
   async resolveNameToAddress(
     name: string
@@ -617,8 +775,19 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Create a new mail template (requires signature)
-   * POST /wallets/:walletAddress/templates
+   * Create a new mail template for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /wallets/:walletAddress/templates`
+   *
+   * @param walletAddress - The wallet address owning the template
+   * @param auth - Wallet-signed authentication credentials
+   * @param template - Template data including name, subject, and body
+   * @returns Created template response with the full template object
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerValidationError} When template data is invalid (400/422)
+   * @throws {IndexerError} On other API errors
    */
   async createMailTemplate(
     walletAddress: string,
@@ -644,8 +813,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get list of templates for a wallet (requires signature)
-   * GET /wallets/:walletAddress/templates
+   * Get a paginated list of mail templates for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/templates`
+   *
+   * @param walletAddress - The wallet address owning the templates
+   * @param auth - Wallet-signed authentication credentials
+   * @param params - Optional filter/pagination parameters (`active`, `limit`, `offset`)
+   * @returns Templates list response with array of templates, total count, and `hasMore` flag
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getMailTemplates(
     walletAddress: string,
@@ -681,8 +860,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get a single template by ID (requires signature)
-   * GET /wallets/:walletAddress/templates/:templateId
+   * Get a single mail template by its ID.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/templates/:templateId`
+   *
+   * @param walletAddress - The wallet address owning the template
+   * @param templateId - The UUID of the template to retrieve
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Template response with the full template object
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getMailTemplate(
     walletAddress: string,
@@ -707,8 +896,20 @@ export class IndexerClient {
   }
 
   /**
-   * Update a template (requires signature)
-   * PUT /wallets/:walletAddress/templates/:templateId
+   * Update an existing mail template.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `PUT /wallets/:walletAddress/templates/:templateId`
+   *
+   * @param walletAddress - The wallet address owning the template
+   * @param templateId - The UUID of the template to update
+   * @param auth - Wallet-signed authentication credentials
+   * @param updates - Partial template data to update (name, subject, body, isActive)
+   * @returns Updated template response with the full template object
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerValidationError} When update data is invalid (400/422)
+   * @throws {IndexerError} On other API errors
    */
   async updateMailTemplate(
     walletAddress: string,
@@ -735,8 +936,18 @@ export class IndexerClient {
   }
 
   /**
-   * Delete a template (soft delete, requires signature)
-   * DELETE /wallets/:walletAddress/templates/:templateId
+   * Soft-delete a mail template. The template is marked inactive but not permanently removed.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `DELETE /wallets/:walletAddress/templates/:templateId`
+   *
+   * @param walletAddress - The wallet address owning the template
+   * @param templateId - The UUID of the template to delete
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Delete confirmation response
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async deleteMailTemplate(
     walletAddress: string,
@@ -766,8 +977,19 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Create a new webhook (requires signature)
-   * POST /wallets/:walletAddress/webhooks
+   * Create a new webhook for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /wallets/:walletAddress/webhooks`
+   *
+   * @param walletAddress - The wallet address owning the webhook
+   * @param auth - Wallet-signed authentication credentials
+   * @param webhook - Webhook configuration including the callback URL
+   * @returns Created webhook response with the full webhook object
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerValidationError} When webhook data is invalid (400/422)
+   * @throws {IndexerError} On other API errors
    */
   async createWebhook(
     walletAddress: string,
@@ -793,8 +1015,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get list of webhooks for a wallet (requires signature)
-   * GET /wallets/:walletAddress/webhooks
+   * Get a paginated list of webhooks for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/webhooks`
+   *
+   * @param walletAddress - The wallet address owning the webhooks
+   * @param auth - Wallet-signed authentication credentials
+   * @param params - Optional filter/pagination parameters (`active`, `limit`, `offset`)
+   * @returns Webhooks list response with array of webhooks, total count, and `hasMore` flag
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getWebhooks(
     walletAddress: string,
@@ -830,8 +1062,18 @@ export class IndexerClient {
   }
 
   /**
-   * Get a single webhook by ID (requires signature)
-   * GET /wallets/:walletAddress/webhooks/:webhookId
+   * Get a single webhook by its ID.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/webhooks/:webhookId`
+   *
+   * @param walletAddress - The wallet address owning the webhook
+   * @param webhookId - The UUID of the webhook to retrieve
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Webhook response with the full webhook object
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getWebhook(
     walletAddress: string,
@@ -856,8 +1098,18 @@ export class IndexerClient {
   }
 
   /**
-   * Delete a webhook (soft delete, requires signature)
-   * DELETE /wallets/:walletAddress/webhooks/:webhookId
+   * Soft-delete a webhook. The webhook is deactivated but not permanently removed.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `DELETE /wallets/:walletAddress/webhooks/:webhookId`
+   *
+   * @param walletAddress - The wallet address owning the webhook
+   * @param webhookId - The UUID of the webhook to delete
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Delete confirmation response
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async deleteWebhook(
     walletAddress: string,
@@ -886,8 +1138,19 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Generate wallet authentication challenge (public endpoint)
-   * POST /auth/challenge
+   * Generate a wallet authentication challenge for OAuth SIWE flow.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `POST /auth/challenge`
+   *
+   * @param walletIdentifier - The wallet address or identifier requesting authentication
+   * @param clientId - OAuth client ID
+   * @param redirectUri - OAuth redirect URI after authentication
+   * @param deviceFingerprint - Optional device fingerprint for session binding
+   * @returns Challenge response with session ID, challenge message, and expiration
+   * @throws {IndexerValidationError} When parameters are invalid (400)
+   * @throws {IndexerError} On other API errors
    */
   async createAuthChallenge(
     walletIdentifier: string,
@@ -916,8 +1179,19 @@ export class IndexerClient {
   }
 
   /**
-   * Verify wallet signature (public endpoint)
-   * POST /auth/verify
+   * Verify a wallet's signature of the authentication challenge.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `POST /auth/verify`
+   *
+   * @param sessionId - The session ID from {@link createAuthChallenge}
+   * @param signature - The wallet's signature of the challenge message
+   * @param chainType - The blockchain type (`'evm'` or `'solana'`)
+   * @param currentWallet - The wallet address that signed the challenge
+   * @returns Verification response confirming the signature validity
+   * @throws {IndexerAuthError} When the signature verification fails (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async verifyAuthSignature(
     sessionId: string,
@@ -946,8 +1220,23 @@ export class IndexerClient {
   }
 
   /**
-   * OAuth authorization endpoint (requires session)
-   * GET /oauth/authorize
+   * OAuth 2.0 authorization endpoint. Requires a valid session from the auth challenge flow.
+   *
+   * `GET /oauth/authorize`
+   *
+   * @param clientId - OAuth client ID
+   * @param redirectUri - URI to redirect after authorization
+   * @param responseType - OAuth response type (e.g., `'code'`)
+   * @param scope - Space-separated OAuth scopes (e.g., `'openid email'`)
+   * @param state - CSRF protection state parameter
+   * @param sessionId - Session ID from {@link verifyAuthSignature}
+   * @param codeChallenge - Optional PKCE code challenge
+   * @param codeChallengeMethod - Optional PKCE method (e.g., `'S256'`)
+   * @param nonce - Optional OpenID Connect nonce
+   * @param privacy - Optional privacy setting
+   * @returns Authorization response with redirect URL and authorization code
+   * @throws {IndexerAuthError} When session is invalid (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async authorizeOAuth(
     clientId: string,
@@ -989,8 +1278,22 @@ export class IndexerClient {
   }
 
   /**
-   * Exchange authorization code for tokens (public endpoint)
-   * POST /oauth/token
+   * Exchange an authorization code or refresh token for access/refresh tokens.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `POST /oauth/token`
+   *
+   * @param grantType - OAuth grant type (`'authorization_code'` or `'refresh_token'`)
+   * @param clientId - OAuth client ID
+   * @param code - Authorization code (required for `authorization_code` grant)
+   * @param redirectUri - Redirect URI (required for `authorization_code` grant)
+   * @param clientSecret - Optional client secret for confidential clients
+   * @param codeVerifier - Optional PKCE code verifier
+   * @param refreshToken - Refresh token (required for `refresh_token` grant)
+   * @returns Token response with `access_token`, `token_type`, `expires_in`, and optional `refresh_token`
+   * @throws {IndexerAuthError} When the code or refresh token is invalid (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async exchangeOAuthToken(
     grantType: 'authorization_code' | 'refresh_token',
@@ -1027,8 +1330,14 @@ export class IndexerClient {
   }
 
   /**
-   * Get user info from access token (requires Bearer token)
-   * GET /oauth/userinfo
+   * Get user info using a Bearer access token (OpenID Connect UserInfo endpoint).
+   *
+   * `GET /oauth/userinfo`
+   *
+   * @param accessToken - A valid OAuth access token
+   * @returns User info object with `sub`, `email`, `wallet_address`, etc.
+   * @throws {IndexerAuthError} When the access token is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getOAuthUserInfo(accessToken: string): Promise<any> {
     const headers = createHeaders(this.dev, {
@@ -1048,8 +1357,15 @@ export class IndexerClient {
   }
 
   /**
-   * Revoke OAuth token (public endpoint)
-   * POST /oauth/revoke
+   * Revoke an OAuth token (access or refresh).
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `POST /oauth/revoke`
+   *
+   * @param token - The token to revoke
+   * @param tokenTypeHint - Optional hint: `'access_token'` or `'refresh_token'`
+   * @throws {IndexerError} On API errors
    */
   async revokeOAuthToken(token: string, tokenTypeHint?: string): Promise<void> {
     const headers = createHeaders(this.dev);
@@ -1068,8 +1384,15 @@ export class IndexerClient {
   }
 
   /**
-   * Get OAuth client info (public endpoint)
-   * GET /oauth/clients/:clientId
+   * Get public information about an OAuth client.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /oauth/clients/:clientId`
+   *
+   * @param clientId - The OAuth client ID to look up
+   * @returns Client info with `client_id`, `client_name`, `client_uri`, and `scope`
+   * @throws {IndexerError} On API errors
    */
   async getOAuthClientInfo(clientId: string): Promise<any> {
     const headers = createHeaders(this.dev);
@@ -1091,8 +1414,18 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Initiate KYC verification (requires signature)
-   * POST /kyc/initiate/:walletAddress
+   * Initiate a KYC verification process for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /kyc/initiate/:walletAddress`
+   *
+   * @param walletAddress - The wallet address to verify
+   * @param auth - Wallet-signed authentication credentials
+   * @param verificationLevel - The level of verification requested (`'basic'`, `'enhanced'`, or `'accredited'`)
+   * @returns KYC initiation response with application ID and access token
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async initiateKYC(
     walletAddress: string,
@@ -1118,8 +1451,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get KYC verification status (requires signature)
-   * GET /kyc/status/:walletAddress
+   * Get the current KYC verification status for a wallet.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /kyc/status/:walletAddress`
+   *
+   * @param walletAddress - The wallet address to check
+   * @param auth - Wallet-signed authentication credentials
+   * @returns KYC status response with verification level, status, and retry information
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async getKYCStatus(
     walletAddress: string,
@@ -1147,8 +1489,17 @@ export class IndexerClient {
   // =============================================================================
 
   /**
-   * Check if wallet has authenticated (requires signature)
-   * GET /wallets/:walletAddress/authenticated
+   * Check whether a wallet has completed authentication.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/authenticated`
+   *
+   * @param walletAddress - The wallet address to check
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Authentication status response
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
    */
   async checkAuthenticated(
     walletAddress: string,
@@ -1172,8 +1523,14 @@ export class IndexerClient {
   }
 
   /**
-   * Get block synchronization status for all chains (public endpoint)
-   * GET /blocks
+   * Get block synchronization status for all indexed chains.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /blocks`
+   *
+   * @returns Block status response with per-chain sync info and overall health
+   * @throws {IndexerError} On API errors
    */
   async getBlockStatus(): Promise<any> {
     const headers = createHeaders(this.dev);
@@ -1191,8 +1548,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get wallets with permissions for a contract (public endpoint)
-   * GET /permissions/contract/:contractAddress
+   * Get all wallets that have permissions for a given contract address.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /permissions/contract/:contractAddress`
+   *
+   * @param contractAddress - The contract address to query
+   * @param chainId - The blockchain chain ID
+   * @param testNet - Whether to query testnet permissions (default: `false`)
+   * @returns Contract permissions response listing wallet addresses with permissions
+   * @throws {IndexerError} On API errors
    */
   async getContractPermissions(
     contractAddress: string,
@@ -1221,8 +1587,17 @@ export class IndexerClient {
   }
 
   /**
-   * Get contracts a wallet has permissions for (public endpoint)
-   * GET /permissions/wallet/:walletAddress
+   * Get all contracts that a wallet has permissions for.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /permissions/wallet/:walletAddress`
+   *
+   * @param walletAddress - The wallet address to query
+   * @param chainId - The blockchain chain ID
+   * @param testNet - Whether to query testnet permissions (default: `false`)
+   * @returns Wallet permissions response listing contract addresses
+   * @throws {IndexerError} On API errors
    */
   async getWalletPermissions(
     walletAddress: string,

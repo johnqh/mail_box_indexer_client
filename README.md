@@ -1,594 +1,96 @@
 # @sudobility/indexer_client
 
-TypeScript client library for the blockchain mail Indexer API. Compatible with React and React Native applications.
-
-## Features
-
-- ✅ **Complete Type Safety** - Full TypeScript support with `@sudobility/types`
-- ✅ **React Integration** - Built-in hooks using `@tanstack/react-query`
-- ✅ **Multi-Chain Support** - EVM and Solana blockchains
-- ✅ **Authentication** - SIWE/SIWS signature verification
-- ✅ **Points System** - Track and display user points
-- ✅ **Referral System** - Generate and track referral codes
-- ✅ **Name Service** - ENS and SNS resolution
-- ✅ **Delegation** - Wallet delegation management
-- ✅ **Development Mode** - Mock data for testing
+TypeScript client library for the 0xMail blockchain indexer REST and GraphQL APIs. Provides an `IndexerClient` class, TanStack React Query hooks, GraphQL/admin/webhook helpers, and a business service layer. Works cross-platform on React and React Native via an injected `NetworkClient` interface.
 
 ## Installation
 
 ```bash
-npm install @sudobility/indexer_client
+bun add @sudobility/indexer_client
 ```
 
-### Peer Dependencies
+Peer dependencies: `react` (>=18), `@tanstack/react-query` (>=5), `@sudobility/di`, `@sudobility/types`, `@sudobility/mail_box_types`, `@sudobility/configs`.
 
-```bash
-npm install react @tanstack/react-query axios @sudobility/di@^1.4.7 @sudobility/types@^1.8.29
-```
-
-**Current Versions:**
-- `@sudobility/di` v1.4.7
-- `@sudobility/types` v1.8.29
-
-## Quick Start
-
-### 1. Setup React Query
-
-```typescript
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* Your app */}
-    </QueryClientProvider>
-  );
-}
-```
-
-### 2. Use Hooks
-
-```typescript
-import { useIndexerPoints } from '@sudobility/indexer_client';
-
-function PointsDisplay({ wallet, signature, message }) {
-  const { data, isLoading } = useIndexerPoints(
-    'https://indexer.example.com',
-    false, // dev mode
-    wallet,
-    signature,
-    message
-  );
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!data?.success) return <div>Error</div>;
-
-  return <div>Points: {data.data.pointsEarned}</div>;
-}
-```
-
-## API Coverage
-
-| Feature | Status | Endpoints |
-|---------|--------|-----------|
-| Mail & User Management | ✅ 71% | 12/17 implemented |
-| Points System | ✅ 100% | 3/3 implemented |
-| Referral System | ✅ 100% | Fully implemented |
-| OAuth 2.0 | ❌ 0% | Planned for v1.0 |
-| KYC Verification | ❌ 0% | Optional feature |
-| Solana Admin | ❌ 0% | Admin tools |
-
-See [docs/COVERAGE.md](docs/COVERAGE.md) for complete endpoint matrix.
-
-## Documentation
-
-- **[docs/API.md](docs/API.md)** - Complete API endpoint documentation
-- **[docs/EXAMPLES.md](docs/EXAMPLES.md)** - Code examples for all features
-- **[docs/HOOKS_DOCUMENTATION.md](docs/HOOKS_DOCUMENTATION.md)** - Comprehensive hook documentation
-- **[docs/AI_DEVELOPMENT_GUIDE.md](docs/AI_DEVELOPMENT_GUIDE.md)** - Guide for AI-assisted development
-- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - Development and contribution guidelines
-- **[docs/COVERAGE.md](docs/COVERAGE.md)** - API implementation status
-
-## Core Components
-
-### IndexerClient
-
-Low-level HTTP client for direct API access:
+## Usage
 
 ```typescript
 import { IndexerClient } from '@sudobility/indexer_client';
 
-const client = new IndexerClient('https://indexer.example.com', false);
-
-// Validate wallet address
-const result = await client.validateUsername('0x742d35Cc...');
-
-// Get signing message
-const msgResult = await client.getMessage(
-  '0x742d35Cc...',
-  1, // chainId
-  'example.com',
-  'https://example.com'
-);
-
-// Get points balance (requires signature)
-const points = await client.getPointsBalance(wallet, signature, message);
+// Core client (uses injected NetworkClient for cross-platform HTTP)
+const client = new IndexerClient(endpointUrl, networkClient, dev);
+const accounts = await client.getWalletAccounts(walletAddress, auth);
+const points = await client.getPointsBalance(walletAddress, auth);
 ```
 
 ### React Hooks
 
-High-level hooks with automatic caching and refetching:
-
-#### useIndexerMail
-```typescript
-import { useIndexerMail } from '@sudobility/indexer_client';
-
-const { data, isLoading, error, refetch } = useIndexerMail(
-  endpointUrl,
-  dev,
-  walletAddress,
-  signature,
-  message
-);
-```
-
-#### useIndexerPoints
-```typescript
-import { useIndexerPoints } from '@sudobility/indexer_client';
-
-const { data, isLoading } = useIndexerPoints(
-  endpointUrl,
-  dev,
-  walletAddress,
-  signature,
-  message
-);
-```
-
-#### useIndexerReferralCode
-```typescript
-import { useIndexerReferralCode } from '@sudobility/indexer_client';
-
-const { data, isLoading } = useIndexerReferralCode(
-  endpointUrl,
-  dev,
-  walletAddress,
-  signature,
-  message
-);
-```
-
-#### useIndexerReferralStats
-```typescript
-import { useIndexerReferralStats } from '@sudobility/indexer_client';
-
-const { data, isLoading } = useIndexerReferralStats(
-  endpointUrl,
-  dev,
-  referralCode
-);
-```
-
-#### useWalletNames / useResolveNameToAddress
-```typescript
-import { useWalletNames, useResolveNameToAddress } from '@sudobility/indexer_client';
-
-// Get all names for a wallet
-const { data: names } = useWalletNames(
-  endpointUrl,
-  dev,
-  walletAddress,
-  signature,
-  message
-);
-
-// Resolve name to address
-const { data: resolved } = useResolveNameToAddress(
-  endpointUrl,
-  dev,
-  'vitalik.eth'
-);
-```
-
-### Business Services
-
-#### IndexerService
-Caching wrapper for public endpoints:
-
-```typescript
-import { IndexerService } from '@sudobility/indexer_client';
-
-const config = {
-  indexerBackendUrl: 'https://indexer.example.com'
-};
-
-const service = IndexerService.getInstance(config);
-
-// Get leaderboard (cached for 5 minutes)
-const leaderboard = await service.getLeaderboard(10);
-
-// Get public stats
-const stats = await service.getPublicStats();
-```
-
-### Factory Helpers
-
-Create helper instances with automatic client injection:
-
 ```typescript
 import {
-  createIndexerAdmin,
-  createIndexerGraphQL,
-  createIndexerWebhook,
-  createIndexerHelpers
+  useIndexerGetWalletAccounts,
+  useIndexerPointsInfo,
+  useIndexerPointsLeaderboard,
+  useIndexerGetDelegatedTo,
+  useWalletNames,
+  useResolveNameToAddress,
+  useIndexerMailTemplates,
+  useIndexerMailWebhooks,
+  useIndexerReferralCode,
 } from '@sudobility/indexer_client';
 
-const config = {
-  indexerBackendUrl: 'https://indexer.example.com'
-};
+// Public endpoints (no auth)
+const { data } = useIndexerPointsInfo(networkClient, endpointUrl, dev);
+const { data } = useResolveNameToAddress(networkClient, endpointUrl, dev, 'vitalik.eth');
 
-// Create individual helpers
-const admin = createIndexerAdmin(config);
-const graphql = createIndexerGraphQL(config);
-const webhook = createIndexerWebhook(config);
-
-// Or create all at once
-const { admin, graphql, webhook } = createIndexerHelpers(config);
+// Authenticated endpoints (wallet signature required)
+const { data } = useIndexerGetWalletAccounts(networkClient, endpointUrl, dev, walletAddress, auth);
 ```
 
-## Authentication
-
-All protected endpoints require signature authentication:
-
-### 1. Generate Message
+### Utility Helpers
 
 ```typescript
-const msgResult = await client.getMessage(
-  walletAddress,
-  chainId,
-  'domain.com',
-  'https://domain.com'
-);
-const message = msgResult.data.message;
+import { createIndexerHelpers } from '@sudobility/indexer_client';
+
+const { admin, graphql, webhook } = createIndexerHelpers(config, networkClient);
+
+// Admin: campaigns, points awards, user flags
+// GraphQL: mails, delegations, statistics
+// Webhook: email-sent, login, referral events
 ```
 
-### 2. Sign Message
+## API
 
-**EVM (ethers.js):**
-```typescript
-import { ethers } from 'ethers';
+| Export | Description |
+|--------|-------------|
+| `IndexerClient` | Core REST API client (~40 endpoints) |
+| `IndexerService` | Singleton with 5-min in-memory cache (public endpoints) |
+| `useIndexer*` hooks | 18 individual TanStack React Query hooks |
+| `IndexerMockData` | Static mock factories for all response types |
+| `IndexerAdminHelper` | Admin API helper (campaigns, points, flags) |
+| `IndexerGraphQLHelper` | GraphQL query helper (mails, delegations, stats) |
+| `IndexerWebhookHelper` | Webhook processing helper |
+| `createAuthHeaders` | Build signature auth headers (`x-signature`, `x-message`, `x-signer`) |
 
-const provider = new ethers.BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
-const signature = await signer.signMessage(message);
-```
-
-**Solana:**
-```typescript
-import { useWallet } from '@solana/wallet-adapter-react';
-import bs58 from 'bs58';
-
-const { publicKey, signMessage } = useWallet();
-const encodedMessage = new TextEncoder().encode(message);
-const signatureBuffer = await signMessage(encodedMessage);
-const signature = bs58.encode(signatureBuffer);
-```
-
-### 3. Make Authenticated Request
-
-```typescript
-const result = await client.getWalletAccounts(
-  walletAddress,
-  signature,
-  message
-);
-```
-
-## Common Use Cases
-
-### Get Email Accounts
-
-```typescript
-const accounts = await client.getWalletAccounts(
-  walletAddress,
-  signature,
-  message
-);
-
-if (accounts.success) {
-  accounts.data.accounts.forEach(account => {
-    console.log('Primary:', account.primaryAccount);
-    account.domainAccounts.forEach(domain => {
-      console.log('Domain:', domain.account);
-    });
-  });
-}
-```
-
-### Apply Referral Code
-
-```typescript
-// Referral code is applied on first /accounts call
-const accounts = await client.getWalletAccounts(
-  walletAddress,
-  signature,
-  message,
-  'ABC123XYZ' // Referral code (applied once)
-);
-```
-
-### Check Points Balance
-
-```typescript
-const points = await client.getPointsBalance(
-  walletAddress,
-  signature,
-  message
-);
-
-console.log(`Points: ${points.data.pointsEarned}`);
-```
-
-### Generate Referral Code
-
-```typescript
-const referral = await client.getReferralCode(
-  walletAddress,
-  signature,
-  message
-);
-
-console.log(`Code: ${referral.data.referralCode}`);
-console.log(`Redemptions: ${referral.data.totalRedemptions}`);
-```
-
-### Resolve ENS/SNS Name
-
-```typescript
-const resolved = await client.resolveNameToAddress('vitalik.eth');
-
-if (resolved.success) {
-  console.log('Address:', resolved.data.address);
-  console.log('Chain:', resolved.data.chainType);
-}
-```
-
-## Development Mode
-
-Enable development mode to use mock data:
-
-```typescript
-const client = new IndexerClient('https://indexer.example.com', true); // dev = true
-```
-
-Mock data is defined in `src/hooks/mocks.ts`.
-
-## Error Handling
-
-All API responses follow this structure:
-
-```typescript
-interface ApiResponse<T> {
-  success: boolean;
-  data: T | null;
-  error?: string;
-  timestamp: string;
-}
-```
-
-Handle errors consistently:
-
-```typescript
-const result = await client.someMethod();
-
-if (!result.success) {
-  console.error('Error:', result.error);
-  return;
-}
-
-// Use result.data
-```
-
-## TypeScript Support
-
-All types must be imported from `@sudobility/types`:
-
-```typescript
-import type {
-  AddressValidationResponse,
-  EmailAccountsResponse,
-  PointsResponse,
-  ReferralCodeResponse,
-  LeaderboardResponse,
-  Optional,
-  // ... and more
-} from '@sudobility/types';
-```
-
-**Important:** As of version 0.0.26, this library no longer re-exports types from `@sudobility/types`. You must import types directly from `@sudobility/types`:
-
-```typescript
-// ✅ Correct
-import type { PointsResponse } from '@sudobility/types';
-import { useIndexerPoints } from '@sudobility/indexer_client';
-
-// ❌ Incorrect (will cause errors)
-import type { PointsResponse } from '@sudobility/indexer_client';
-```
-
-## Testing
-
-### Unit Tests
+## Development
 
 ```bash
-# Run unit tests
-npm test
-
-# Run unit tests once
-npm run test:run
-
-# Run with coverage
-npm run test:coverage
+bun install
+bun run check-all          # lint + typecheck + test:run
+bun run build              # TypeScript compilation
+bun run test               # Vitest (watch mode)
+bun run test:run           # Single run
+bun run test:coverage      # Coverage (70% threshold)
+bun run test:integration   # Integration tests (requires live indexer)
+bun run typecheck          # tsc --noEmit
+bun run lint               # ESLint
 ```
 
-### Integration Tests
+## Related Packages
 
-Integration tests run against a real indexer endpoint. See [src/__integration__/README.md](src/__integration__/README.md) for details.
-
-```bash
-# Setup
-cp .env.example .env.test
-# Edit .env.test and set INTEGRATION_TEST_INDEXER_URL
-
-# Run integration tests
-npm run test:integration
-
-# Run integration tests in watch mode
-npm run test:integration:watch
-```
-
-### Other Commands
-
-```bash
-# Type checking
-npm run typecheck
-
-# Linting
-npm run lint
-
-# All checks (lint + typecheck + unit tests)
-npm run check-all
-```
-
-## Building
-
-```bash
-# Build for production
-npm run build
-
-# Build and watch
-npm run build:watch
-
-# Clean build artifacts
-npm run clean
-```
-
-## Roadmap
-
-### v0.1.0 (Current)
-- ✅ Core mail and user management
-- ✅ Points system
-- ✅ Referral system
-- ✅ Name service integration
-- ✅ React hooks
-
-### v1.0.0 (Planned)
-- [ ] Complete OAuth 2.0 flow
-- [ ] Block status monitoring
-- [ ] Authentication status check
-- [ ] Enhanced GraphQL support
-
-### v1.1.0 (Future)
-- [ ] KYC verification module
-- [ ] Solana admin tools
-- [ ] Advanced caching strategies
-- [ ] Request deduplication
-
-See [docs/COVERAGE.md](docs/COVERAGE.md) for detailed implementation status.
-
-## CI/CD
-
-This project uses GitHub Actions for automated testing and releases.
-
-### Automated Workflow
-
-On every push to `main`:
-1. ✅ Run tests on Node.js 20.x and 22.x
-2. ✅ Type checking and linting
-3. ✅ Build verification
-4. ✅ Create GitHub release
-5. ✅ Publish to NPM
-
-### Triggering a Release
-
-```bash
-# Bump version
-npm version patch  # 0.0.1 -> 0.0.2
-
-# Push to trigger release
-git push origin main
-```
-
-See [.github/workflows/README.md](.github/workflows/README.md) for detailed CI/CD documentation.
-
-## Contributing
-
-See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
-
-## Backend Repository
-
-This client library connects to the mail_box_indexer backend, located at `../mail_box_indexer`.
-
-The backend provides:
-- Blockchain indexing (Ponder framework)
-- REST API (Hono framework)
-- GraphQL API
-- OAuth 2.0 server
-- KYC integration (Sumsub)
-- Multi-chain support (EVM + Solana)
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  React Application                   │
-│                                                      │
-│  ┌────────────────────────────────────────────────┐ │
-│  │           React Query Hooks                     │ │
-│  │  useIndexerMail, useIndexerPoints, etc.        │ │
-│  └────────────────────────────────────────────────┘ │
-│                        ↓                             │
-│  ┌────────────────────────────────────────────────┐ │
-│  │         Business Services                       │ │
-│  │  IndexerService, IndexerAdminHelper, etc.      │ │
-│  └────────────────────────────────────────────────┘ │
-│                        ↓                             │
-│  ┌────────────────────────────────────────────────┐ │
-│  │           IndexerClient (HTTP)                  │ │
-│  │               axios                             │ │
-│  └────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────┐
-│           mail_box_indexer Backend                   │
-│                                                      │
-│  REST API (Hono) + GraphQL + OAuth 2.0              │
-│  PostgreSQL Database (Ponder framework)             │
-│  Multi-chain indexing (EVM + Solana)                │
-└─────────────────────────────────────────────────────┘
-```
+- `@0xmail/indexer` -- the backend this client connects to
+- `@sudobility/di` -- provides `NetworkClient` interface
+- `@sudobility/mail_box_types` -- shared API response types
+- `@sudobility/types` -- core types (ChainType, Optional)
+- `@sudobility/configs` -- application configuration
 
 ## License
 
-MIT
-
-## Support
-
-For questions and support:
-- GitHub Issues: https://github.com/johnqh/mail_box_indexer_client/issues
-- Documentation: See `docs/API.md` and `docs/EXAMPLES.md`
-- Backend: `../mail_box_indexer`
-
-## Version
-
-Current version: **0.0.28**
-
-See [docs/COVERAGE.md](docs/COVERAGE.md) for implementation roadmap.
+BUSL-1.1

@@ -5,27 +5,13 @@ import {
   UseQueryResult,
 } from '@tanstack/react-query';
 import { type NetworkClient } from '@sudobility/types';
+import type { IndexerWalletPermissionsResponse } from '@sudobility/mail_box_types';
 import { IndexerClient } from '../network/IndexerClient';
 
 /**
- * Wallet permissions response data structure
+ * Re-exported for backward compatibility
  */
-export interface WalletPermissionsData {
-  walletAddress: string;
-  chainId: number;
-  permissions: string[];
-  timestamp: string;
-}
-
-/**
- * Wallet permissions response
- */
-export interface WalletPermissionsResponse {
-  success: boolean;
-  data: WalletPermissionsData;
-  error?: string;
-  timestamp: string;
-}
+export type WalletPermissionsResponse = IndexerWalletPermissionsResponse;
 
 /**
  * React hook for fetching wallet permissions
@@ -52,7 +38,7 @@ export interface WalletPermissionsResponse {
  * );
  *
  * if (data?.success) {
- *   // Access data.data.permissions
+ *   // Access data.data.contracts
  * }
  *
  * // Force refresh the data

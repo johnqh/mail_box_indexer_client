@@ -1,15 +1,29 @@
-import type { ChainType, NetworkClient, Optional } from '@sudobility/types';
+import type { NetworkClient } from '@sudobility/types';
 import type {
   IndexerAddressValidationResponse,
+  IndexerAuthenticationStatusResponse,
+  IndexerBlockStatusResponse,
+  IndexerContractPermissionsResponse,
   IndexerDelegatedFromResponse,
   IndexerDelegatedToResponse,
   IndexerEmailAccountsResponse,
   IndexerEntitlementResponse,
+  IndexerKYCInitiateResponse,
+  IndexerKYCStatusResponse,
   IndexerLeaderboardResponse,
   IndexerNameResolutionResponse,
   IndexerNameServiceResponse,
   IndexerNonceResponse,
+  IndexerOAuthAuthorizeResponse,
+  IndexerOAuthChallengeResponse,
+  IndexerOAuthClientInfoResponse,
+  IndexerOAuthTokenResponse,
+  IndexerOAuthUserInfoResponse,
+  IndexerOAuthVerifyResponse,
+  IndexerPointsInfoResponse,
   IndexerPointsResponse,
+  IndexerReferralCodeResponse,
+  IndexerReferralStatsResponse,
   IndexerSignInMessageResponse,
   IndexerSiteStatsResponse,
   IndexerTemplateCreateRequest,
@@ -18,6 +32,7 @@ import type {
   IndexerTemplateListResponse,
   IndexerTemplateResponse,
   IndexerTemplateUpdateRequest,
+  IndexerWalletPermissionsResponse,
   IndexerWebhookCreateRequest,
   IndexerWebhookData,
   IndexerWebhookDeleteResponse,
@@ -33,93 +48,21 @@ import {
 } from '../utils/indexer-helpers';
 
 /**
- * Referral code data
+ * Re-exported referral types from @sudobility/mail_box_types for backward compatibility
  */
-export interface ReferralCodeData {
-  walletAddress: string;
-  chainType: ChainType;
-  referralCode: string;
-  totalRedemptions: number;
-  lastUsedAt?: string;
-  createdAt: string;
-}
+export type { IndexerReferralCodeData as ReferralCodeData } from '@sudobility/mail_box_types';
+export type { IndexerReferralCodeResponse as ReferralCodeResponse } from '@sudobility/mail_box_types';
+export type { IndexerReferralConsumptionData as ReferredWallet } from '@sudobility/mail_box_types';
+export type { IndexerReferralStatsData as ReferralStatsData } from '@sudobility/mail_box_types';
+export type { IndexerReferralStatsResponse as ReferralStatsResponse } from '@sudobility/mail_box_types';
 
 /**
- * Referral code response
+ * Re-exported points info types from @sudobility/mail_box_types for backward compatibility
  */
-export interface ReferralCodeResponse {
-  success: boolean;
-  data: ReferralCodeData;
-  error: Optional<string>;
-  timestamp: string;
-}
-
-/**
- * Referred wallet data
- */
-export interface ReferredWallet {
-  walletAddress: string;
-  chainType: ChainType;
-  createdAt: string;
-  ipAddress?: string;
-}
-
-/**
- * Referral statistics data
- */
-export interface ReferralStatsData {
-  walletAddress: string;
-  chainType: ChainType;
-  referralCode: string;
-  totalReferred: number;
-  referredWallets: ReferredWallet[];
-}
-
-/**
- * Referral statistics response
- */
-export interface ReferralStatsResponse {
-  success: boolean;
-  data: ReferralStatsData;
-  error: Optional<string>;
-  timestamp: string;
-}
-
-/**
- * Points info site stats
- */
-export interface PointsInfoSiteStats {
-  totalPoints: string;
-  totalUsers: number;
-  lastUpdated: string;
-}
-
-/**
- * Points info top user
- */
-export interface PointsInfoTopUser {
-  walletAddress: string;
-  pointsEarned: string;
-  rank: number;
-}
-
-/**
- * Points info data
- */
-export interface PointsInfoData {
-  siteStats: PointsInfoSiteStats;
-  topUsers: PointsInfoTopUser[];
-}
-
-/**
- * Points info response
- */
-export interface PointsInfoResponse {
-  success: boolean;
-  data: PointsInfoData;
-  error: Optional<string>;
-  timestamp: string;
-}
+export type { IndexerPointsInfoSiteStats as PointsInfoSiteStats } from '@sudobility/mail_box_types';
+export type { IndexerPointsInfoTopUser as PointsInfoTopUser } from '@sudobility/mail_box_types';
+export type { IndexerPointsInfoData as PointsInfoData } from '@sudobility/mail_box_types';
+export type { IndexerPointsInfoResponse as PointsInfoResponse } from '@sudobility/mail_box_types';
 
 /**
  * Mail template data - re-export from @sudobility/types
@@ -327,10 +270,10 @@ export class IndexerClient {
    * @returns Points info response with site stats and top users list
    * @throws {IndexerError} On API errors
    */
-  async getPointsInfo(): Promise<PointsInfoResponse> {
+  async getPointsInfo(): Promise<IndexerPointsInfoResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.get<PointsInfoResponse>(
+    const response = await this.networkClient.get<IndexerPointsInfoResponse>(
       buildUrl(this.baseUrl, '/points'),
       { headers }
     );
@@ -654,10 +597,10 @@ export class IndexerClient {
   async getReferralCode(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<ReferralCodeResponse> {
+  ): Promise<IndexerReferralCodeResponse> {
     const headers = createAuthHeaders(auth, this.dev);
 
-    const response = await this.networkClient.post<ReferralCodeResponse>(
+    const response = await this.networkClient.post<IndexerReferralCodeResponse>(
       buildUrl(
         this.baseUrl,
         `/wallets/${encodeURIComponent(walletAddress)}/referral`
@@ -684,17 +627,20 @@ export class IndexerClient {
    * @returns Referral stats response with total referred count and wallet list
    * @throws {IndexerError} On API errors
    */
-  async getReferralStats(referralCode: string): Promise<ReferralStatsResponse> {
+  async getReferralStats(
+    referralCode: string
+  ): Promise<IndexerReferralStatsResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.post<ReferralStatsResponse>(
-      buildUrl(
-        this.baseUrl,
-        `/referrals/${encodeURIComponent(referralCode)}/stats`
-      ),
-      {},
-      { headers }
-    );
+    const response =
+      await this.networkClient.post<IndexerReferralStatsResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/referrals/${encodeURIComponent(referralCode)}/stats`
+        ),
+        {},
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get referral stats');
@@ -1157,19 +1103,20 @@ export class IndexerClient {
     clientId: string,
     redirectUri: string,
     deviceFingerprint?: string
-  ): Promise<any> {
+  ): Promise<IndexerOAuthChallengeResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.post<any>(
-      buildUrl(this.baseUrl, '/auth/challenge'),
-      {
-        wallet_identifier: walletIdentifier,
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        device_fingerprint: deviceFingerprint,
-      },
-      { headers }
-    );
+    const response =
+      await this.networkClient.post<IndexerOAuthChallengeResponse>(
+        buildUrl(this.baseUrl, '/auth/challenge'),
+        {
+          wallet_identifier: walletIdentifier,
+          client_id: clientId,
+          redirect_uri: redirectUri,
+          device_fingerprint: deviceFingerprint,
+        },
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create auth challenge');
@@ -1198,10 +1145,10 @@ export class IndexerClient {
     signature: string,
     chainType: 'evm' | 'solana',
     currentWallet: string
-  ): Promise<any> {
+  ): Promise<IndexerOAuthVerifyResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.post<any>(
+    const response = await this.networkClient.post<IndexerOAuthVerifyResponse>(
       buildUrl(this.baseUrl, '/auth/verify'),
       {
         session_id: sessionId,
@@ -1249,7 +1196,7 @@ export class IndexerClient {
     codeChallengeMethod?: string,
     nonce?: string,
     privacy?: string
-  ): Promise<any> {
+  ): Promise<IndexerOAuthAuthorizeResponse> {
     const headers = createHeaders(this.dev, { 'X-Session-Id': sessionId });
     const queryParams = new URLSearchParams({
       client_id: clientId,
@@ -1265,10 +1212,11 @@ export class IndexerClient {
     if (nonce) queryParams.append('nonce', nonce);
     if (privacy) queryParams.append('privacy', privacy);
 
-    const response = await this.networkClient.get<any>(
-      buildUrl(this.baseUrl, `/oauth/authorize?${queryParams.toString()}`),
-      { headers }
-    );
+    const response =
+      await this.networkClient.get<IndexerOAuthAuthorizeResponse>(
+        buildUrl(this.baseUrl, `/oauth/authorize?${queryParams.toString()}`),
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'authorize');
@@ -1303,9 +1251,9 @@ export class IndexerClient {
     clientSecret?: string,
     codeVerifier?: string,
     refreshToken?: string
-  ): Promise<any> {
+  ): Promise<IndexerOAuthTokenResponse> {
     const headers = createHeaders(this.dev);
-    const body: any = {
+    const body: Record<string, string> = {
       grant_type: grantType,
       client_id: clientId,
     };
@@ -1316,7 +1264,7 @@ export class IndexerClient {
     if (codeVerifier) body.code_verifier = codeVerifier;
     if (refreshToken) body.refresh_token = refreshToken;
 
-    const response = await this.networkClient.post<any>(
+    const response = await this.networkClient.post<IndexerOAuthTokenResponse>(
       buildUrl(this.baseUrl, '/oauth/token'),
       body,
       { headers }
@@ -1339,12 +1287,14 @@ export class IndexerClient {
    * @throws {IndexerAuthError} When the access token is invalid or expired (401/403)
    * @throws {IndexerError} On other API errors
    */
-  async getOAuthUserInfo(accessToken: string): Promise<any> {
+  async getOAuthUserInfo(
+    accessToken: string
+  ): Promise<IndexerOAuthUserInfoResponse> {
     const headers = createHeaders(this.dev, {
       Authorization: `Bearer ${accessToken}`,
     });
 
-    const response = await this.networkClient.get<any>(
+    const response = await this.networkClient.get<IndexerOAuthUserInfoResponse>(
       buildUrl(this.baseUrl, '/oauth/userinfo'),
       { headers }
     );
@@ -1369,16 +1319,16 @@ export class IndexerClient {
    */
   async revokeOAuthToken(token: string, tokenTypeHint?: string): Promise<void> {
     const headers = createHeaders(this.dev);
-    const body: any = { token };
+    const body: Record<string, string> = { token };
     if (tokenTypeHint) body.token_type_hint = tokenTypeHint;
 
-    const response = await this.networkClient.post<any>(
+    const response = await this.networkClient.post<void>(
       buildUrl(this.baseUrl, '/oauth/revoke'),
       body,
       { headers }
     );
 
-    if (!response.ok || !response.data) {
+    if (!response.ok) {
       throw handleApiError(response, 'revoke token');
     }
   }
@@ -1394,13 +1344,16 @@ export class IndexerClient {
    * @returns Client info with `client_id`, `client_name`, `client_uri`, and `scope`
    * @throws {IndexerError} On API errors
    */
-  async getOAuthClientInfo(clientId: string): Promise<any> {
+  async getOAuthClientInfo(
+    clientId: string
+  ): Promise<IndexerOAuthClientInfoResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.get<any>(
-      buildUrl(this.baseUrl, `/oauth/clients/${clientId}`),
-      { headers }
-    );
+    const response =
+      await this.networkClient.get<IndexerOAuthClientInfoResponse>(
+        buildUrl(this.baseUrl, `/oauth/clients/${clientId}`),
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get client info');
@@ -1431,10 +1384,10 @@ export class IndexerClient {
     walletAddress: string,
     auth: IndexerUserAuth,
     verificationLevel: 'basic' | 'enhanced' | 'accredited'
-  ): Promise<any> {
+  ): Promise<IndexerKYCInitiateResponse> {
     const headers = createAuthHeaders(auth, this.dev);
 
-    const response = await this.networkClient.post<any>(
+    const response = await this.networkClient.post<IndexerKYCInitiateResponse>(
       buildUrl(
         this.baseUrl,
         `/kyc/initiate/${encodeURIComponent(walletAddress)}`
@@ -1466,10 +1419,10 @@ export class IndexerClient {
   async getKYCStatus(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<any> {
+  ): Promise<IndexerKYCStatusResponse> {
     const headers = createAuthHeaders(auth, this.dev);
 
-    const response = await this.networkClient.get<any>(
+    const response = await this.networkClient.get<IndexerKYCStatusResponse>(
       buildUrl(
         this.baseUrl,
         `/kyc/status/${encodeURIComponent(walletAddress)}`
@@ -1504,16 +1457,17 @@ export class IndexerClient {
   async checkAuthenticated(
     walletAddress: string,
     auth: IndexerUserAuth
-  ): Promise<any> {
+  ): Promise<IndexerAuthenticationStatusResponse> {
     const headers = createAuthHeaders(auth, this.dev);
 
-    const response = await this.networkClient.get<any>(
-      buildUrl(
-        this.baseUrl,
-        `/wallets/${encodeURIComponent(walletAddress)}/authenticated`
-      ),
-      { headers }
-    );
+    const response =
+      await this.networkClient.get<IndexerAuthenticationStatusResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/wallets/${encodeURIComponent(walletAddress)}/authenticated`
+        ),
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'check authentication status');
@@ -1532,10 +1486,10 @@ export class IndexerClient {
    * @returns Block status response with per-chain sync info and overall health
    * @throws {IndexerError} On API errors
    */
-  async getBlockStatus(): Promise<any> {
+  async getBlockStatus(): Promise<IndexerBlockStatusResponse> {
     const headers = createHeaders(this.dev);
 
-    const response = await this.networkClient.get<any>(
+    const response = await this.networkClient.get<IndexerBlockStatusResponse>(
       buildUrl(this.baseUrl, '/blocks'),
       { headers }
     );
@@ -1564,20 +1518,21 @@ export class IndexerClient {
     contractAddress: string,
     chainId: number,
     testNet: boolean = false
-  ): Promise<any> {
+  ): Promise<IndexerContractPermissionsResponse> {
     const headers = createHeaders(this.dev);
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       testNet: testNet.toString(),
     });
 
-    const response = await this.networkClient.get<any>(
-      buildUrl(
-        this.baseUrl,
-        `/permissions/contract/${encodeURIComponent(contractAddress)}?${queryParams.toString()}`
-      ),
-      { headers }
-    );
+    const response =
+      await this.networkClient.get<IndexerContractPermissionsResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/permissions/contract/${encodeURIComponent(contractAddress)}?${queryParams.toString()}`
+        ),
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get contract permissions');
@@ -1603,20 +1558,21 @@ export class IndexerClient {
     walletAddress: string,
     chainId: number,
     testNet: boolean = false
-  ): Promise<any> {
+  ): Promise<IndexerWalletPermissionsResponse> {
     const headers = createHeaders(this.dev);
     const queryParams = new URLSearchParams({
       chainId: chainId.toString(),
       testNet: testNet.toString(),
     });
 
-    const response = await this.networkClient.get<any>(
-      buildUrl(
-        this.baseUrl,
-        `/permissions/wallet/${encodeURIComponent(walletAddress)}?${queryParams.toString()}`
-      ),
-      { headers }
-    );
+    const response =
+      await this.networkClient.get<IndexerWalletPermissionsResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/permissions/wallet/${encodeURIComponent(walletAddress)}?${queryParams.toString()}`
+        ),
+        { headers }
+      );
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get wallet permissions');

@@ -413,8 +413,9 @@ describe('useIndexerGetWalletPermissions', () => {
       data: {
         walletAddress: '0xWallet',
         chainId: 1,
-        permissions: ['read', 'write'],
-        timestamp: '',
+        testNet: false,
+        contracts: ['read', 'write'],
+        count: 2,
       },
       timestamp: '',
     };
@@ -434,7 +435,7 @@ describe('useIndexerGetWalletPermissions', () => {
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.data?.permissions).toEqual(['read', 'write']);
+    expect(result.current.data?.data?.contracts).toEqual(['read', 'write']);
   });
 
   it('should not fetch when wallet is empty', () => {

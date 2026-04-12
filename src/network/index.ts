@@ -15,4 +15,8 @@ export type {
   ReferredWallet,
   ReferralStatsData,
   ReferralStatsResponse,
+  PointsInfoSiteStats,
+  PointsInfoTopUser,
+  PointsInfoData,
+  PointsInfoResponse,
 } from './IndexerClient';

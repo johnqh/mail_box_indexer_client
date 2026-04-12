@@ -34,7 +34,10 @@ describe('IndexerError classes', () => {
   });
 
   it('IndexerNetworkError should extend IndexerError', () => {
-    const err = new IndexerNetworkError('connection refused', 'get leaderboard');
+    const err = new IndexerNetworkError(
+      'connection refused',
+      'get leaderboard'
+    );
     expect(err).toBeInstanceOf(Error);
     expect(err).toBeInstanceOf(IndexerError);
     expect(err).toBeInstanceOf(IndexerNetworkError);
@@ -43,7 +46,11 @@ describe('IndexerError classes', () => {
   });
 
   it('IndexerValidationError should extend IndexerError', () => {
-    const err = new IndexerValidationError('bad input', 'validate username', 400);
+    const err = new IndexerValidationError(
+      'bad input',
+      'validate username',
+      400
+    );
     expect(err).toBeInstanceOf(IndexerError);
     expect(err).toBeInstanceOf(IndexerValidationError);
     expect(err.name).toBe('IndexerValidationError');
@@ -51,7 +58,11 @@ describe('IndexerError classes', () => {
   });
 
   it('IndexerRateLimitError should extend IndexerError with retryAfter', () => {
-    const err = new IndexerRateLimitError('too many requests', 'get leaderboard', 30);
+    const err = new IndexerRateLimitError(
+      'too many requests',
+      'get leaderboard',
+      30
+    );
     expect(err).toBeInstanceOf(IndexerError);
     expect(err).toBeInstanceOf(IndexerRateLimitError);
     expect(err.name).toBe('IndexerRateLimitError');
@@ -115,7 +126,11 @@ describe('handleApiError', () => {
 
   it('should return IndexerRateLimitError for 429', () => {
     const err = handleApiError(
-      { status: 429, data: { error: 'Rate limited' }, headers: { 'retry-after': '60' } },
+      {
+        status: 429,
+        data: { error: 'Rate limited' },
+        headers: { 'retry-after': '60' },
+      },
       'get leaderboard'
     );
     expect(err).toBeInstanceOf(IndexerRateLimitError);
@@ -162,10 +177,7 @@ describe('handleApiError', () => {
   });
 
   it('should return generic IndexerError when no status code', () => {
-    const err = handleApiError(
-      { data: { error: 'Unknown' } },
-      'do something'
-    );
+    const err = handleApiError({ data: { error: 'Unknown' } }, 'do something');
     expect(err).toBeInstanceOf(IndexerError);
     expect(err.statusCode).toBeUndefined();
   });
@@ -179,10 +191,7 @@ describe('handleApiError', () => {
   });
 
   it('should use "Unknown error" when no error/message in data', () => {
-    const err = handleApiError(
-      { status: 500, data: {} },
-      'get data'
-    );
+    const err = handleApiError({ status: 500, data: {} }, 'get data');
     expect(err.message).toContain('Unknown error');
   });
 });

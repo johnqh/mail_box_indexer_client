@@ -10,10 +10,10 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import type { PointsInfoResponse } from '../network/IndexerClient';
 import type { NetworkClient, Optional } from '@sudobility/types';
 import type {
   IndexerLeaderboardResponse,
+  IndexerPointsInfoResponse,
   IndexerSiteStatsResponse,
 } from '@sudobility/mail_box_types';
 import { IndexerClient } from '../network/IndexerClient';
@@ -50,8 +50,8 @@ export function useIndexerPointsInfo(
   networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean,
-  options?: UseQueryOptions<PointsInfoResponse>
-): UseQueryResult<PointsInfoResponse> {
+  options?: UseQueryOptions<IndexerPointsInfoResponse>
+): UseQueryResult<IndexerPointsInfoResponse> {
   const client = useMemo(
     () => new IndexerClient(endpointUrl, networkClient, dev),
     [endpointUrl, networkClient, dev]
@@ -59,7 +59,7 @@ export function useIndexerPointsInfo(
 
   return useQuery({
     queryKey: ['indexer', 'points-info'],
-    queryFn: async (): Promise<PointsInfoResponse> => {
+    queryFn: async (): Promise<IndexerPointsInfoResponse> => {
       return await client.getPointsInfo();
     },
     staleTime: 2 * 60 * 1000, // 2 minutes - general info changes frequently
@@ -211,7 +211,7 @@ export function useIndexerPoints(
 
   // Mutation for getting points info
   const pointsInfoMutation = useMutation({
-    mutationFn: async (): Promise<PointsInfoResponse | undefined> => {
+    mutationFn: async (): Promise<IndexerPointsInfoResponse | undefined> => {
       setError(null);
       try {
         return await client.getPointsInfo();
@@ -263,7 +263,7 @@ export function useIndexerPoints(
   });
 
   const getPointsInfo = useCallback(async (): Promise<
-    PointsInfoResponse | undefined
+    IndexerPointsInfoResponse | undefined
   > => {
     const result = await pointsInfoMutation.mutateAsync();
     return result;

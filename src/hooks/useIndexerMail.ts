@@ -67,7 +67,6 @@ interface UseIndexerMailReturn {
 }
 
 /** Tracks whether the deprecation warning has been emitted to avoid log spam. */
-let _useIndexerMailDeprecationWarned = false;
 
 /**
  * React hook for Indexer Mail API operations.
@@ -77,39 +76,12 @@ let _useIndexerMailDeprecationWarned = false;
  * Note: IP-restricted endpoints (using IPHelper) are not included as they are only
  * accessible from the WildDuck server.
  *
- * @deprecated **Removal target: next major version.** This legacy monolithic hook is kept
- * for backward compatibility only. Migrate to the individual hooks listed below, which use
- * React Query's `useQuery` for GET endpoints (automatic caching) and `useMutation` for POST
- * endpoints:
- *
- * | Legacy method | Replacement hook |
- * |---|---|
- * | `validateUsername` | `useIndexerValidateUsername` |
- * | `getSigningMessage` | `useIndexerGetSigningMessage` |
- * | `getPointsLeaderboard` | `useIndexerPointsLeaderboard` |
- * | `getPointsSiteStats` | `useIndexerPointsSiteStats` |
- * | `getWalletAccounts` | `useIndexerGetWalletAccounts` |
- * | `getDelegatedTo` | `useIndexerGetDelegatedTo` |
- * | `getDelegatedFrom` | `useIndexerGetDelegatedFrom` |
- * | `createNonce` | `useIndexerCreateNonce` |
- * | `getNonce` | `useIndexerGetNonce` |
- * | `getEntitlement` | `useIndexerGetEntitlement` |
- * | `getPointsBalance` | `useIndexerGetPointsBalance` |
  */
 const useIndexerMail = (
   networkClient: NetworkClient,
   endpointUrl: string,
   dev: boolean = false
 ): UseIndexerMailReturn => {
-  // Emit a one-time runtime deprecation warning
-  if (!_useIndexerMailDeprecationWarned) {
-    _useIndexerMailDeprecationWarned = true;
-    console.warn(
-      '[useIndexerMail] DEPRECATED: useIndexerMail is deprecated and will be removed in the next major version. ' +
-        'Migrate to individual hooks (useIndexerValidateUsername, useIndexerGetSigningMessage, etc.).'
-    );
-  }
-
   const client = useMemo(
     () => new IndexerClient(endpointUrl, networkClient, dev),
     [endpointUrl, networkClient, dev]

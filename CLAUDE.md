@@ -1,5 +1,10 @@
 # mail_box_indexer_client - AI Development Guide
 
+> **Git policy — never auto-commit or auto-push.** Leave your work in the working tree.
+> Run `git commit`, `git push`, `gh pr create`, or `scripts/push_all.sh` **only when the user
+> explicitly asks in that turn**. Approval for an earlier change does not carry forward, and
+> finishing a task is not permission to commit it.
+
 ## Overview
 
 `@sudobility/indexer_client` is a TypeScript client library for the blockchain mail indexer REST and GraphQL APIs. It provides an `IndexerClient` class, TanStack React Query hooks, GraphQL/admin/webhook helper utilities, and a business service layer -- all designed to work cross-platform on React 18+ and React Native. Authentication for protected endpoints uses wallet message-signing (`x-signature` / `x-message` / `x-signer` headers).
@@ -278,3 +283,7 @@ The library never imports a concrete HTTP client. All network calls go through t
 | `react` (>=18.0.0) | React peer dependency |
 
 **Dev-only notable dependencies**: `vitest`, `@vitest/coverage-v8`, `@testing-library/react`, `happy-dom`, `typescript` (5.9+), `eslint` (9+, flat config), `prettier`, `dotenv`.
+
+## Git Workflow
+
+- Do not use feature branches for code changes. Always stay on the current branch.

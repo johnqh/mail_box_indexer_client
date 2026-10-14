@@ -20,6 +20,11 @@ export * from './useIndexerGetEntitlement';
 export * from './useIndexerGetPointsBalance';
 export * from './useIndexerGetWalletPermissions';
 
+// Custom (user-defined) address hooks
+export * from './useIndexerCustomAddressAvailability';
+export * from './useIndexerGetCustomAddress';
+export * from './useIndexerSetCustomAddress';
+
 // Name service hooks
 export {
   useWalletNames,

@@ -4,6 +4,8 @@ import type {
   IndexerAuthenticationStatusResponse,
   IndexerBlockStatusResponse,
   IndexerContractPermissionsResponse,
+  IndexerCustomAddressAvailabilityResponse,
+  IndexerCustomAddressResponse,
   IndexerDelegatedFromResponse,
   IndexerDelegatedToResponse,
   IndexerEmailAccountsResponse,
@@ -376,6 +378,113 @@ export class IndexerClient {
 
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get wallet accounts');
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Check whether a desired custom (user-defined) address local part is available.
+   *
+   * **Public endpoint** -- no authentication required.
+   *
+   * `GET /addresses/custom/:name/availability`
+   *
+   * @param name - Desired local part (e.g. `'john'`); normalized (lowercased) server-side
+   * @returns Availability response with `available` and, when not, a `reason`
+   * @throws {IndexerError} On API errors
+   */
+  async checkCustomAddressAvailability(
+    name: string
+  ): Promise<IndexerCustomAddressAvailabilityResponse> {
+    const headers = createHeaders(this.dev);
+
+    const response =
+      await this.networkClient.get<IndexerCustomAddressAvailabilityResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/addresses/custom/${encodeURIComponent(name)}/availability`
+        ),
+        { headers }
+      );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'check custom address availability');
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Get the current custom (user-defined) address state for a wallet, including
+   * the active custom address (if any) and the remaining set allowance.
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `GET /wallets/:walletAddress/custom-address`
+   *
+   * @param walletAddress - The wallet address to query
+   * @param auth - Wallet-signed authentication credentials
+   * @returns Custom address state response
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} On other API errors
+   */
+  async getCustomAddress(
+    walletAddress: string,
+    auth: IndexerUserAuth
+  ): Promise<IndexerCustomAddressResponse> {
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response = await this.networkClient.get<IndexerCustomAddressResponse>(
+      buildUrl(
+        this.baseUrl,
+        `/wallets/${encodeURIComponent(walletAddress)}/custom-address`
+      ),
+      { headers }
+    );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get custom address');
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Claim (set) a custom (user-defined) address for a wallet. Can only succeed
+   * while the wallet has a remaining set allowance and the name passes all rules
+   * (not taken, not reserved, not a wallet string, not an ENS/SNS postfix).
+   *
+   * **Signature-protected** -- requires a valid `IndexerUserAuth`.
+   *
+   * `POST /wallets/:walletAddress/custom-address`
+   *
+   * @param walletAddress - The wallet address claiming the address
+   * @param auth - Wallet-signed authentication credentials
+   * @param address - Desired local part (e.g. `'john'`); lowercased server-side
+   * @returns Custom address state response reflecting the new claim
+   * @throws {IndexerAuthError} When the signature is invalid or expired (401/403)
+   * @throws {IndexerError} When the name is rejected (400) or conflicts (409), or on other errors
+   */
+  async setCustomAddress(
+    walletAddress: string,
+    auth: IndexerUserAuth,
+    address: string
+  ): Promise<IndexerCustomAddressResponse> {
+    const headers = createAuthHeaders(auth, this.dev);
+
+    const response =
+      await this.networkClient.post<IndexerCustomAddressResponse>(
+        buildUrl(
+          this.baseUrl,
+          `/wallets/${encodeURIComponent(walletAddress)}/custom-address`
+        ),
+        { address },
+        { headers }
+      );
+
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'set custom address');
     }
 
     return response.data;
